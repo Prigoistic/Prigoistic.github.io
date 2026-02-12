@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Priyam — Projects</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav>
+    <a href="index.html">ABOUT</a><span class="sep">·</span><a href="projects.html" class="active">PROJECTS</a><span class="sep">·</span><a href="experience.html">EXPERIENCE</a><span class="sep">·</span><a href="research.html">RESEARCH</a><span class="sep">·</span><a href="blog.html">BLOG</a><span class="sep">·</span><a href="contact.html">CONTACT</a>
+  </nav>
+
+  <!-- ═══════════ PAGE HEADER ═══════════ -->
+  <div class="page-header-row">
+    <div class="page-header-text">
+      <div class="page-title">PROJECTS</div>
+      <div class="page-desc">
+        Systems, tools, and experiments — shipped or in progress.
+      </div>
+    </div>
+<pre class="ascii-art">
+   ._________________.
+   |.---------------.|
+   ||               ||
+   ||   -._ .-.     ||
+   ||   -._| | |    ||
+   ||   -._|"|"|    ||
+   ||   -._|.-.|    ||
+   ||_______________||
+   /.-.-.-.-.-.-.-.-.\
+  /.-.-.-.-.-.-.-.-.-.\
+ /.-.-.-.-.-.-.-.-.-.-.\
+/______/__________\___o_\ 
+\_______________________/
+</pre>
+  </div>
+
+  <hr />
+
+  <!-- ═══════════ PROJECT 01 ═══════════ -->
+  <div class="project">
+    <div class="project-name">Ananta — Energy-Based Self-Learning Architecture</div>
+    <div class="project-desc">
+      Research-driven LLM architecture exploring energy-based self-learning
+      for scientific reasoning, symbolic mathematics, and formal logic.
+      Combines contrastive energy functions with autoregressive generation
+      to enable iterative self-correction without external reward models.
+    </div>
+    <div class="project-meta">STACK <span>Python, PyTorch, CUDA, LoRA/QLora, RLHF</span></div>
+    <div class="project-meta">ARCH <span>Energy-based models, autoregressive decoding, self-play loops</span></div>
+    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-links">
+      <a href="https://github.com/Prigoistic/ananta-oss" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 02 ═══════════ -->
+  <div class="project">
+    <div class="project-name">Whisp</div>
+    <div class="project-desc">
+      Real-time chat system built from scratch over raw WebSocket connections.
+      Persistent message storage, presence detection, typing indicators,
+      and room-based multiplexing — no third-party chat SDKs.
+    </div>
+    <div class="project-meta">STACK <span>TypeScript, Node.js, Express, Socket.IO, MongoDB</span></div>
+    <div class="project-meta">ARCH <span>Event-driven, WebSocket bidirectional, room-scoped pub/sub</span></div>
+    <div class="project-links">
+      <a href="https://github.com/Prigoistic/whisp" target="_blank" rel="noopener">GitHub</a>
+      <!-- <a href="#" target="_blank" rel="noopener">Live</a> -->
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 03 ═══════════ -->
+  <div class="project">
+    <div class="project-name">Anti-Shuffle</div>
+    <div class="project-desc">
+      Mobile application that clusters photos using on-device ML
+      for perceptual similarity. Extracts feature embeddings, runs
+      hierarchical clustering, and groups visually related images
+      without uploading data to any external server.
+    </div>
+    <div class="project-meta">STACK <span>Kotlin, Java, TensorFlow Lite, Android SDK</span></div>
+    <div class="project-meta">ARCH <span>On-device inference, feature extraction, agglomerative clustering</span></div>
+    <div class="project-links">
+      <!-- <a href="#" target="_blank" rel="noopener">GitHub</a> -->
+      <!-- <a href="#" target="_blank" rel="noopener">Play Store</a> -->
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 04 ═══════════ -->
+  <div class="project">
+    <div class="project-name">Oro</div>
+    <div class="project-desc">
+      Deterministic spatial interaction engine for generating structured
+      synthetic datasets. Simulates grid-based environments with
+      configurable physics, agent policies, and collision semantics —
+      designed to produce training data for autonomous agent learning.
+    </div>
+    <div class="project-meta">STACK <span>Python, NumPy, JSON schema</span></div>
+    <div class="project-meta">ARCH <span>Deterministic simulation, configurable state machines, batch export</span></div>
+    <div class="project-links">
+      <!-- <a href="#" target="_blank" rel="noopener">GitHub</a> -->
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 05 ═══════════ -->
+  <div class="project">
+    <div class="project-name">M2D2</div>
+    <div class="project-desc">
+      AI-driven microplastic detection pipeline combining optical particle
+      counters with Bulk Acoustic Wave (BAW) preprocessing. Classifies
+      particle morphology through signal analysis and implements a
+      toxin-free acoustic capture system for microplastic recovery
+      across varied aquatic environments.
+    </div>
+    <div class="project-meta">STACK <span>Python, MATLAB, signal processing, optical sensor data</span></div>
+    <div class="project-meta">DOMAIN <span>Environmental sensing, acoustic filtering, particle classification</span></div>
+    <div class="project-meta">STATUS <span>Published</span></div>
+    <div class="project-links">
+      <a href="https://www.researchgate.net/publication/391628259_Developing_an_Autonomous_System_for_Identification_and_Removal_of_Microplastic_from_Water_Bodies_M2D2" target="_blank" rel="noopener">Paper</a>
+    </div>
+  </div>
+
+  <div class="list-tail">...and ongoing experimental systems</div>
+
+  <!-- ═══════════════════════════════════
+       ADD MORE PROJECTS BELOW
+       Copy a project block and fill in:
+       - project-name
+       - project-desc
+       - project-meta (stack, status)
+       - project-links (GitHub, Demo, Paper, etc.)
+       You can also add images inside a project:
+       <div class="gallery">
+         <img src="images/your-screenshot.png" alt="description" />
+       </div>
+       ═══════════════════════════════════ -->
+
+  <hr />
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <div class="footer">
+    <div>&copy; 2026 Priyam</div>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
