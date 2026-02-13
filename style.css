@@ -487,36 +487,134 @@ hr {
   font-size: 12px;
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 540px) {
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 768px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
   .container {
-    padding: 32px 16px 48px;
+    padding: 40px 20px 56px;
   }
 
   .header-name {
-    font-size: 22px;
+    font-size: 24px;
+    letter-spacing: 0.14em;
   }
 
   .page-title {
+    font-size: 20px;
+  }
+
+  .page-header-row {
+    gap: 20px;
+  }
+
+  .ascii-art {
+    font-size: 9px;
+  }
+
+  hr {
+    margin: 36px 0;
+  }
+
+  .project-desc,
+  .paper-abstract,
+  .post-excerpt,
+  .mission {
+    max-width: 100%;
+  }
+
+  nav .sep {
+    margin: 0 5px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 540px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 540px) {
+  .container {
+    padding: 28px 16px 44px;
+  }
+
+  /* ── NAV: wrap gracefully ── */
+  nav {
+    margin-bottom: 36px;
+    line-height: 2;
+  }
+
+  nav a {
+    font-size: 11px;
+  }
+
+  nav .sep {
+    margin: 0 4px;
+  }
+
+  /* ── HEADER ── */
+  .header-name {
+    font-size: 20px;
+    letter-spacing: 0.12em;
+  }
+
+  .header-subtitle {
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  .header-links a {
+    font-size: 12px;
+  }
+
+  .header-links .sep {
+    margin: 0 4px;
+  }
+
+  .mission {
+    font-size: 12px;
+    line-height: 1.75;
+    max-width: 100%;
+  }
+
+  /* ── PAGE HEADERS ── */
+  .page-title {
     font-size: 18px;
+    letter-spacing: 0.1em;
+  }
+
+  .page-desc {
+    font-size: 12px;
   }
 
   .page-header-row {
     flex-direction: column;
+    gap: 0;
   }
 
   .ascii-art {
     display: none;
   }
 
+  /* ── SECTIONS ── */
+  .section-title {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  hr {
+    margin: 32px 0;
+  }
+
+  /* ── ROWS: stack label/value vertically ── */
   .row {
     flex-wrap: wrap;
+    margin-bottom: 12px;
   }
 
   .row-label {
     min-width: unset;
     width: 100%;
     margin-bottom: 2px;
+    font-size: 11px;
   }
 
   .row-dots {
@@ -526,9 +624,210 @@ hr {
   .row-value {
     text-align: left;
     padding-left: 0;
+    font-size: 13px;
+    white-space: normal;
+    word-break: break-word;
   }
 
+  /* ── PROJECTS ── */
+  .project {
+    margin-bottom: 32px;
+  }
+
+  .project-name {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .project-desc {
+    font-size: 12px;
+    max-width: 100%;
+  }
+
+  .project-meta {
+    font-size: 11px;
+  }
+
+  .project-links a {
+    font-size: 11px;
+    margin-right: 12px;
+  }
+
+  /* ── EXPERIENCE ── */
+  .exp-block {
+    margin-bottom: 32px;
+  }
+
+  .exp-role {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .exp-org {
+    font-size: 12px;
+  }
+
+  .exp-period {
+    font-size: 11px;
+  }
+
+  .exp-details {
+    font-size: 12px;
+  }
+
+  .exp-details .list-item {
+    margin-bottom: 6px;
+  }
+
+  /* ── PAPERS / NOTES ── */
+  .paper {
+    margin-bottom: 28px;
+  }
+
+  .paper-title {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .paper-authors {
+    font-size: 11px;
+  }
+
+  .paper-venue {
+    font-size: 11px;
+  }
+
+  .paper-abstract {
+    font-size: 12px;
+    max-width: 100%;
+    line-height: 1.65;
+  }
+
+  .paper-links a {
+    font-size: 11px;
+  }
+
+  /* ── BLOG ── */
+  .post {
+    margin-bottom: 28px;
+  }
+
+  .post-title {
+    font-size: 13px;
+  }
+
+  .post-excerpt {
+    font-size: 12px;
+    max-width: 100%;
+  }
+
+  .post-tags {
+    font-size: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ── LIST ITEMS ── */
+  .list-item {
+    font-size: 12px;
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+
+  /* ── GALLERY ── */
   .gallery {
     flex-direction: column;
+    gap: 8px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    font-size: 11px;
+  }
+
+  .footer-links a {
+    font-size: 11px;
+  }
+
+  .footer-links .sep {
+    margin: 0 3px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (≤ 380px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .container {
+    padding: 24px 12px 36px;
+  }
+
+  .header-name {
+    font-size: 18px;
+    letter-spacing: 0.1em;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  nav {
+    margin-bottom: 28px;
+  }
+
+  nav a {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  nav .sep {
+    margin: 0 3px;
+  }
+
+  .row {
+    margin-bottom: 14px;
+  }
+
+  .row-label {
+    font-size: 10px;
+  }
+
+  .row-value {
+    font-size: 12px;
+  }
+
+  .project-name,
+  .exp-role,
+  .paper-title,
+  .post-title {
+    font-size: 12px;
+  }
+
+  .project-desc,
+  .paper-abstract,
+  .post-excerpt,
+  .exp-details,
+  .list-item {
+    font-size: 11px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TOUCH TARGET — ensure tap-friendly links
+   ═══════════════════════════════════════════ */
+@media (pointer: coarse) {
+  nav a {
+    padding: 6px 2px;
+  }
+
+  .row-value a,
+  .project-links a,
+  .paper-links a,
+  .paper-title a,
+  .post-title a,
+  .header-links a,
+  .footer-links a {
+    padding: 4px 0;
+    display: inline-block;
   }
 }
