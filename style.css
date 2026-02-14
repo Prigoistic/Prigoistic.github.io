@@ -605,12 +605,15 @@ hr {
 }
 
 .article-figure img {
-  max-width: 100%;
+  max-width: 480px;
+  width: 100%;
   height: auto;
   border-radius: 6px;
   border: 1px solid #1a1a1a;
   display: block;
   margin: 0 auto;
+  background: #0a0a0a;
+  padding: 8px;
 }
 
 .article-figure figcaption {
@@ -1001,6 +1004,11 @@ hr {
 
   .article-figure {
     margin: 28px 0;
+  }
+
+  .article-figure img {
+    max-width: 100%;
+    padding: 6px;
   }
 
   /* ── LIST ITEMS ── */
