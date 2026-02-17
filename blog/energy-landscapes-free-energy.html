@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="../images/icon.png" />
   <link rel="stylesheet" href="../style.css" />
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"
+    onload="document.querySelectorAll('.article-equation').forEach(function(el){katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false});});"></script>
 </head>
 <body>
 
@@ -50,7 +54,7 @@
 
       <p>We often confuse predictive power with intelligence. Modern AI, especially token-based LLMs, is fundamentally a predictive engine. It learns a conditional distribution</p>
 
-      <div class="article-equation">P(token(t) | tokens(t+1))</div>
+      <div class="article-equation">P(x_t \mid x_{&lt;t})</div>
 
       <p>and generates one token at a time. It works beautifully. It is astonishingly good at pattern continuation. <strong>But continuation is not cognition.</strong></p>
 
@@ -66,7 +70,7 @@
 
       <p>Let us be clear about how token models operate. They optimize cross-entropy loss:</p>
 
-      <div class="article-equation">ℒ_CE = − Σ_t log P_θ(x_t | x_&lt;t)</div>
+      <div class="article-equation">\mathcal{L}_{\text{CE}} = -\sum_t \log P_\theta(x_t \mid x_{&lt;t})</div>
 
       <p>This means they maximize likelihood over sequences. They approximate a distribution over token strings.</p>
 
@@ -87,11 +91,11 @@
 
       <p>Energy based models flip the perspective entirely. Instead of modeling probability over next tokens, they define an energy function over entire configurations:</p>
 
-      <div class="article-equation">E(x)</div>
+      <div class="article-equation">E(\mathbf{x})</div>
 
       <p>Lower energy means more stable. Higher energy means unstable, inconsistent, noisy. Prediction becomes:</p>
 
-      <div class="article-equation">x* = arg min_x E(x)</div>
+      <div class="article-equation">\mathbf{x}^* = \arg\min_{\mathbf{x}} E(\mathbf{x})</div>
 
       <p>You are not guessing the next token. You are searching for a state that minimizes tension in the system.</p>
 
@@ -138,41 +142,41 @@
 
       <p>That shift alone changes the entire framing. Traditional models are obsessed with probability. They learn a conditional distribution and optimize cross entropy,</p>
 
-      <div class="article-equation">ℒ_CE = − Σ_t log P_θ(x_t | x_&lt;t)</div>
+      <div class="article-equation">\mathcal{L}_{\text{CE}} = -\sum_t \log P_\theta(x_t \mid x_{&lt;t})</div>
 
       <p>Everything is about likelihood. About predicting what comes next. Energy based systems do not ask what comes next. They ask what configuration makes the entire system most stable.</p>
 
       <p>Instead of sampling tokens, the system evolves a state vector s. The dynamics follow gradient descent on the energy landscape,</p>
 
-      <div class="article-equation">ds/dt = −∇E(s)</div>
+      <div class="article-equation">\frac{d\mathbf{s}}{dt} = -\nabla E(\mathbf{s})</div>
 
       <p>In plain language, the state moves downhill. Wherever the energy decreases, that is where the system goes. If the landscape is shaped correctly, the state settles into meaningful basins. If the geometry is wrong, you get useless attractors or unstable wandering. Reasoning, in this view, is not continuation. It is tension reduction.</p>
 
       <p>Now this is where free energy starts becoming important. Because once you scale these systems, you cannot just minimize raw energy. You also need to account for uncertainty. In statistical physics and variational inference, the free energy functional typically looks like</p>
 
-      <div class="article-equation">F(q) = 𝔼_q(s)[E(s)] − H(q)</div>
+      <div class="article-equation">F(q) = \mathbb{E}_{q(\mathbf{s})}[E(\mathbf{s})] - H(q)</div>
 
       <p>where q(s) is an approximate distribution over states and H(q) is its entropy. The first term encourages low energy configurations. The second term prevents collapse by rewarding uncertainty. This balance between structure and entropy is what makes free energy powerful.</p>
 
       <p>In many structured systems, exact free energy is intractable because computing the partition function</p>
 
-      <div class="article-equation">Z = ∫ e^(−E(s)) ds</div>
+      <div class="article-equation">Z = \int e^{-E(\mathbf{s})}\, d\mathbf{s}</div>
 
       <p>is impossible in high dimensions. So we approximate.</p>
 
       <p>This is where Bethe free energy comes in. In graphical models, the Bethe approximation rewrites the global free energy in terms of local beliefs and pairwise consistency constraints. Instead of solving a fully global normalization, you enforce consistency over nodes and edges of a factor graph. The Bethe free energy can be written schematically as</p>
 
-      <div class="article-equation">F_Bethe(b) = Σ_i F_i(b_i) + Σ_(i,j) F_ij(b_ij)</div>
+      <div class="article-equation">F_{\text{Bethe}}(\mathbf{b}) = \sum_i F_i(b_i) + \sum_{(i,j)} F_{ij}(b_{ij})</div>
 
       <p>where b_i and b_ij are local and pairwise beliefs. It approximates the true free energy while keeping computations local. That idea matters because large structured energy systems cannot be optimized exactly. You need principled decompositions.</p>
 
       <p>And that connects directly to CCCP. Many free energy formulations can be written as a difference of convex functions,</p>
 
-      <div class="article-equation">F(s) = F₁(s) − F₂(s)</div>
+      <div class="article-equation">F(\mathbf{s}) = F_1(\mathbf{s}) - F_2(\mathbf{s})</div>
 
       <p>where F₁ is convex and F₂ is convex but subtracted, making the total objective nonconvex. The Concave Convex Procedure works by linearizing the concave part at each step and minimizing the resulting convex surrogate,</p>
 
-      <div class="article-equation">s^(k+1) = arg min_s [ F₁(s) − ⟨∇F₂(s^(k)), s⟩ ]</div>
+      <div class="article-equation">\mathbf{s}^{(k+1)} = \arg\min_{\mathbf{s}} \left[ F_1(\mathbf{s}) - \langle \nabla F_2(\mathbf{s}^{(k)}),\, \mathbf{s} \rangle \right]</div>
 
       <p>Each iteration guarantees descent in the original objective. No chaotic jumps. No uncontrolled oscillations. Just structured monotonic reduction.</p>
 

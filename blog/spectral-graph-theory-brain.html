@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="../images/icon.png" />
   <link rel="stylesheet" href="../style.css" />
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"
+    onload="document.querySelectorAll('.article-equation').forEach(function(el){katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false});});"></script>
 </head>
 <body>
 
@@ -123,7 +127,7 @@
 
       <p>When we write diffusion on a graph in its simplest form,</p>
 
-      <div class="article-equation">dM/dt = −γ L M</div>
+      <div class="article-equation">\frac{d\mathbf{M}}{dt} = -\gamma\, \mathbf{L}\, \mathbf{M}</div>
 
       <p>it describes how activation over nodes evolves over time.</p>
 
