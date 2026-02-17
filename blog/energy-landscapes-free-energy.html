@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Energy Landscapes &amp; Free Energy Models — Priyam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/icon.png" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav>
+    <a href="../index.html">ABOUT</a><span class="sep">·</span><a href="../projects.html">PROJECTS</a><span class="sep">·</span><a href="../experience.html">EXPERIENCE</a><span class="sep">·</span><a href="../research.html">RESEARCH</a><span class="sep">·</span><a href="../blog.html" class="active">BLOG</a><span class="sep">·</span><a href="../contact.html">CONTACT</a>
+  </nav>
+
+  <!-- ═══════════ BACK LINK ═══════════ -->
+  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+  <!-- ═══════════ ARTICLE ═══════════ -->
+  <article class="blog-article">
+
+    <div class="article-meta">
+      <span class="article-date">February 18, 2026</span>
+      <span class="article-reading-time">15 min read</span>
+    </div>
+
+    <h1 class="article-title">A Quick Deep Dive into Energy Landscapes and Free Energy Models</h1>
+
+    <div class="article-tags">
+      <span>energy models</span>
+      <span>free energy</span>
+      <span>dynamical systems</span>
+      <span>AGI</span>
+      <span>memory</span>
+    </div>
+
+    <div class="article-divider"></div>
+
+    <!-- ── CONTENT ── -->
+    <div class="article-body">
+
+      <p>I am a domain expert in this topic. Not bragging. This is just somewhere I have spent months sitting with equations, breaking them, rebuilding them, trying to formalize what we are actually building. And before going further, I want to keep this very honest.</p>
+
+      <p>We often confuse predictive power with intelligence. Modern AI, especially token-based LLMs, is fundamentally a predictive engine. It learns a conditional distribution</p>
+
+      <div class="article-equation">P(token_t | tokens_&lt;t)</div>
+
+      <p>and generates one token at a time. It works beautifully. It is astonishingly good at pattern continuation. <strong>But continuation is not cognition.</strong></p>
+
+      <p>If we are serious about AGI, or even about long-horizon reasoning systems, we have to ask a deeper question. Is intelligence really just next-token prediction scaled up? Or is it something else? To me, intelligence is not continuation. Intelligence is constraint satisfaction under partial information. It is systems that think about their own internal consistency. It is global coherence, not local probability spikes.</p>
+
+      <p>Autoregressive models are sequential. They commit at every step. They generate one token, condition on it, then generate the next. It is like walking forward and burning the bridge behind you. Energy based models are different. They do not walk. They settle.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Token Models: Local Probability Machines</h2>
+
+      <p>Let us be clear about how token models operate. They optimize cross-entropy loss:</p>
+
+      <div class="article-equation">ℒ_CE = − Σ_t log P_θ(x_t | x_&lt;t)</div>
+
+      <p>This means they maximize likelihood over sequences. They approximate a distribution over token strings.</p>
+
+      <figure class="article-figure">
+        <img src="../images/autoreg.png" alt="Autoregressive token prediction — sequential generation" />
+        <figcaption>Autoregressive models generate one token at a time, conditioning on all previous tokens — walking forward and burning the bridge behind.</figcaption>
+      </figure>
+
+      <p>Internally, they condition on previous tokens, maximize local probabilities, and generate sequentially. They do not explicitly model stability. They do not explicitly minimize inconsistency. They are incredible storytellers. But they do not "settle" into coherence — they just keep predicting the next most likely step.</p>
+
+      <blockquote>
+        There is no notion of a global energy that says: this entire configuration is internally contradictory.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Energy Based Models: Global Configuration Evaluators</h2>
+
+      <p>Energy based models flip the perspective entirely. Instead of modeling probability over next tokens, they define an energy function over entire configurations:</p>
+
+      <div class="article-equation">E(x)</div>
+
+      <p>Lower energy means more stable. Higher energy means unstable, inconsistent, noisy. Prediction becomes:</p>
+
+      <div class="article-equation">x* = arg min_x E(x)</div>
+
+      <p>You are not guessing the next token. You are searching for a state that minimizes tension in the system.</p>
+
+      <figure class="article-figure">
+        <img src="../images/energy.png" alt="Energy based model — global configuration evaluation" />
+        <figcaption>Energy based models evaluate the entire configuration at once, scoring global coherence rather than predicting one token at a time.</figcaption>
+      </figure>
+
+      <p><strong>This is fundamentally global.</strong> Autoregressive models move step by step. Energy based models evaluate the whole thing at once. They are not generators in the usual sense. They are stabilizers.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>The Energy Landscape Intuition</h2>
+
+      <p>The best way to think about this is geometrically. Imagine every possible state of the system as a point in a high dimensional space. Now define an energy over that space. You get a landscape. Valleys are stable patterns. Hills are unstable configurations. Deep basins are strong attractors. Flat regions are ambiguity.</p>
+
+      <figure class="article-figure">
+        <img src="../images/landscape.png" alt="Energy landscape — valleys, hills, and attractors" />
+        <figcaption>The energy landscape — intelligence emerges when meaningful patterns become deep valleys and noise remains shallow and unstable.</figcaption>
+      </figure>
+
+      <p>Intelligence emerges when meaningful patterns become deep valleys and noise remains shallow and unstable. When you drop a noisy state into the landscape, dynamics push it downhill until it settles into a basin. That settling is reasoning.</p>
+
+      <div class="article-highlight">
+        PREDICTION IS NOT GENERATION.<br />
+        PREDICTION IS CONVERGENCE.
+      </div>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>What Energy Based Models Are Good At</h2>
+
+      <p>When do energy models shine? They are naturally suited for denoising, pattern completion, constraint satisfaction, structured reasoning, and multi-variable consistency. Token models are excellent at continuation. Energy models are excellent at stabilization.</p>
+
+      <blockquote>
+        If your system needs to settle into coherence rather than just continue text, energy based approaches start to make sense.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>The Core Mathematics</h2>
+
+      <p>At the heart of any energy model is an energy function E(x). Lower energy means coherence. Higher energy means contradiction. Dynamics follow gradient descent:</p>
+
+      <div class="article-equation">dM/dt = −∇E(M)</div>
+
+      <p>You move downhill in energy space. Now, in our work, especially in <em>Neural Memory as a Dynamical Field</em>, we formalized a full multi-component energy:</p>
+
+      <div class="article-equation">E(M) = E_assoc + E_decay + E_diffusion + E_competition + E_input</div>
+
+      <p>Which expands into:</p>
+
+      <div class="article-equation">E(M) = −lse(βXᵀM) − (1+α)/2 · ‖M‖² − γMᵀLM − δ/2 · (𝟏ᵀM)² − IᵀM</div>
+
+      <p>Each term corresponds to something very concrete — associative recall, multi-rate decay, semantic diffusion via graph Laplacian, inhibitory competition, and external input injection.</p>
+
+      <p><strong>Memory becomes a continuous dynamical field.</strong> Not a database. Not a retrieval cache. A field.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>CCCP and Convergence</h2>
+
+      <p>One of the biggest misconceptions about energy systems is that they are unstable or chaotic. They can be — unless you shape them correctly.</p>
+
+      <p>We decomposed the energy into convex and concave components and used a Concave–Convex Procedure formulation:</p>
+
+      <div class="article-equation">E(M) = E₁(M) − E₂(M)</div>
+
+      <p>where E₁ is convex and E₂ is concave. By iteratively linearizing the concave part and minimizing the convex part, you guarantee monotonic energy descent. Energy always decreases. No oscillations. No divergence.</p>
+
+      <p>This is not hand-wavy. It is formally grounded. And in the whitepaper, we verify global convergence under Zangwill-style conditions.</p>
+
+      <blockquote>
+        If you are building memory as a dynamical substrate, you cannot afford chaotic drift.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Differential Decay and Why Forgetting Is Intelligence</h2>
+
+      <p>In <em>Differential Memory Decay</em>, we isolated forgetting itself as a computational primitive. <strong>Forgetting is not a bug. It is stability.</strong></p>
+
+      <p>We defined multi-timescale decay:</p>
+
+      <div class="article-equation">dM/dt = −AM − γLM − δ(𝟏ᵀM)𝟏</div>
+
+      <p>with</p>
+
+      <div class="article-equation">A = diag(α₁, …, α_d)</div>
+
+      <p>Fast decay clears transient activations. Medium decay allows semantic drift. Slow decay reshapes long-term structure. If you do not decay, you saturate. If you decay uniformly, you erase meaning. If you decay differentially, you create abstraction. That was a turning point for me conceptually.</p>
+
+      <div class="article-highlight">
+        INTELLIGENCE REQUIRES FORGETTING.
+      </div>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>SLEB Inside Ananta</h2>
+
+      <p>Now let me explain this the way I actually feel it. SLEB stands for Self Learning Energy Based architecture — we introduced it formally in <a href="https://www.researchgate.net/publication/397885858_An_Energy-Based_Self-Learning_Engine_for_Neuro-Symbolic_Scientific_Reasoning" target="_blank" rel="noopener"><em>An Energy-Based Self-Learning Engine for Neuro-Symbolic Scientific Reasoning</em></a>. But honestly, that name does not capture what it is. <strong>It feels less like a model and more like a living field.</strong></p>
+
+      <p>There are no tokens being predicted step by step. Instead, there is a state vector living inside an energy landscape. When the system thinks, it does not emit words one at a time. It slides downhill in energy space. Low energy means coherence. High energy means contradiction.</p>
+
+      <p>Memory does not look like key-value storage. Memory contributes energy terms. Long-term knowledge bends the landscape. Recent reasoning reshapes local curvature.</p>
+
+      <blockquote>
+        Recall is not retrieval.<br />
+        Recall is geometry.
+      </blockquote>
+
+      <p>Competitive normalization keeps magnitudes bounded. Patterns compete. Strong coherent signals suppress inconsistent ones. Then comes replay. When the system finds a stable trajectory, it reinforces it. It deepens that basin. Over time the landscape gets sculpted by its own successful reasoning.</p>
+
+      <p>And multi-timescale decay ensures it does not freeze or explode. It forgets transient noise while preserving structure. It does not generate text step by step. <strong>It settles into reasoning.</strong></p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Limitations</h2>
+
+      <p>Let us not romanticize this. Energy models struggle with high dimensional scaling, sampling inefficiency, expensive inference steps, partition function estimation, curvature control, and spurious minima.</p>
+
+      <p>Token models scale beautifully with GPU parallelism. Energy models often require iterative refinement. If the Hessian has bad curvature, you get flat regions or unstable minima. If the eigenspectrum is poorly shaped, convergence slows or becomes messy. <strong>This is not trivial engineering.</strong></p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Where I Think This Goes</h2>
+
+      <p>Energy models are not replacements for token models. <strong>They are complementary.</strong> Token models are storytellers. Energy models are stabilizers. One generates surface fluency. The other enforces deep structure.</p>
+
+      <p>The future likely lies in hybrid architectures — autoregressive layers for expressive generation, energy layers for global coherence, decay for abstraction, replay for consolidation.</p>
+
+      <blockquote>
+        If we want systems that do not just continue text but actually settle into internally consistent reasoning states, we need landscapes, not just likelihoods.
+      </blockquote>
+
+      <p>And that is where my head has been for the past few months.</p>
+
+      <div class="article-highlight">
+        TRYING TO SCULPT THE GEOMETRY OF INTELLIGENCE.
+      </div>
+
+    </div>
+
+    <!-- ── END CONTENT ── -->
+
+    <div class="article-divider"></div>
+
+    <div class="article-footer-note">
+      Written by Priyam · 18 February 2026
+    </div>
+
+  </article>
+
+  <hr />
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <div class="footer">
+    <div>&copy; 2026 Priyam</div>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
