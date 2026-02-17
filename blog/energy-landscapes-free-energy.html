@@ -50,13 +50,15 @@
 
       <p>We often confuse predictive power with intelligence. Modern AI, especially token-based LLMs, is fundamentally a predictive engine. It learns a conditional distribution</p>
 
-      <div class="article-equation">P(token_t | tokens_&lt;t)</div>
+      <div class="article-equation">P(token(t) | tokens(t+1))</div>
 
       <p>and generates one token at a time. It works beautifully. It is astonishingly good at pattern continuation. <strong>But continuation is not cognition.</strong></p>
 
-      <p>If we are serious about AGI, or even about long-horizon reasoning systems, we have to ask a deeper question. Is intelligence really just next-token prediction scaled up? Or is it something else? To me, intelligence is not continuation. Intelligence is constraint satisfaction under partial information. It is systems that think about their own internal consistency. It is global coherence, not local probability spikes.</p>
+      <p>If we are serious about AGI, or even about long-horizon reasoning systems, we have to ask a deeper question. Is intelligence really just next-token prediction scaled up? Or is it something else? To me, intelligence is not continuation. Intelligence is connecting the dots under partial information. It is systems that Think about Thinking.</p>
 
-      <p>Autoregressive models are sequential. They commit at every step. They generate one token, condition on it, then generate the next. It is like walking forward and burning the bridge behind you. Energy based models are different. They do not walk. They settle.</p>
+      <p>Autoregressive models like GPTs are sequential. They commit at every step. They generate one token, condition on it, then generate the next. It is like walking forward and burning the bridge behind you. Energy based models on the other hand are different. They do not walk. They settle.</p>
+
+      <p>Lets go through all the underlying stuffs around Token based Approaches and what they lacked which caused emergence of Energy Based Models.</p>
 
       <div class="article-section-break">· · ·</div>
 
@@ -132,63 +134,61 @@
 
       <h2>The Core Mathematics</h2>
 
-      <p>At the heart of any energy model is an energy function E(x). Lower energy means coherence. Higher energy means contradiction. Dynamics follow gradient descent:</p>
+      <p>At the center of all this energy based thinking there is something almost embarrassingly simple. You define a scalar function over states. That is it. Call it energy, E(s). Low energy means the configuration is internally consistent. High energy means something does not add up. There is tension in the system, contradictions, instability, unresolved structure.</p>
 
-      <div class="article-equation">dM/dt = −∇E(M)</div>
+      <p>That shift alone changes the entire framing. Traditional models are obsessed with probability. They learn a conditional distribution and optimize cross entropy,</p>
 
-      <p>You move downhill in energy space. Now, in our work, especially in <em>Neural Memory as a Dynamical Field</em>, we formalized a full multi-component energy:</p>
+      <div class="article-equation">ℒ_CE = − Σ_t log P_θ(x_t | x_&lt;t)</div>
 
-      <div class="article-equation">E(M) = E_assoc + E_decay + E_diffusion + E_competition + E_input</div>
+      <p>Everything is about likelihood. About predicting what comes next. Energy based systems do not ask what comes next. They ask what configuration makes the entire system most stable.</p>
 
-      <p>Which expands into:</p>
+      <p>Instead of sampling tokens, the system evolves a state vector s. The dynamics follow gradient descent on the energy landscape,</p>
 
-      <div class="article-equation">E(M) = −lse(βXᵀM) − (1+α)/2 · ‖M‖² − γMᵀLM − δ/2 · (𝟏ᵀM)² − IᵀM</div>
+      <div class="article-equation">ds/dt = −∇E(s)</div>
 
-      <p>Each term corresponds to something very concrete — associative recall, multi-rate decay, semantic diffusion via graph Laplacian, inhibitory competition, and external input injection.</p>
+      <p>In plain language, the state moves downhill. Wherever the energy decreases, that is where the system goes. If the landscape is shaped correctly, the state settles into meaningful basins. If the geometry is wrong, you get useless attractors or unstable wandering. Reasoning, in this view, is not continuation. It is tension reduction.</p>
 
-      <p><strong>Memory becomes a continuous dynamical field.</strong> Not a database. Not a retrieval cache. A field.</p>
+      <p>Now this is where free energy starts becoming important. Because once you scale these systems, you cannot just minimize raw energy. You also need to account for uncertainty. In statistical physics and variational inference, the free energy functional typically looks like</p>
 
-      <div class="article-section-break">· · ·</div>
+      <div class="article-equation">F(q) = 𝔼_q(s)[E(s)] − H(q)</div>
 
-      <h2>CCCP and Convergence</h2>
+      <p>where q(s) is an approximate distribution over states and H(q) is its entropy. The first term encourages low energy configurations. The second term prevents collapse by rewarding uncertainty. This balance between structure and entropy is what makes free energy powerful.</p>
 
-      <p>One of the biggest misconceptions about energy systems is that they are unstable or chaotic. They can be — unless you shape them correctly.</p>
+      <p>In many structured systems, exact free energy is intractable because computing the partition function</p>
 
-      <p>We decomposed the energy into convex and concave components and used a Concave–Convex Procedure formulation:</p>
+      <div class="article-equation">Z = ∫ e^(−E(s)) ds</div>
 
-      <div class="article-equation">E(M) = E₁(M) − E₂(M)</div>
+      <p>is impossible in high dimensions. So we approximate.</p>
 
-      <p>where E₁ is convex and E₂ is concave. By iteratively linearizing the concave part and minimizing the convex part, you guarantee monotonic energy descent. Energy always decreases. No oscillations. No divergence.</p>
+      <p>This is where Bethe free energy comes in. In graphical models, the Bethe approximation rewrites the global free energy in terms of local beliefs and pairwise consistency constraints. Instead of solving a fully global normalization, you enforce consistency over nodes and edges of a factor graph. The Bethe free energy can be written schematically as</p>
 
-      <p>This is not hand-wavy. It is formally grounded. And in the whitepaper, we verify global convergence under Zangwill-style conditions.</p>
+      <div class="article-equation">F_Bethe(b) = Σ_i F_i(b_i) + Σ_(i,j) F_ij(b_ij)</div>
+
+      <p>where b_i and b_ij are local and pairwise beliefs. It approximates the true free energy while keeping computations local. That idea matters because large structured energy systems cannot be optimized exactly. You need principled decompositions.</p>
+
+      <p>And that connects directly to CCCP. Many free energy formulations can be written as a difference of convex functions,</p>
+
+      <div class="article-equation">F(s) = F₁(s) − F₂(s)</div>
+
+      <p>where F₁ is convex and F₂ is convex but subtracted, making the total objective nonconvex. The Concave Convex Procedure works by linearizing the concave part at each step and minimizing the resulting convex surrogate,</p>
+
+      <div class="article-equation">s^(k+1) = arg min_s [ F₁(s) − ⟨∇F₂(s^(k)), s⟩ ]</div>
+
+      <p>Each iteration guarantees descent in the original objective. No chaotic jumps. No uncontrolled oscillations. Just structured monotonic reduction.</p>
+
+      <p>So when I talk about shaping curvature, this is what I mean. You are not just defining an energy function. You are making sure that its geometry allows stable descent even under approximation. You are making sure the Hessian spectrum does not explode. You are making sure entropy terms and structural terms are balanced.</p>
+
+      <p>At scale, everything becomes approximation. Exact partition functions disappear. Exact inference disappears. What remains is geometry and how you navigate it. Energy gives you structure. Free energy introduces uncertainty into that structure. Bethe style approximations make the system tractable. CCCP gives you a stable optimization pathway through that approximated landscape.</p>
+
+      <p>When all of that aligns, the system does not just generate outputs. It settles into coherence.</p>
 
       <blockquote>
-        If you are building memory as a dynamical substrate, you cannot afford chaotic drift.
+        And that, to me, is much closer to intelligence than just predicting the next token ever could be.
       </blockquote>
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Differential Decay and Why Forgetting Is Intelligence</h2>
-
-      <p>In <em>Differential Memory Decay</em>, we isolated forgetting itself as a computational primitive. <strong>Forgetting is not a bug. It is stability.</strong></p>
-
-      <p>We defined multi-timescale decay:</p>
-
-      <div class="article-equation">dM/dt = −AM − γLM − δ(𝟏ᵀM)𝟏</div>
-
-      <p>with</p>
-
-      <div class="article-equation">A = diag(α₁, …, α_d)</div>
-
-      <p>Fast decay clears transient activations. Medium decay allows semantic drift. Slow decay reshapes long-term structure. If you do not decay, you saturate. If you decay uniformly, you erase meaning. If you decay differentially, you create abstraction. That was a turning point for me conceptually.</p>
-
-      <div class="article-highlight">
-        INTELLIGENCE REQUIRES FORGETTING.
-      </div>
-
-      <div class="article-section-break">· · ·</div>
-
-      <h2>SLEB Inside Ananta</h2>
+      <h2>SLEB Engine at Ananta Research</h2>
 
       <p>Now let me explain this the way I actually feel it. SLEB stands for Self Learning Energy Based architecture — we introduced it formally in <a href="https://www.researchgate.net/publication/397885858_An_Energy-Based_Self-Learning_Engine_for_Neuro-Symbolic_Scientific_Reasoning" target="_blank" rel="noopener"><em>An Energy-Based Self-Learning Engine for Neuro-Symbolic Scientific Reasoning</em></a>. But honestly, that name does not capture what it is. <strong>It feels less like a model and more like a living field.</strong></p>
 
