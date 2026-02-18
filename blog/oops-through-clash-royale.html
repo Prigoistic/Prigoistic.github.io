@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Understanding OOP Through Clash Royale — Priyam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../images/icon.png" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav>
+    <a href="../index.html">ABOUT</a><span class="sep">·</span><a href="../projects.html">PROJECTS</a><span class="sep">·</span><a href="../experience.html">EXPERIENCE</a><span class="sep">·</span><a href="../research.html">RESEARCH</a><span class="sep">·</span><a href="../blog.html" class="active">BLOG</a><span class="sep">·</span><a href="../contact.html">CONTACT</a>
+  </nav>
+
+  <!-- ═══════════ BACK LINK ═══════════ -->
+  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
+
+  <!-- ═══════════ ARTICLE ═══════════ -->
+  <article class="blog-article">
+
+    <div class="article-meta">
+      <span class="article-date">February 19, 2026</span>
+      <span class="article-reading-time">14 min read</span>
+    </div>
+
+    <h1 class="article-title">Clash Royale and OOPs</h1>
+
+    <div class="article-tags">
+      <span>OOP</span>
+      <span>java</span>
+      <span>game design</span>
+      <span>programming</span>
+      <span>clash royale</span>
+    </div>
+
+    <div class="article-divider"></div>
+
+    <!-- ── CONTENT ── -->
+    <div class="article-body">
+
+      <p>When I first read about the principles of Object Oriented Programming, it totally went over my head. I could not grasp what those principles intended to mean. But I used to play a lot of games back in the day, especially Clash of Clans and Clash Royale, and I feel RPG games are the best use case of OOP concepts.</p>
+
+      <p>Everyone at some point has played Clash Royale. So many roles and classes in the game. Barbarians, Archers, Giants, Wizards, but all of them have some shared properties.</p>
+
+      <p>Think of a <strong><a href="https://en.wikipedia.org/wiki/Class_(computer_programming)" target="_blank" rel="noopener">class</a></strong> as a race of entities in the game, like Skeletons or Goblins.</p>
+
+      <p>Whereas <strong><a href="https://en.wikipedia.org/wiki/Object_(computer_science)" target="_blank" rel="noopener">objects</a></strong> are like an instance of that class, like Skeleton Army or Goblin Barrel, with their own method injections.</p>
+
+      <p>All the entities in Clash Royale have a fixed set of properties. HP, attack power, position, and so on.</p>
+
+      <p>So instead of rewriting HP, <code>takeDamage()</code>, <code>destroy()</code> functions for every single troop class, we create a base blueprint.</p>
+
+      <p>Let us call that blueprint a <strong>GameEntity</strong>. The very fundamental block of the game. Every character, every troop, every building has the properties of GameEntity.</p>
+
+      <div class="article-code">class GameEntity {
+    int health;
+    int x, y;
+
+    void takeDamage(int amount) { ... }
+    void destroy() { ... }
+}</div>
+
+      <p>Now when we create something like</p>
+
+      <div class="article-code">class Troop extends GameEntity { ... }
+class Building extends GameEntity { ... }</div>
+
+      <p>These classes automatically gain health, damage handling, and destruction logic. No rewriting. No copy pasting. Just extension.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Inheritance and the "Is-A" Chain</h2>
+
+      <p>An Ice Wizard <em>is a</em> Wizard. A Wizard <em>is a</em> Troop. A Troop <em>is a</em> GameEntity.</p>
+
+      <p>Which means writing something like</p>
+
+      <div class="article-code">GameEntity x = new Wizard();</div>
+
+      <p>is perfectly valid.</p>
+
+      <p>This whole chain of "is-a" relationships is <strong><a href="https://en.wikipedia.org/wiki/Inheritance_(object-oriented_programming)" target="_blank" rel="noopener">inheritance</a></strong>. But inheritance is not only about copying code.</p>
+
+      <p>A Wizard must behave like a Troop in every context where a Troop is expected. If somewhere in the engine we have</p>
+
+      <div class="article-code">void applyRange(Troop t) { ... }</div>
+
+      <p>we should be able to pass a Wizard, an Archer, a P.E.K.K.A, without any problem. This idea, that a child must be safely usable as its parent, is called the <strong><a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle" target="_blank" rel="noopener">Liskov Substitution Principle</a></strong>.</p>
+
+      <blockquote>
+        If a function expects a parent type, any child type must work without breaking anything.
+      </blockquote>
+
+      <p>And this whole system of "one blueprint extends another" is what we call inheritance.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Polymorphism: Same Call, Different Chaos</h2>
+
+      <p>Now let us go back into Clash Royale. Your opponent unleashed a P.E.K.K.A with a Skeleton Army, a great tactic honestly. Both of these entities have <code>attack()</code> but the attacking style of P.E.K.K.A and Skeleton Army are wildly different.</p>
+
+      <p>P.E.K.K.A is slow but hits hard and costs seven Elixir. Skeleton Army needs three Elixir but as a swarm they attack quick.</p>
+
+      <p>But from the Game Engine's point of view, it just wants to say</p>
+
+      <div class="article-code">t.attack();</div>
+
+      <p>It does not care if <code>t</code> is P.E.K.K.A or Skeleton Army.</p>
+
+      <p>The same method call behaves differently depending on what the actual object is. And this is so beautiful, as Kshitij Sir says, that you can add anything and it inherits all its methods.</p>
+
+      <div class="article-highlight">
+        SAME INTERFACE. DIFFERENT BEHAVIOURS.
+      </div>
+
+      <div class="article-code">class Troop {
+    void attack() { }
+}
+
+class PEKKA extends Troop {
+    void attack() { swingIronSword(); }
+}
+
+class SkeletonArmy extends Troop {
+    void attack() { swingBoneSword(); }
+}</div>
+
+      <p>When you rewrite a method like this, the child replaces the parent behavior. This is <strong><a href="https://en.wikipedia.org/wiki/Method_overriding" target="_blank" rel="noopener">method overriding</a></strong>.</p>
+
+      <p>The engine calls <code>attack()</code>. At runtime, Java decides which actual version to run based on the real object. That runtime behavior switching is called <strong><a href="https://en.wikipedia.org/wiki/Dynamic_dispatch" target="_blank" rel="noopener">dynamic binding</a></strong>.</p>
+
+      <p>And this entire concept, same method, different behavior, that is called <strong><a href="https://en.wikipedia.org/wiki/Polymorphism_(computer_science)" target="_blank" rel="noopener">polymorphism</a></strong>.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Overloading: Same Name, Different Intent</h2>
+
+      <p>Now contrast that with overloading. Overloading is when the method name is the same but the parameters are different.</p>
+
+      <div class="article-code">attack()
+attack(Building target)
+attack(Troop target)</div>
+
+      <p>Same name but with different intent. The compiler picks the right version at compile time based on the argument types. That is called <strong><a href="https://en.wikipedia.org/wiki/Function_overloading" target="_blank" rel="noopener">compile-time polymorphism</a></strong>.</p>
+
+      <p>Overriding is runtime polymorphism. Overloading is compile-time polymorphism.</p>
+
+      <blockquote>
+        When you override, the method signature must match exactly.<br />
+        When you overload, the signature must differ.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Encapsulation: Protecting the Arena</h2>
+
+      <p>Now imagine if every part of Clash Royale could directly modify a troop's health. Some random class could just do</p>
+
+      <div class="article-code">wizard.health = -5000;</div>
+
+      <p>Which is so wrong.</p>
+
+      <p>Instead we hide health. We make it <strong><a href="https://en.wikipedia.org/wiki/Access_modifiers" target="_blank" rel="noopener">private</a></strong> so that no one can touch it directly. They must use controlled methods like</p>
+
+      <div class="article-code">takeDamage(int amount)
+heal(int amount)</div>
+
+      <p>So that we can control the rules. Maybe health cannot drop below zero. Maybe Elixir regains after a cooldown. Maybe certain troops have damage resistance.</p>
+
+      <p>By hiding internal state and exposing controlled methods, we protect the system. And that hiding of data and forcing interaction through methods, this is called <strong><a href="https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)" target="_blank" rel="noopener">encapsulation</a></strong>.</p>
+
+      <blockquote>
+        This actually keeps your game logic safe so that no one can directly inject random values into your Clash Royale game.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Abstraction: The Prince's Charge</h2>
+
+      <p>Now picture this.</p>
+
+      <p>You are staring at the code for the Prince. He is not just a bundle of stats. He has a personality. He has that iconic, terrifying <strong>Charge</strong>.</p>
+
+      <p>Now think about what actually happens when he starts running. It is a mess of math. The code has to track how many tiles he has moved without stopping. It has to calculate a gradual speed ramp-up. It has to trigger the white streak visual effect behind his pony. It has to load that trumpet sound effect. And finally, it has to tell the game, "Hey, next time he hits something, multiply the damage by two."</p>
+
+      <p>If you forced the main Game Engine to handle all that micromanagement, the code would be a disaster. The Engine is like a busy director on a movie set. It does not have time to tell the actor how to breathe or tie his shoes.</p>
+
+      <p><strong>So you lie to the Engine.</strong></p>
+
+      <p>You hide all that messy, complex logic inside a nice, clean box. You create a simple command, an abstraction, called <code>initiateCharge()</code>.</p>
+
+      <p>The Engine does not know how the speed is calculated. It does not know why the damage doubles. It does not care about the physics of the pony. It just looks at the Prince and says, "Charge."</p>
+
+      <p><strong>Suddenly, the complexity vanishes.</strong></p>
+
+      <p>The same goes for the Witch. Think about her summoning skeletons. Inside her logic, it is a nightmare of grid coordinates. Is there space to the left? Is there a wall to the right? Which level are the skeletons?</p>
+
+      <p>But to the outside world? It is just <code>witch.summon()</code>.</p>
+
+      <p>That is the beauty of <strong><a href="https://en.wikipedia.org/wiki/Abstraction_(computer_science)" target="_blank" rel="noopener">abstraction</a></strong>.</p>
+
+      <p>It allows you to look at a complex object, like a P.E.K.K.A with her heavy, slow swing timers and butterfly distractions, and treat it like a simple tool. You expose <em>what</em> the card does. But you ruthlessly hide <em>how</em> she does it.</p>
+
+      <blockquote>
+        It saves your brain from exploding. It reduces the mental load so you can focus on the fun stuff, like game balance, instead of debugging skeleton spawn coordinates.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Encapsulation vs Abstraction</h2>
+
+      <p>Here is the difference that trips people up.</p>
+
+      <p><strong><a href="https://en.wikipedia.org/wiki/Encapsulation_(computer_programming)" target="_blank" rel="noopener">Encapsulation</a></strong> is like the Prince's armor. It protects his internal data, like his Health Points, so nothing outside can accidentally reach in and break him.</p>
+
+      <p><strong><a href="https://en.wikipedia.org/wiki/Abstraction_(computer_science)" target="_blank" rel="noopener">Abstraction</a></strong> is like the Prince's reputation. Everyone knows what he does, he charges. But nobody needs to know his internal workout routine or his diet plan to fear him. You know the action, not the details.</p>
+
+      <div class="article-highlight">
+        ONE PROTECTS THE CODE.<br />
+        THE OTHER SIMPLIFIES IT.
+      </div>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Composition Over Inheritance</h2>
+
+      <p>Let us zoom out and look at how we actually build these legendary troops.</p>
+
+      <p>The instinct is often to say a Dragon <em>is a</em> Fire Creature. It feels natural. But in code, that "is-a" relationship is a trap. If you say <code>Dragon extends Fire</code>, you have locked that dragon's destiny. It can never be an Ice Dragon. It can never be an Electro Dragon. You have hard-coded its biology.</p>
+
+      <p>The smarter move is <strong><a href="https://en.wikipedia.org/wiki/Composition_over_inheritance" target="_blank" rel="noopener">composition</a></strong>. You do not tell the engine the Dragon <em>is</em> fire, you tell the engine the Dragon <em>has</em> a FireBreath component.</p>
+
+      <p>Think of it like equipping a character in an RPG. You take a generic Flying Unit body, and you plug in a Fire Module. Later, when you want to make a Wizard, you do not need to rewrite the code for fire. You just take that same Fire Module and plug it into a Ground Unit body. If you want a Lava Hound? Plug in the fire module and the flying module, but swap the skin.</p>
+
+      <blockquote>
+        Inheritance is rigid. It is a family tree you cannot escape.<br />
+        Composition is flexible. It is a bucket of Lego bricks you can snap together however you want.
+      </blockquote>
+
+      <p>If you rely too heavily on inheritance, you end up with a nightmare structure. You start with GameEntity, then branch to Troop, then GroundTroop, then HeavyGroundTroop, and finally P.E.K.K.A. But what happens when you want a FlyingP.E.K.K.A? You are stuck. You cannot inherit from both FlyingTroop and HeavyGroundTroop without breaking the logic. Your tree explodes.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>The Diamond Problem</h2>
+
+      <p>This leads us to the most dangerous trap in C++: <strong><a href="https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem" target="_blank" rel="noopener">the Diamond Problem</a></strong>.</p>
+
+      <p>Imagine you ignore the warnings and try to make a Dragon by inheriting from both FlyingUnit and FireUnit. It sounds powerful. But here is the catch, both FlyingUnit and FireUnit probably inherit from the base GameEntity class to get their health bars.</p>
+
+      <p>So now your Dragon is born. The game engine looks at it and sees <strong>two paths back to GameEntity</strong>. It sees two health bars. Two position coordinates. Two <code>die()</code> functions. When an Archer shoots your Dragon, which health bar goes down? The one from the Flying side, or the one from the Fire side?</p>
+
+      <p><strong>The computer does not know. It is ambiguous. The game crashes.</strong></p>
+
+      <p>Java saw this mess and drew a hard line in the sand. The architects of Java said, "No more multiple inheritance for classes."</p>
+
+      <p>In Java, a Dragon can only have one parent. It can extend Troop. That is it. That avoids the diamond ambiguity because there is only ever one copy of the health bar, one copy of the state.</p>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>Interfaces: Contracts Without Baggage</h2>
+
+      <p>But you still need the Dragon to do multiple things, right? You need it to fly and breathe fire. So Java uses <strong><a href="https://en.wikipedia.org/wiki/Interface_(Java)" target="_blank" rel="noopener">interfaces</a></strong>.</p>
+
+      <p>An interface is just a contract. It has no state, no health bars, no variables, just a list of empty promises.</p>
+
+      <div class="article-code">class Dragon extends Troop implements Flyable, Burnable {
+    void fly() { ... }
+    void breatheFire() { ... }
+}</div>
+
+      <p>Because Flyable is just a contract saying "I know how to flap wings," there is no data to conflict. You can sign a hundred contracts, but you can only have one body.</p>
+
+      <blockquote>
+        Interfaces let you say what a class can do without dictating what it is.
+      </blockquote>
+
+      <div class="article-section-break">· · ·</div>
+
+      <h2>The Battle Is Just Objects</h2>
+
+      <p>When you look at Clash of Clans through this lens, the magic fades, but the elegance appears. The chaotic battle is just a symphony of objects.</p>
+
+      <p>The Barbarian is an object with a pathfinding behavior. The Town Hall is an object with a storage state. The Dragon is an object composed of flight logic and attack logic. They are all just instances of classes, protecting their internal data with encapsulation, hiding their complex math with abstraction, and interacting through the clean, safe rules we designed.</p>
+
+      <p>Every raid is just millions of lines of code asking:</p>
+
+      <div class="article-highlight">
+        WHAT STATE ARE YOU IN,<br />
+        AND WHAT IS YOUR NEXT BEHAVIOR?
+      </div>
+
+      <p>Anyway, not sure if I answered the question. But I think it would have helped me if someone had explained it this way when I first started programming. It is kind of funny that I remember making a post years ago about how I "mastered OOP" and I did not even know what composition meant at that time.</p>
+
+    </div>
+
+    <!-- ── END CONTENT ── -->
+
+    <div class="article-divider"></div>
+
+    <div class="article-footer-note">
+      Written by Priyam · 19 February 2026
+    </div>
+
+  </article>
+
+  <hr />
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <div class="footer">
+    <div>&copy; 2026 Priyam</div>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
