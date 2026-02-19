@@ -651,29 +651,87 @@ hr {
   letter-spacing: 0.04em;
 }
 
-/* ── Code Block ── */
-.article-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  color: #c8c8c8;
+/* ── Notion-style Code Block ── */
+.article-code-block {
   margin: 28px 0;
-  padding: 20px 24px;
-  background: #0a0a0a;
-  border: 1px solid #1a1a1a;
   border-radius: 6px;
-  line-height: 1.75;
-  white-space: pre;
+  background: #0d0d0d;
+  border: 1px solid #1e1e1e;
+  overflow: hidden;
+}
+
+.article-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #141414;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.article-code-lang {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.article-code-copy {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.article-code-copy:hover {
+  color: #aaa;
+  background: #1a1a1a;
+}
+
+.article-code-copy.copied {
+  color: #4ade80;
+}
+
+.article-code-block pre {
+  margin: 0;
+  padding: 18px 20px;
   overflow-x: auto;
 }
 
+.article-code-block code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px;
+  color: #c8c8c8;
+  line-height: 1.75;
+  background: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* syntax highlights */
+.article-code-block .kw  { color: #c586c0; }  /* keywords */
+.article-code-block .type { color: #4ec9b0; } /* types */
+.article-code-block .fn  { color: #dcdcaa; }  /* functions */
+.article-code-block .str { color: #ce9178; }  /* strings */
+.article-code-block .cmt { color: #6a9955; font-style: italic; } /* comments */
+.article-code-block .num { color: #b5cea8; }  /* numbers */
+
 .article-body code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-size: 13.5px;
   color: #e0e0e0;
-  background: #111111;
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid #1a1a1a;
+  background: #141414;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid #1e1e1e;
 }
 
 /* ── Highlight Block ── */

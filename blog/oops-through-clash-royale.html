@@ -60,18 +60,30 @@
 
       <p>Let us call that blueprint a <strong>GameEntity</strong>. The very fundamental block of the game. Every character, every troop, every building has the properties of GameEntity.</p>
 
-      <div class="article-code">class GameEntity {
-    int health;
-    int x, y;
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="kw">class</span> <span class="type">GameEntity</span> {
+    <span class="type">int</span> health;
+    <span class="type">int</span> x, y;
 
-    void takeDamage(int amount) { ... }
-    void destroy() { ... }
-}</div>
+    <span class="type">void</span> <span class="fn">takeDamage</span>(<span class="type">int</span> amount) { ... }
+    <span class="type">void</span> <span class="fn">destroy</span>() { ... }
+}</code></pre>
+      </div>
 
       <p>Now when we create something like</p>
 
-      <div class="article-code">class Troop extends GameEntity { ... }
-class Building extends GameEntity { ... }</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="kw">class</span> <span class="type">Troop</span> <span class="kw">extends</span> <span class="type">GameEntity</span> { ... }
+<span class="kw">class</span> <span class="type">Building</span> <span class="kw">extends</span> <span class="type">GameEntity</span> { ... }</code></pre>
+      </div>
 
       <p>These classes automatically gain health, damage handling, and destruction logic. No rewriting. No copy pasting. Just extension.</p>
 
@@ -83,7 +95,13 @@ class Building extends GameEntity { ... }</div>
 
       <p>Which means writing something like</p>
 
-      <div class="article-code">GameEntity x = new Wizard();</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="type">GameEntity</span> x = <span class="kw">new</span> <span class="type">Wizard</span>();</code></pre>
+      </div>
 
       <p>is perfectly valid.</p>
 
@@ -91,7 +109,13 @@ class Building extends GameEntity { ... }</div>
 
       <p>A Wizard must behave like a Troop in every context where a Troop is expected. If somewhere in the engine we have</p>
 
-      <div class="article-code">void applyRange(Troop t) { ... }</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="type">void</span> <span class="fn">applyRange</span>(<span class="type">Troop</span> t) { ... }</code></pre>
+      </div>
 
       <p>we should be able to pass a Wizard, an Archer, a P.E.K.K.A, without any problem. This idea, that a child must be safely usable as its parent, is called the <strong><a href="https://en.wikipedia.org/wiki/Liskov_substitution_principle" target="_blank" rel="noopener">Liskov Substitution Principle</a></strong>.</p>
 
@@ -111,7 +135,13 @@ class Building extends GameEntity { ... }</div>
 
       <p>But from the Game Engine's point of view, it just wants to say</p>
 
-      <div class="article-code">t.attack();</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>t.<span class="fn">attack</span>();</code></pre>
+      </div>
 
       <p>It does not care if <code>t</code> is P.E.K.K.A or Skeleton Army.</p>
 
@@ -121,17 +151,23 @@ class Building extends GameEntity { ... }</div>
         SAME INTERFACE. DIFFERENT BEHAVIOURS.
       </div>
 
-      <div class="article-code">class Troop {
-    void attack() { }
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="kw">class</span> <span class="type">Troop</span> {
+    <span class="type">void</span> <span class="fn">attack</span>() { }
 }
 
-class PEKKA extends Troop {
-    void attack() { swingIronSword(); }
+<span class="kw">class</span> <span class="type">PEKKA</span> <span class="kw">extends</span> <span class="type">Troop</span> {
+    <span class="type">void</span> <span class="fn">attack</span>() { <span class="fn">swingIronSword</span>(); }
 }
 
-class SkeletonArmy extends Troop {
-    void attack() { swingBoneSword(); }
-}</div>
+<span class="kw">class</span> <span class="type">SkeletonArmy</span> <span class="kw">extends</span> <span class="type">Troop</span> {
+    <span class="type">void</span> <span class="fn">attack</span>() { <span class="fn">swingBoneSword</span>(); }
+}</code></pre>
+      </div>
 
       <p>When you rewrite a method like this, the child replaces the parent behavior. This is <strong><a href="https://en.wikipedia.org/wiki/Method_overriding" target="_blank" rel="noopener">method overriding</a></strong>.</p>
 
@@ -145,9 +181,15 @@ class SkeletonArmy extends Troop {
 
       <p>Now contrast that with overloading. Overloading is when the method name is the same but the parameters are different.</p>
 
-      <div class="article-code">attack()
-attack(Building target)
-attack(Troop target)</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="fn">attack</span>()
+<span class="fn">attack</span>(<span class="type">Building</span> target)
+<span class="fn">attack</span>(<span class="type">Troop</span> target)</code></pre>
+      </div>
 
       <p>Same name but with different intent. The compiler picks the right version at compile time based on the argument types. That is called <strong><a href="https://en.wikipedia.org/wiki/Function_overloading" target="_blank" rel="noopener">compile-time polymorphism</a></strong>.</p>
 
@@ -164,14 +206,26 @@ attack(Troop target)</div>
 
       <p>Now imagine if every part of Clash Royale could directly modify a troop's health. Some random class could just do</p>
 
-      <div class="article-code">wizard.health = -5000;</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>wizard.health = <span class="num">-5000</span>;</code></pre>
+      </div>
 
       <p>Which is so wrong.</p>
 
       <p>Instead we hide health. We make it <strong><a href="https://en.wikipedia.org/wiki/Access_modifiers" target="_blank" rel="noopener">private</a></strong> so that no one can touch it directly. They must use controlled methods like</p>
 
-      <div class="article-code">takeDamage(int amount)
-heal(int amount)</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="fn">takeDamage</span>(<span class="type">int</span> amount)
+<span class="fn">heal</span>(<span class="type">int</span> amount)</code></pre>
+      </div>
 
       <p>So that we can control the rules. Maybe health cannot drop below zero. Maybe Elixir regains after a cooldown. Maybe certain troops have damage resistance.</p>
 
@@ -271,10 +325,16 @@ heal(int amount)</div>
 
       <p>An interface is just a contract. It has no state, no health bars, no variables, just a list of empty promises.</p>
 
-      <div class="article-code">class Dragon extends Troop implements Flyable, Burnable {
-    void fly() { ... }
-    void breatheFire() { ... }
-}</div>
+      <div class="article-code-block">
+        <div class="article-code-header">
+          <span class="article-code-lang">Java</span>
+          <button class="article-code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code><span class="kw">class</span> <span class="type">Dragon</span> <span class="kw">extends</span> <span class="type">Troop</span> <span class="kw">implements</span> <span class="type">Flyable</span>, <span class="type">Burnable</span> {
+    <span class="type">void</span> <span class="fn">fly</span>() { ... }
+    <span class="type">void</span> <span class="fn">breatheFire</span>() { ... }
+}</code></pre>
+      </div>
 
       <p>Because Flyable is just a contract saying "I know how to flap wings," there is no data to conflict. You can sign a hundred contracts, but you can only have one body.</p>
 
@@ -322,6 +382,20 @@ heal(int amount)</div>
   </div>
 
 </div>
+
+<script>
+function copyCode(btn) {
+  const code = btn.closest('.article-code-block').querySelector('code');
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
 
 </body>
 </html>
