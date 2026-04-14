@@ -48,6 +48,26 @@
 
   <!-- ═══════════ PROJECT 01 ═══════════ -->
   <div class="project">
+    <div class="project-name">Poolgrad — Memory Aware ML Runtime to Explore Neural Network Performance</div>
+    <div class="project-desc">
+      A minimal autograd engine built from scratch in Rust exploring where
+      neural network performance actually comes from. Implements reverse-mode
+      autograd over a dynamic graph, four matrix multiplication kernels
+      (naive, tiled, packed+SIMD, and an experimental Strassen-form mp variant),
+      a kernel scheduler, and a gradient memory pool with lifetime-based release.
+      CPU-only; SIMD via NEON on arm64 and AVX2+FMA on x86_64.
+    </div>
+    <div class="project-meta">STACK <span>Rust, Rayon, NEON/AVX2+FMA SIMD</span></div>
+    <div class="project-meta">ARCH <span>Dynamic autograd graph, kernel scheduler, size-based gradient memory pool</span></div>
+    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-links">
+      <a href="https://github.com/Prigoistic/poolgrad" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://shorturl.at/fKmj1" target="_blank" rel="noopener">Paper</a>
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 02 ═══════════ -->
+  <div class="project">
     <div class="project-name">Ananta — Energy-Based Self-Learning Architecture</div>
     <div class="project-desc">
       Research-driven LLM architecture exploring energy-based self-learning
