@@ -48,6 +48,26 @@
 
   <!-- ═══════════ PROJECT 01 ═══════════ -->
   <div class="project">
+    <div class="project-name">Engram — Redis-Wire-Compatible Vector Memory Engine</div>
+    <div class="project-desc">
+      A vector memory engine written from scratch in Rust with no dependencies
+      beyond libc. Hand-written NEON/AVX2 SIMD distance kernels (8.8× over
+      scalar), a from-scratch HNSW index (recall@10 = 1.0 vs brute force),
+      crash-safe mmap+WAL persistence (validated under kill -9), and a
+      self-pipe worker-pool reactor that holds p99 PING &lt; 0.6 ms under a
+      concurrent search storm. 123 tests.
+    </div>
+    <div class="project-meta">STACK <span>Rust (no deps beyond libc), NEON/AVX2 SIMD</span></div>
+    <div class="project-meta">ARCH <span>From-scratch HNSW, mmap+WAL persistence, self-pipe worker-pool reactor</span></div>
+    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-links">
+      <a href="https://github.com/Prigoistic/engram" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://prigoistic.me/engram" target="_blank" rel="noopener">Blog</a>
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 02 ═══════════ -->
+  <div class="project">
     <div class="project-name">Poolgrad — Memory Aware ML Runtime to Explore Neural Network Performance</div>
     <div class="project-desc">
       A minimal autograd engine built from scratch in Rust exploring where
