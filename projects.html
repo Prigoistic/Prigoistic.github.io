@@ -48,17 +48,17 @@
 
   <!-- ═══════════ PROJECT 01 ═══════════ -->
   <div class="project">
-    <div class="project-name">Engram — Redis-Wire-Compatible Vector Memory Engine</div>
+    <div class="project-name">engram — Redis-Wire Associative Vector Memory Engine</div>
     <div class="project-desc">
-      A vector memory engine written from scratch in Rust with no dependencies
-      beyond libc. Hand-written NEON/AVX2 SIMD distance kernels (8.8× over
-      scalar), a from-scratch HNSW index (recall@10 = 1.0 vs brute force),
-      crash-safe mmap+WAL persistence (validated under kill -9), and a
-      self-pipe worker-pool reactor that holds p99 PING &lt; 0.6 ms under a
-      concurrent search storm. 123 tests.
+      A Redis-wire-compatible (RESP) vector memory engine written from scratch in Rust with zero
+      dependencies beyond libc — works unchanged with redis-cli and existing clients. Hand-rolled
+      HNSW approximate nearest-neighbour index with a single-threaded event-driven I/O core over
+      raw kqueue/epoll and vector search offloaded to a worker pool. Hand-written SIMD distance
+      kernels in NEON (ARM64) and AVX2+FMA (x86_64) with runtime dispatch achieve ~9&times;
+      speedup at 768 dimensions; WAL + compacting mmap snapshot for crash-safe durability.
     </div>
-    <div class="project-meta">STACK <span>Rust (no deps beyond libc), NEON/AVX2 SIMD</span></div>
-    <div class="project-meta">ARCH <span>From-scratch HNSW, mmap+WAL persistence, self-pipe worker-pool reactor</span></div>
+    <div class="project-meta">STACK <span>Rust (no deps beyond libc), NEON/AVX2+FMA SIMD</span></div>
+    <div class="project-meta">ARCH <span>From-scratch HNSW, kqueue/epoll event loop, worker-pool I/O, mmap+WAL persistence</span></div>
     <div class="project-meta">STATUS <span>Open-sourced</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/engram" target="_blank" rel="noopener">GitHub</a>
@@ -67,6 +67,31 @@
   </div>
 
   <!-- ═══════════ PROJECT 02 ═══════════ -->
+  <div class="project">
+    <div class="project-name">cheeger — Differentiable Spectral Embedding for Dense Semantic Segmentation</div>
+    <div class="project-desc">
+      A from-scratch differentiable spectral-segmentation library in PyTorch that treats a
+      network's feature map as a graph and learns to segment by cutting graphs, motivated by the
+      Cheeger inequality bounding graph conductance by the Fiedler value &lambda;<sub>2</sub>.
+      Implements every spectral operator by hand — learned-metric affinity kernels, three
+      graph-Laplacian variants, k-NN sparsification, and a symmetric eigensolver (cyclic Jacobi
+      + Lanczos), each validated against numpy/scipy oracles. Hand-codes a degeneracy-robust
+      differentiable eigensolver replacing PyTorch's unstable <code>eigh</code> backward with
+      Lorentzian-broadened eigenvalue-gap gradients stable where eigenvalues collapse at segment
+      boundaries. Replaces fixed eigenbasis weighting with a learned, label-supervised spectral
+      response whose noise floor is set from the Marchenko–Pastur bulk edge; benchmarked as a
+      U-Net head on Cityscapes with mIoU / Boundary-IoU metrics.
+    </div>
+    <div class="project-meta">STACK <span>Python, PyTorch, NumPy, SciPy (test oracles only)</span></div>
+    <div class="project-meta">ARCH <span>Differentiable spectral graph operators, cyclic Jacobi + Lanczos eigensolver, OHEM/Lovász + Rayleigh losses, U-Net segmentation head</span></div>
+    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-links">
+      <a href="https://github.com/Prigoistic/cheeger" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://prigoistic.me/cheeger/" target="_blank" rel="noopener">Write-up</a>
+    </div>
+  </div>
+
+  <!-- ═══════════ PROJECT 03 ═══════════ -->
   <div class="project">
     <div class="project-name">Poolgrad — Memory Aware ML Runtime to Explore Neural Network Performance</div>
     <div class="project-desc">
