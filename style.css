@@ -703,6 +703,7 @@ hr {
   margin: 0;
   padding: 18px 20px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .article-code-block code {
@@ -770,25 +771,28 @@ hr {
 
 /* ── PDF VIEWER ── */
 .pdf-actions {
-  margin-top: 16px;
-  margin-bottom: 16px;
-  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
 }
 
 .pdf-actions a {
+  font-size: 12px;
   color: #9a9a9a;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.2s;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  border: 1px solid #222222;
+  border-radius: 4px;
+  padding: 8px 16px;
+  background: #0a0a0a;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
 .pdf-actions a:hover {
   color: #ffffff;
-}
-
-.pdf-actions .sep {
-  color: #333333;
-  margin: 0 8px;
+  border-color: #444444;
+  background: #111111;
 }
 
 .pdf-viewer-wrap {
@@ -804,27 +808,6 @@ hr {
   min-height: 600px;
   display: block;
   border: none;
-}
-
-.pdf-fallback {
-  display: none;
-  padding: 48px 24px;
-  text-align: center;
-  color: #9a9a9a;
-  font-size: 13px;
-}
-
-.pdf-fallback a {
-  color: #ffffff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-@media (max-width: 540px) {
-  .pdf-viewer {
-    height: 75vh;
-    min-height: 480px;
-  }
 }
 
 /* ── FOOTER ── */
@@ -877,8 +860,9 @@ hr {
     gap: 20px;
   }
 
+  /* Hide ASCII art at tablet — too small to read, wastes layout space */
   .ascii-art {
-    font-size: 9px;
+    display: none;
   }
 
   hr {
@@ -892,10 +876,54 @@ hr {
     max-width: 100%;
   }
 
+  /* ── Nav: begin wrapping gracefully at tablet ── */
+  nav {
+    line-height: 2;
+  }
+
+  nav a {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
   nav .sep {
     margin: 0 5px;
   }
 
+  /* ── Rows: stack at tablet so long values don't overflow ── */
+  .row {
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .row-label {
+    min-width: unset;
+    width: 100%;
+    font-size: 10px;
+    color: #666666;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .row-dots {
+    display: none;
+  }
+
+  .row-value {
+    text-align: left;
+    font-size: 14px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* ── Experience ── */
+  .exp-org {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* ── Article ── */
   .article-title {
     font-size: 28px;
   }
@@ -904,9 +932,18 @@ hr {
     font-size: 16px;
   }
 
+  .article-body blockquote {
+    font-size: 17px;
+  }
+
   .article-highlight {
     font-size: 14px;
     padding: 24px 20px;
+  }
+
+  .pdf-viewer {
+    height: 80vh;
+    min-height: 540px;
   }
 }
 
@@ -918,18 +955,23 @@ hr {
     padding: 28px 16px 44px;
   }
 
-  /* ── NAV: wrap gracefully ── */
+  /* ── NAV: flex-wrap so 7-item nav doesn't overflow viewport ── */
   nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 6px;
     margin-bottom: 36px;
-    line-height: 2;
+    line-height: 1;
   }
 
   nav a {
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
   }
 
   nav .sep {
-    margin: 0 4px;
+    margin: 0 3px;
   }
 
   /* ── HEADER ── */
@@ -984,36 +1026,25 @@ hr {
   /* ── SECTIONS ── */
   .section-title {
     font-size: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+    letter-spacing: 0.16em;
   }
 
   hr {
-    margin: 32px 0;
+    margin: 36px 0;
   }
 
-  /* ── ROWS: stack label/value vertically ── */
+  /* ── ROWS: font tightening on small screens ── */
   .row {
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   .row-label {
-    min-width: unset;
-    width: 100%;
-    margin-bottom: 2px;
-    font-size: 11px;
-  }
-
-  .row-dots {
-    display: none;
+    font-size: 10px;
   }
 
   .row-value {
-    text-align: left;
-    padding-left: 0;
     font-size: 13px;
-    white-space: normal;
-    word-break: break-word;
   }
 
   /* ── PROJECTS ── */
@@ -1029,10 +1060,18 @@ hr {
   .project-desc {
     font-size: 12px;
     max-width: 100%;
+    margin-bottom: 14px;
   }
 
   .project-meta {
     font-size: 11px;
+    color: #888888;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .project-meta span {
+    color: #aaaaaa;
   }
 
   .project-links a {
@@ -1065,10 +1104,11 @@ hr {
 
   .exp-details {
     font-size: 12px;
+    line-height: 1.75;
   }
 
   .exp-details .list-item {
-    margin-bottom: 6px;
+    margin-bottom: 10px;
   }
 
   /* ── PAPERS / NOTES ── */
@@ -1178,6 +1218,22 @@ hr {
     gap: 8px;
   }
 
+  /* ── PDF VIEWER ── */
+  .pdf-actions {
+    gap: 8px;
+  }
+
+  .pdf-actions a {
+    flex: 1;
+    text-align: center;
+    padding: 11px 12px;
+  }
+
+  .pdf-viewer {
+    height: 72vh;
+    min-height: 460px;
+  }
+
   /* ── FOOTER ── */
   .footer {
     font-size: 11px;
@@ -1247,6 +1303,16 @@ hr {
   .exp-details,
   .list-item {
     font-size: 11px;
+  }
+
+  .pdf-actions a {
+    font-size: 11px;
+    padding: 10px 10px;
+  }
+
+  .pdf-viewer {
+    height: 70vh;
+    min-height: 400px;
   }
 }
 
