@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Why World Models Need Memory</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #fff;
+  color: #222;
+  font-size: 17px;
+  line-height: 1.78;
+  -webkit-font-smoothing: antialiased;
+}
+.page { max-width: 700px; margin: 0 auto; padding: 72px 28px 120px; }
+
+.title-block { text-align: center; margin-bottom: 56px; }
+.title-block h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 400;
+  color: #2a2a2a;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 16px;
+}
+.title-block .date { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; }
+
+p { margin-bottom: 20px; color: #333; }
+p:last-child { margin-bottom: 0; }
+strong { font-weight: 700; color: #1a1a1a; }
+em { font-style: italic; }
+a { color: #1a1a1a; text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: #555; }
+
+.lead { font-weight: 700; color: #1a1a1a; margin-bottom: 22px; }
+blockquote { font-style: italic; color: #555; margin: 28px 0; }
+
+h2 {
+  font-size: clamp(20px, 2.8vw, 26px);
+  font-weight: 700; color: #111; line-height: 1.3;
+  margin-top: 64px; margin-bottom: 18px; letter-spacing: -0.01em;
+}
+h3 { font-size: 17px; font-weight: 700; color: #111; margin-top: 36px; margin-bottom: 10px; }
+h4 { font-size: 15.5px; font-weight: 700; color: #222; margin-top: 26px; margin-bottom: 8px; }
+
+ul, ol { padding-left: 22px; margin-bottom: 20px; }
+li { margin-bottom: 7px; color: #333; }
+li strong { color: #111; }
+
+hr { border: none; border-top: 1px solid #ebebeb; margin: 56px 0; }
+
+figure { margin: 28px 0 10px; overflow-x: auto; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { text-align: center; font-size: 13px; color: #999; margin-top: 10px; margin-bottom: 28px; font-style: italic; }
+
+.math-block {
+  margin: 22px 0; padding: 20px 24px;
+  background: #fafafa; border-left: 2px solid #d4d4d4;
+  border-radius: 0 6px 6px 0; overflow-x: auto;
+}
+.math-block .katex-display { margin: 10px 0; }
+.math-block p { margin-bottom: 6px; color: #555; font-size: 14px; line-height: 1.6; }
+
+.table-wrap { overflow-x: auto; margin: 28px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { border-bottom: 1.5px solid #ddd; padding: 9px 12px; text-align: left; font-weight: 700; color: #111; }
+tbody td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: #444; vertical-align: top; }
+tbody tr:last-child td { border-bottom: none; }
+.yes { color: #166534; font-weight: 600; }
+.no  { color: #991b1b; font-weight: 600; }
+.partial { color: #92400e; font-weight: 600; }
+
+code {
+  font-family: 'Menlo', 'Monaco', monospace; font-size: 0.83em;
+  background: #f3f3f3; padding: 2px 5px; border-radius: 3px; color: #1e1e1e;
+}
+.note {
+  font-size: 14.5px; color: #666; border-top: 1px solid #ebebeb;
+  padding-top: 14px; margin: 28px 0;
+}
+.note strong { color: #333; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; text-align: center; font-size: 13px; color: #bbb; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- shared arrow markers -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"/>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="title-block">
+  <h1>Why World Models Need Memory</h1>
+  <p class="date">June 2026 &nbsp;·&nbsp; Priyam Ghosh</p>
+</div>
+<blockquote>
+  "The failure of current world models at long horizons is not the absence of capacity.
+  It is the absence of a persistent memory hierarchy in the predictor."
+</blockquote>
+
+<p>
+  This piece works through the problem from the ground up. We start with why memory is inseparable from
+  prediction in biological brains, then watch language models rediscover the same lesson, then look at why
+  JEPA, the most promising world-model family, still cannot do it. From there we name the exact bottlenecks,
+  examine the partial solutions that exist and where each one stops, and only then build toward an
+  architecture that closes the gap. Nothing about the solution is introduced before the problem earns it.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     1 · NEUROSCIENCE: WHY MEMORY AT ALL
+══════════════════════════════════════════ -->
+
+<h2>1. The neuroscience case: why prediction requires memory</h2>
+
+<p>
+  Walk into your kitchen in the dark and your hand finds the light switch before your eyes find anything
+  at all. You already know where the counter ends, that the floor will hold, that the fridge is humming
+  to your right. None of that is sensation. It is prediction. What you experience as "seeing the room"
+  is mostly your brain rendering its own model of the room, with the actual light arriving a beat late,
+  used only to correct the parts the model got wrong.
+</p>
+<p>
+  This is the core of predictive processing, and Karl Friston gave it its sharpest form in the free
+  energy principle: a brain exists to minimize surprise. Not the jolt of a single startling moment, but
+  the long-run mismatch between what it expects and what the world actually delivers. To pull this off it
+  runs a <strong>generative model</strong> that is always a step ahead, forecasting the next sight, sound,
+  and touch. Perception is not the world flowing in. It is prediction flowing out, met halfway by evidence,
+  and the gap between the two, the prediction error, is the only thing the brain ever really learns from.
+</p>
+<p>
+  Here is the part that matters for us. A prediction is only as good as the history behind it. Strip away
+  memory and every moment arrives naked: no sense of what this place usually looks like, no expectation
+  that the cup you set down is still on the desk. Every glance would carry maximum surprise. A system like
+  that is not perceiving the world. It is transcribing it. A camera, not a mind.
+</p>
+<p>
+  Brains dodge this with not one memory system but two, running at different speeds. The
+  <strong>hippocampus</strong> writes fast: a new experience is laid down in seconds, vivid and specific,
+  which is why you can still picture exactly where you dropped your keys this morning. The
+  <strong>neocortex</strong> writes slow. Over nights of sleep it replays what the hippocampus caught and
+  quietly distills the patterns that repeat, until what remains is no longer "Tuesday's kitchen" but
+  kitchen-ness itself: what is always there, what tends to move, what can safely be ignored.
+</p>
+<p>
+  The trick that makes this work is restraint. If every fleeting experience rewrote long-term memory, one
+  strange afternoon could overwrite years of knowledge. So the brain gates the transfer. Fast memory fills
+  constantly; slow memory updates only when the evidence piles up into something stable and genuinely new.
+  That gate, the judgment of when a passing experience has earned a permanent place, is the quiet hinge the
+  whole system turns on. Lose it in one direction and you forget everything; lose it in the other and you
+  never learn anything new.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <!-- Hippocampus -->
+  <rect x="8" y="8" width="188" height="90" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="102" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">Hippocampus</text>
+  <line x1="8" y1="35" x2="196" y2="35" stroke="#a78bfa" stroke-width="1"/>
+  <text x="102" y="52" text-anchor="middle" font-size="11" fill="#4c1d95">Fast write · High fidelity</text>
+  <text x="102" y="67" text-anchor="middle" font-size="11" fill="#4c1d95">Episode-specific · Short-lived</text>
+  <text x="102" y="82" text-anchor="middle" font-size="11" fill="#4c1d95">Rapid encoding of surprise</text>
+
+  <!-- Arrow right to gate -->
+  <line x1="196" y1="53" x2="234" y2="53" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="215" y="47" text-anchor="middle" font-size="9" fill="#9ca3af">evidence</text>
+
+  <!-- Consolidation Gate -->
+  <rect x="238" y="8" width="196" height="90" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="336" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">Consolidation Gate</text>
+  <line x1="238" y1="35" x2="434" y2="35" stroke="#fcd34d" stroke-width="1"/>
+  <text x="336" y="52" text-anchor="middle" font-size="11" fill="#78350f">Fires when evidence is stable,</text>
+  <text x="336" y="67" text-anchor="middle" font-size="11" fill="#78350f">novel, and geometrically coherent</text>
+  <text x="336" y="82" text-anchor="middle" font-size="11" fill="#78350f">Suppresses noise-driven updates</text>
+
+  <!-- Arrow right to neocortex -->
+  <line x1="434" y1="53" x2="472" y2="53" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="453" y="47" text-anchor="middle" font-size="9" fill="#9ca3af">writes to</text>
+
+  <!-- Neocortex -->
+  <rect x="476" y="8" width="196" height="90" rx="6" fill="#ecfdf5" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="574" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">Neocortex</text>
+  <line x1="476" y1="35" x2="672" y2="35" stroke="#4ade80" stroke-width="1"/>
+  <text x="574" y="52" text-anchor="middle" font-size="11" fill="#14532d">Slow consolidation</text>
+  <text x="574" y="67" text-anchor="middle" font-size="11" fill="#14532d">Compressed · Permanent</text>
+  <text x="574" y="82" text-anchor="middle" font-size="11" fill="#14532d">Cross-episode abstract patterns</text>
+
+  <text x="340" y="118" text-anchor="middle" font-size="10" fill="#9ca3af" font-style="italic">New experiences encode fast. The gate decides when accumulated evidence justifies a slow, permanent update.</text>
+</svg>
+</figure>
+<figcaption>Figure 1. The brain's two-timescale memory architecture. Fast hippocampal encoding feeds a consolidation gate that updates the neocortex only when evidence is stable and genuinely novel.</figcaption>
+
+<p>
+  You can watch this play out in a rat. Tucked inside its hippocampus are <strong>place cells</strong>,
+  neurons that each fire for one particular spot in the world, and <strong>grid cells</strong> that tile
+  space into a coordinate system. Drop the rat into a room it knows and these cells light up in their
+  familiar order. It does not re-survey the walls. It remembers them, and that memory steadies its very
+  next move. A world model worth the name should do the same: walk into a region it has seen before,
+  recognize it, pull up what it already learned, and predict from there instead of starting over.
+  Evolution shipped this hundreds of millions of years ago. The open question is whether we can build it.
+</p>
+<p>
+  Which makes the state of machine learning a little strange. Nearly every system we know of that stays
+  competent over a long, shifting life leans on some version of this fast-slow, gated architecture. So why
+  do we keep building world models that throw it away? Before answering that for world models, it helps to
+  see the same problem appear, and get partly solved, in the systems we understand best.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     2 · MEMORY IN LLMs
+══════════════════════════════════════════ -->
+
+<h2>2. Language models hit this wall first</h2>
+
+<p>
+  A language model has no memory in the ordinary sense. Every time it answers, it reads the whole
+  conversation again from the top. Nothing carries over between turns except what gets fed back in as
+  text. For a short exchange this is invisible. But re-reading everything costs attention that grows with
+  the square of the length, so as a conversation stretches into hundreds of turns something has to give.
+  Either the model quietly drops the older parts of the context and loses track of what was decided an
+  hour ago, or it pays a steeply rising bill to keep attending to all of it.
+</p>
+<p>
+  The fixes that actually worked all converge on one idea: give the model a way to write things down.
+  The <strong>KV cache</strong> keeps the computed state of past tokens so they never have to be
+  reprocessed. <strong>Retrieval-augmented generation</strong> pushes knowledge out into a document
+  store and pulls back only the few passages that matter right now. <strong>Learned memory banks</strong>
+  let the model decide for itself which tokens are worth keeping and fetch them later by content.
+  Different mechanisms, one shape: instead of holding everything in mind at once, the model stores what
+  it learned in a durable form and reaches for it on demand.
+</p>
+<p>
+  The payoff is not subtle. A model that can write and retrieve handles long tasks on less compute,
+  because it stops re-deriving what it already worked out. The attention it saves goes to the new problem
+  in front of it rather than the old ones behind it. And it starts to accumulate: the notes it kept about
+  a codebase yesterday make it sharper today, where a memoryless model walks in every morning a stranger.
+</p>
+<p>
+  It is worth being exact about what counts here, because the obvious move, just enlarge the context
+  window, is not the same thing. A bigger context still forgets the instant it overflows. It dilutes, the
+  one fact you need buried under everything you don't. And it forces the model to search the entire
+  haystack on every single step. Real memory is the opposite: selective, structured, and durable. It
+  writes the important things on purpose, in a form built for retrieval, behind a gate that keeps noise
+  from crowding out signal. Those are the same three properties the brain's consolidation gate enforces.
+</p>
+<p>
+  World models face this exact problem one floor up. A language model forgets across turns; a world model
+  forgets across episodes. One loses the thread of a conversation, the other loses the room it mapped an
+  hour ago. The cure has the same skeleton: something fast to catch experience as it happens, something
+  slow to keep what proves durable, and a gate deciding what crosses between them. The hard part is fitting
+  that skeleton into a predictor that works in latent space, without wrecking the representations that cost
+  so much to train in the first place. To see why that is hard, look at how these world models are built.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     3 · JEPA AND THE LONG-HORIZON PROBLEM
+══════════════════════════════════════════ -->
+
+<h2>3. JEPA and the long-horizon memory gap</h2>
+
+<p>
+  JEPA, the Joint-Embedding Predictive Architecture, makes one decisive bet: do not predict what the
+  world looks like, predict what it means. A generative model labors to reconstruct every pixel of the
+  next frame. JEPA refuses to. Its encoder turns each observation into an abstract representation, and its
+  predictor learns to guess the next representation from the current one, training only to close the gap
+  between the two in that abstract space, with a stop-gradient on the target so the whole thing does not
+  collapse into predicting a constant.
+</p>
+<p>
+  This is the right bet, for a good reason. Pixels are full of things no planner should waste a thought
+  on: the grain of a wall, the exact shade of a shadow, the flicker of noise that will never repeat.
+  Predicting them burns compute on the parts of the world that are both unpredictable and irrelevant.
+  Predicting in latent space spends that compute where it counts, on what is where, what follows what,
+  what kind of place this is. The results bear it out: JEPA-family models match or beat generative
+  baselines on action-conditioned prediction, zero-shot robot planning, and video understanding, at a
+  fraction of the cost.
+</p>
+<p>
+  A few systems in this family are worth knowing by name, because the rest of the argument leans on them.
+</p>
+<ul>
+  <li>
+    <strong>V-JEPA 2:</strong> A frozen encoder combined with a learned video predictor. Strong
+    performance on action-conditioned prediction and zero-shot robot planning. Demonstrated that
+    a JEPA encoder pretrained on unlabeled video can generalize to robotics tasks without
+    task-specific fine-tuning.
+  </li>
+  <li>
+    <strong>V-JEPA 2.1:</strong> Fixed a specific weakness in V-JEPA 2 where token-level spatial
+    grounding was fragmented; representations were semantically coherent globally but lacked
+    precise local spatial structure needed for fine-grained manipulation tasks.
+  </li>
+  <li>
+    <strong>LeWorldModel (LeWM):</strong> The most architecturally clean. A stable end-to-end JEPA
+    trained from raw pixels without pretrained encoders, without stop-gradient heuristics, without
+    exponential moving average encoders. Just two loss terms. 15 million parameters. Trains on a
+    single consumer GPU in a few hours. Keep this one in mind; it matters later.
+  </li>
+  <li>
+    <strong>MC-JEPA:</strong> A pyramidal flow predictor, and the first hierarchical JEPA instantiation.
+    Showed that multi-resolution prediction in latent space is architecturally feasible, with
+    predictions at different spatial scales sharing a common embedding space.
+  </li>
+</ul>
+<p>
+  Every one of them shares the same blind spot: the predictor is stateless across episodes. LeWM's
+  encoder learns beautiful, general representations of how scenes evolve. V-JEPA 2 plans zero-shot. But
+  the instant an episode ends, none of what just happened survives in the predictor. Its weights froze at
+  the end of training and never move again. Episode one thousand starts from the identical prior as
+  episode one, as if the previous nine hundred and ninety-nine never occurred.
+</p>
+<p>
+  LeCun's 2022 H-JEPA vision explicitly named this as a structural goal: stack JEPA modules at
+  multiple levels of temporal abstraction. Lower-level JEPA handles moment-to-moment dynamics.
+  Higher-level JEPA handles long-horizon, scene-level abstractions. The hierarchy was the proposed
+  solution to the long-horizon planning problem. But the H-JEPA papers also acknowledge
+  what they left open: how many abstraction levels the hierarchy should have, how levels communicate
+  across episode boundaries, and what mechanism governs updating any level's representations when
+  world dynamics change. The two-tier structure was called "arbitrary." The cross-episode
+  update mechanism was left as future work.
+</p>
+<p>
+  That last item is the heart of it. The hierarchy tells the system what to predict at what timescale,
+  but it says nothing about how to carry experience across episodes or when to revise what the
+  predictor knows. Before we can propose a mechanism for that, we need to be precise about what
+  actually breaks when a stateless predictor runs at long horizons. "It forgets" is too vague to
+  build against. There are five distinct failure modes, and each one demands a different response.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     4 · THE FIVE BOTTLENECKS
+══════════════════════════════════════════ -->
+
+<h2>4. Five bottlenecks, five different root causes</h2>
+
+<p>
+  Each of these is a distinct failure with a distinct signature. Keeping them separate matters, because
+  any real solution will need a different mechanism for each one. Lump them together as "forgetting" and
+  you end up reaching for a single blunt instrument that fixes none of them cleanly.
+</p>
+
+<h3>Autoregressive predictive compounding</h3>
+<p>
+  A predictor that feeds on its own output has a problem built in. It guesses the next representation,
+  then feeds that guess back in to guess the one after, and so on. Each guess carries a small error, and
+  each error becomes part of the input to the next. The mistakes do not average out. They snowball.
+  Researchers at CMU and UCSD have traced exactly this in latent-space rollouts and named it
+  <strong>autoregressive latent drift</strong>: a few steps in, the predicted representation has wandered
+  away from anything the encoder would produce for the real scene. Plan against it and you are planning
+  against a hallucination.
+</p>
+<div class="math-block">
+  \[\varepsilon_{t+k} \approx \varepsilon_t \cdot (1 + \lambda)^k\]
+  <p>The growth is geometric. At λ = 0.02 the error is 7× larger after 100 steps. At λ = 0.05 it is 131× larger. Shaving down the per-step error helps a little, but it only changes λ. What actually tames this is re-anchoring the rollout to a real observation now and then, resetting the drift before it can run away.</p>
+</div>
+
+<h3>No write mechanism</h3>
+<p>
+  Freeze the encoder and predictor at inference, as every JEPA system does, and you cut the only wire by
+  which today's experience could reach tomorrow's prediction. A robot can watch a new kind of object for
+  an hour and retain nothing of it past the episode. This is not a setting you can tune or a dataset you
+  can enlarge. There is simply no channel through which the model can grow once it is deployed. It is, by
+  construction, incapable of learning from what it sees.
+</p>
+
+<h3>Noise vs. genuine change: the prediction error ambiguity</h3>
+<p>
+  Suppose the prediction error suddenly spikes. What does it mean? It could mean the world genuinely
+  changed, a wall moved, an object appeared, and the model ought to take note. Or it could be nothing:
+  sensor noise, a stochastic render, the model's own drift catching up with it. The trouble is that these
+  two cases can produce the exact same spike. Judge by magnitude alone and you cannot tell them apart.
+  React to every spike and noise quietly corrupts everything you know. Raise the bar to stay safe and you
+  sleep through the changes that mattered. Every memory system that wants to update itself runs straight
+  into this wall.
+</p>
+
+<h3>Dynamic drift blindness</h3>
+<p>
+  Not every change announces itself. A storeroom fills one box at a time over a month. A workspace creeps
+  into a new layout over weeks. At any single visit the scene looks unremarkable, so a stateless model
+  shrugs and moves on, every time. It never sees the trend, because seeing a trend requires comparing now
+  against a remembered then, and it has no remembered then. Ask it how the room has drifted across its
+  last three visits and it has no answer, because as far as it is concerned there were no last three visits.
+</p>
+
+<h3>Return visit degradation</h3>
+<p>
+  This is the one that stings in practice. A model can pass through the same environment a hundred times
+  and arrive on the hundredth visit no wiser than on the first, sometimes worse. With nothing consolidated,
+  every return is a first encounter. And the one crutch available, stuffing past observations back into the
+  context, decays on its own: the useful early frames get buried under a hundred recent irrelevant ones.
+  The experience is all there, technically. It is just completely out of reach.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Failure mode</th><th>Root cause</th><th>Observable signature</th><th>What fixes it</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Autoregressive compounding</strong></td><td>Errors feed next prediction</td><td>Rollout divergence at k &gt; 20 steps</td><td>Periodic re-anchoring to real observations</td></tr>
+      <tr><td><strong>No write mechanism</strong></td><td>Frozen weights at inference</td><td>Zero cross-episode transfer</td><td>A persistent write pathway</td></tr>
+      <tr><td><strong>Noise vs. genuine change</strong></td><td>Error magnitude is ambiguous</td><td>False update storms on noise</td><td>Gating on geometry, not magnitude</td></tr>
+      <tr><td><strong>Dynamic drift blindness</strong></td><td>No incremental accumulation</td><td>Misses gradual scene changes</td><td>Incrementally updated representations</td></tr>
+      <tr><td><strong>Return visit degradation</strong></td><td>No consolidated retrieval</td><td>Flat or declining performance</td><td>Consolidated, retrievable memory</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Five failures, five root causes, five mechanisms that would have to be built. There is no single lever
+  that throws all of them at once, which already tells you any honest solution has to be modular. The good
+  news is that the field has not been idle. Several systems tackle one or two of these directly, and seeing
+  exactly how far each one gets, and where it stalls, is what points the way to the rest.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     5 · EXISTING SOLUTIONS: HWM, FF-JEPA, PAM
+══════════════════════════════════════════ -->
+
+<h2>5. The partial solutions, and where each one stalls</h2>
+
+<p>
+  Three systems take real runs at the long-horizon problem, each from a different angle. None of them
+  ends up giving the predictor a memory that survives between episodes, but that is precisely what makes
+  them useful to study. The place where each one stops is a clue to what is actually missing.
+</p>
+
+<h3>Hierarchical World Models (HWM)</h3>
+<p>
+  HWM splits the problem across two levels. A <strong>high-level planner</strong> thinks in coarse
+  subgoals, the milestones of a task, while a <strong>low-level predictor</strong> handles the
+  frame-by-frame dynamics needed to reach each one. The planner doesn't reason about raw actions at all;
+  an Action Encoder folds whole sequences of primitive actions into single "latent macro-actions," so the
+  top of the hierarchy plans in big strokes and the bottom fills in the detail.
+</p>
+<p>
+  And it works. On Push-T, HWM lands 61 to 70% task success where flat models manage 17%. On hard robotic
+  arm control it reaches 70% zero-shot against a flat baseline stuck near zero. It even runs cheaper, about
+  3× less compute, because it can stop at a coarse level whenever fine detail is not needed. The interesting
+  question is why dividing the horizon helps this much, and the answer goes straight back to the compounding
+  problem from the last section.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 285" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <!-- High-level planner bar -->
+  <rect x="8" y="8" width="664" height="68" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5"/>
+  <text x="340" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0369a1">High-Level Planner (slow, abstract)</text>
+  <line x1="8" y1="37" x2="672" y2="37" stroke="#7dd3fc" stroke-width="1"/>
+  <text x="340" y="54" text-anchor="middle" font-size="11.5" fill="#075985">Subgoal sequence: g₁ → g₂ → g₃ &nbsp;·&nbsp; Action Encoder compresses primitive actions into Latent Macro-Actions</text>
+  <text x="340" y="68" text-anchor="middle" font-size="11" fill="#075985">Operates on coarse representations across many timesteps</text>
+
+  <!-- Arrows from planner to subgoals -->
+  <line x1="170" y1="76" x2="170" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="340" y1="76" x2="340" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="510" y1="76" x2="510" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="170" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₁</text>
+  <text x="340" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₂</text>
+  <text x="510" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₃</text>
+
+  <!-- Low-level predictors -->
+  <rect x="60" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="170" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="60" y1="145" x2="280" y2="145" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="170" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="170" y="175" text-anchor="middle" font-size="11" fill="#475569">z₁ … z_k</text>
+
+  <rect x="230" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="340" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="230" y1="145" x2="450" y2="145" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="340" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="340" y="175" text-anchor="middle" font-size="11" fill="#475569">z_k … z_2k</text>
+
+  <rect x="400" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="510" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="400" y1="145" x2="620" y2="145" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="510" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="510" y="175" text-anchor="middle" font-size="11" fill="#475569">z_2k … z_3k</text>
+
+  <!-- Error bounding annotations -->
+  <line x1="60" y1="210" x2="280" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="170" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+  <line x1="230" y1="210" x2="450" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="340" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+  <line x1="400" y1="210" x2="620" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="510" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+
+  <text x="340" y="258" text-anchor="middle" font-size="10.5" fill="#94a3b8">Subgoal boundaries act as re-anchor points · high-level plan persists across low-level noise</text>
+  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#94a3b8">Error per interval: (1+λ)^(N/K) vs full rollout: (1+λ)^N — a dramatic reduction in worst-case drift</text>
+</svg>
+</figure>
+<figcaption>Figure 2. HWM architecture. The hierarchy bounds error compounding per subgoal interval rather than across the full rollout.</figcaption>
+
+<h3>How subgoal decomposition counters predictive error compounding</h3>
+<p>
+  Recall that error grows as \((1+\lambda)^N\) over an \(N\)-step rollout, the snowball from the previous
+  section. Now cut that rollout into \(K\) subgoals. Inside each one the predictor only runs free for
+  \(N/K\) steps before it hits a boundary and the high-level plan pins it back to a known target. So the
+  worst the error can get is no longer set by the full horizon, only by the length of one segment.
+</p>
+<div class="math-block">
+  \[\text{Flat rollout: } \varepsilon_{\max} = \varepsilon_0 \cdot (1+\lambda)^N\]
+  \[\text{With } K \text{ subgoals: } \varepsilon_{\max} = \varepsilon_0 \cdot (1+\lambda)^{N/K}\]
+  <p>Take λ = 0.02, N = 100, K = 5. The worst-case drift falls from 7.2× down to 1.49×. The subgoal boundary is, in effect, a free anchor: the same re-anchoring trick the compounding problem was crying out for, supplied here by the plan rather than by memory.</p>
+</div>
+<p>
+  That free anchor is the whole story. Because the high-level plan holds steady while the low-level
+  predictor wobbles, the agent always has somewhere to aim. It never gets truly lost the way a flat
+  predictor does when its own noise snowballs into nonsense. Which is why subgoal agents finish
+  long-horizon tasks far more often even when, step for step, their predictions are no more accurate.
+  HWM buys a real reduction in compounding. What it does not buy is memory: when the episode ends, the
+  plan and everything under it evaporate.
+</p>
+
+<h3>FF-JEPA: the dual-engine approach</h3>
+<p>
+  FF-JEPA, from June 2026, gets at the same anchoring effect a different way. It pairs a
+  <strong>goal-free latent planner</strong>, which sketches a plausible future trajectory without being
+  handed a target image, with an <strong>action-conditioned model</strong> that executes against that
+  sketch. The move that makes it work is a feedback loop: the planner's high-level expectation is folded
+  back into the encoder, so the representation the predictor sees already carries a sense of where things
+  are headed.
+</p>
+<p>
+  The effect is an attractor. When local noise nudges a prediction off course, the top-down expectation
+  tugs it back. The representation \(z_t\) is built from the bottom-up observation and the planner's
+  expected trajectory \(h_t\) at once, so it is harder to knock loose. Same strength as HWM, then, and the
+  same ceiling: it steadies prediction within an episode, and carries nothing across episode boundaries.
+</p>
+
+<h3>PAM: Predictive Associative Memory</h3>
+<p>
+  PAM, Predictive Associative Memory, is the only one of the three that even tries to remember. It keeps a
+  key-value store in the predictor's latent space: see an observation that resembles something filed away,
+  pull the stored version back out, and use it to sharpen the current prediction. That is a genuine write
+  mechanism, and in principle it can hold information across episodes, which already sets PAM apart.
+</p>
+<p>
+  But look at how the memory is used. PAM treats the store as a <em>destination</em>: write observations
+  in, retrieve the relevant ones, paste them alongside the current input. That is in-context memory wearing
+  a different hat, and it drags along every in-context flaw. It dilutes as the store fills. It costs more to
+  search as it grows. And, fatally for our list, it has no gate, so it cannot tell a genuine change from
+  noise and it never consolidates anything into the predictor's own weights. The buffer should not be a
+  place you read from. It should be a <em>signal</em>, something whose accumulated evidence decides when
+  the predictor itself ought to change. PAM has the wire but not the judgment.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Failure mode</th><th>HWM</th><th>FF-JEPA</th><th>PAM</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Autoregressive compounding</strong></td><td class="partial">Partial — bounded per interval</td><td class="partial">Partial — feedback re-anchors</td><td class="partial">Partial — retrieval can anchor</td></tr>
+      <tr><td><strong>No write mechanism</strong></td><td class="no">No</td><td class="no">No</td><td class="partial">Partial — retrieval only</td></tr>
+      <tr><td><strong>Noise vs. genuine change</strong></td><td class="no">No</td><td class="no">No</td><td class="no">No — no gating</td></tr>
+      <tr><td><strong>Dynamic drift blindness</strong></td><td class="no">No</td><td class="no">No</td><td class="no">No — snapshots not accumulation</td></tr>
+      <tr><td><strong>Return visit degradation</strong></td><td class="partial">Partial — subgoal reuse</td><td class="no">No</td><td class="partial">Partial — if retrieved correctly</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Lay the three side by side and a pattern jumps out. Each one solves a failure mode or two and leaves the
+  rest untouched, and the failures they all walk past are the same ones: telling real change from noise,
+  noticing slow drift, and writing what is learned into the predictor itself. Every one of those wants the
+  same missing piece, a gate that judges accumulated evidence by its <em>geometry</em> rather than by the
+  size of any single error, and that commits to a permanent update only when the evidence has earned it.
+  That is exactly the piece the brain has and none of these systems do. The next section asks what it would
+  take to build it.
+</p>
+
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     6 · THE GAP AND THE IDEA
+══════════════════════════════════════════ -->
+
+<h2>6. What if the predictor could remember?</h2>
+
+<p>
+  Step back and take stock. HWM and FF-JEPA make prediction within an episode markedly steadier. PAM goes
+  further and writes things down, but reads them back the wrong way. And the moment any episode ends, all
+  three snap back to the same frozen prior they began with. For all their differences, the predictor at the
+  center is amnesiac in exactly the same way.
+</p>
+<p>
+  The reflex, when a JEPA system buckles at long horizons, is to reach for more: a longer context window,
+  a bigger model, more frequent fine-tuning. None of these touches the actual problem. A longer context is
+  more to look at, not more structure to remember. A bigger model is more capacity, not more adaptability.
+  Fine-tuning trades the old knowledge for the new instead of holding both. The question was never how to
+  give the predictor more of the present. It is how to give it a past: a memory that gathers experience
+  across episodes and rewrites what the predictor knows only when that experience has genuinely earned it.
+</p>
+<p>
+  We already have a working blueprint for this, and it has been sitting in Section 1 the whole time. The
+  hippocampus writes fast. The neocortex consolidates slow. A gate between them holds the line, committing
+  to a permanent change only when the evidence clusters into something stable, novel, and geometrically
+  coherent, never on the strength of one loud error. So the question almost asks itself: what if we built
+  that gate for a JEPA predictor?
+</p>
+<p>
+  Picture it concretely. A fast buffer catches the surprising moments as they happen, in latent space. An
+  online clustering step groups those moments by where they land, so the geometry becomes visible. A gate
+  watches the clusters and fires only when one settles into stable new structure. And when it fires, a
+  small, reversible adapter nudges the predictor's weights to absorb what was learned, while the encoder,
+  with its hard-won representations, stays frozen and untouched. Fast capture, slow consolidation, a gate
+  in between. The brain's design, ported to a predictor.
+</p>
+<p>
+  Stated plainly, the bet is this: <strong>a two-timescale memory in the predictor, a fast episodic buffer
+  in latent space feeding a consolidation-gated slow weight update, is the minimal sufficient mechanism for
+  continual world-model prediction across long horizons, tracking non-stationary scenes with bounded
+  forgetting, and needing no demonstrations and no replay buffer.</strong> The rest of this piece is what
+  that looks like when you actually build it.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     7 · MAPA: WHAT IT IS
+══════════════════════════════════════════ -->
+
+<h2>7. MAPA, end to end</h2>
+
+<p>
+  We call it <strong>MAPA</strong>, the Memory-Augmented Predictive Architecture. It is not a new world
+  model. It is a memory layer that wraps an existing JEPA predictor, and in the reference build that
+  predictor is LeWorldModel, the clean 15-million-parameter system from Section 3. One rule sits above all
+  the others: the encoder is never touched. The representations it learned in pretraining are the bedrock
+  everything else stands on, and disturbing them would defeat the purpose. Every adaptation MAPA makes
+  flows through a single LoRA adapter on the predictor, roughly 0.8% extra parameters, and the original
+  weights can always be restored exactly.
+</p>
+<p>
+  It comes apart into seven components, and the seams are deliberate. Each one answers a specific failure
+  mode from Section 4, which means each one can be removed on its own to see what breaks. That ablation
+  table is not an afterthought; it is one of the central results the whole project is built to produce.
+  Here is the system whole, then we will walk it piece by piece.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 598" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <!-- Frozen base -->
+  <rect x="8" y="8" width="664" height="100" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="340" y="28" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">FROZEN BASE (never updated at inference)</text>
+  <rect x="22" y="35" width="300" height="63" rx="5" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="172" y="55" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Encoder φ</text>
+  <text x="172" y="72" text-anchor="middle" font-size="11" fill="#475569">ViT · 192-dim · SIGReg-trained</text>
+  <text x="172" y="87" text-anchor="middle" font-size="11" fill="#475569">Maps observations → latent z_t</text>
+  <rect x="358" y="35" width="300" height="63" rx="5" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="508" y="55" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Predictor f_θ + LoRA Δθ</text>
+  <text x="508" y="72" text-anchor="middle" font-size="11" fill="#475569">LeWM predictor · rank r=8 adapter</text>
+  <text x="508" y="87" text-anchor="middle" font-size="11" fill="#475569">~0.8% params · only Δθ updates</text>
+
+  <!-- Arrow -->
+  <line x1="340" y1="108" x2="340" y2="133" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="360" y="125" font-size="10.5" fill="#64748b">z_t ∈ ℝ¹⁹²</text>
+
+  <!-- C2 -->
+  <rect x="8" y="137" width="664" height="58" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="340" y="157" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">C2 · Adaptive Threshold Filter</text>
+  <text x="340" y="173" text-anchor="middle" font-size="11" fill="#78350f">τ(t) = μ_W + α·σ_W &nbsp;(W=100 steps, α=2.0) &nbsp;·&nbsp; only "surprising" observations pass through</text>
+  <text x="340" y="187" text-anchor="middle" font-size="10.5" fill="#92400e">adapts as predictor improves · maintains sensitivity even as baseline error falls</text>
+
+  <line x1="340" y1="195" x2="340" y2="218" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C3 -->
+  <rect x="8" y="222" width="664" height="60" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="340" y="242" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d4ed8">C3 · Fast Episodic Buffer &nbsp;←&nbsp; hippocampus</text>
+  <text x="340" y="258" text-anchor="middle" font-size="11" fill="#1e3a8a">2048 entries · 5-tuple × 192-dim · ~7.5MB · (z_t, a_t, z_{t+1}, ε_t, episode_id)</text>
+  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#1e3a8a">surprise-weighted LRU eviction · fast write at every surprising timestep</text>
+
+  <line x1="340" y1="282" x2="340" y2="305" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C4 -->
+  <rect x="8" y="309" width="664" height="60" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="340" y="329" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">C4 · Online Streaming K-Means</text>
+  <text x="340" y="345" text-anchor="middle" font-size="11" fill="#14532d">K=8–16 clusters · cosine similarity · τ_assign=0.85 · EMA centroids β=0.95</text>
+  <text x="340" y="360" text-anchor="middle" font-size="10.5" fill="#166534">tracks gradual scene drift via centroid movement · sudden shifts spawn new clusters</text>
+
+  <line x1="340" y1="369" x2="340" y2="392" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C5 -->
+  <rect x="8" y="396" width="664" height="68" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="340" y="416" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">C5 · Consolidation Gate &nbsp;—&nbsp; ALL THREE required</text>
+  <text x="340" y="433" text-anchor="middle" font-size="11" fill="#78350f">① support(k) ≥ N_min &nbsp;·&nbsp; ② tightness(k) ≤ σ²_max &nbsp;·&nbsp; ③ novelty(k) ≥ δ_novel</text>
+  <text x="340" y="449" text-anchor="middle" font-size="10.5" fill="#92400e">tightness is the noise discriminator: noise = dispersed clusters · real change = tight clusters</text>
+  <text x="340" y="463" text-anchor="middle" font-size="10.5" fill="#92400e">any single criterion is gameable by noise · all three together are not</text>
+
+  <!-- Fork -->
+  <path d="M340,464 L340,488 L178,488" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <path d="M340,488 L502,488" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <text x="340" y="484" text-anchor="middle" font-size="10" fill="#9ca3af" font-style="italic">gate fires</text>
+
+  <!-- C6 -->
+  <rect x="8" y="492" width="328" height="68" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="172" y="512" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">C6 · LoRA Update</text>
+  <line x1="8" y1="519" x2="336" y2="519" stroke="#a78bfa" stroke-width="1"/>
+  <text x="172" y="535" text-anchor="middle" font-size="11" fill="#4c1d95">32-entry raw cache · 20 Adam steps · lr=1e-4</text>
+  <text x="172" y="550" text-anchor="middle" font-size="11" fill="#4c1d95">discard cache after update · only Δθ=BA persists</text>
+
+  <!-- C7 -->
+  <rect x="344" y="492" width="328" height="68" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="508" y="512" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">C7 · Landmark Set &nbsp;←&nbsp; neocortex</text>
+  <line x1="344" y1="519" x2="672" y2="519" stroke="#4ade80" stroke-width="1"/>
+  <text x="508" y="535" text-anchor="middle" font-size="11" fill="#14532d">one 192-dim centroid per gate fire</text>
+  <text x="508" y="550" text-anchor="middle" font-size="11" fill="#14532d">kilobytes total · permanent · queryable</text>
+
+  <!-- Feedback arrow: C7 landmark retrieval feeds predictor at every step -->
+  <path d="M620,556 L638,556 L638,55 L622,55" stroke="#4ade80" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="642" y="310" font-size="9" fill="#4ade80" transform="rotate(90,642,310)">retrieval at every step</text>
+</svg>
+</figure>
+<figcaption>Figure 3. The MAPA system end to end. Gate fires are rare, happening only when evidence is sufficient. Landmark retrieval (dashed arrow) happens at every single step, anchoring predictions continuously.</figcaption>
+
+<p>
+  One contrast with PAM is worth pausing on, because it is the whole design philosophy in miniature. PAM's
+  buffer was a place to read from. MAPA's buffer is a place to listen to. Nothing is ever retrieved out of
+  the episodic buffer directly; its job is to accumulate evidence and feed the gate, and the gate decides
+  when the predictor should change. What actually persists and gets used at inference are the landmarks and
+  the LoRA adapter, both of them products of consolidation, never the raw buffer itself. The buffer is the
+  signal. The landmarks and the adapter are the memory.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     8 · MAPA INTERNALS IN DETAIL
+══════════════════════════════════════════ -->
+
+<h2>8. Inside the memory: what gets kept, and how it knows</h2>
+
+<h3>Only the surprises get written down</h3>
+<p>
+  Most of what a model sees is unremarkable, and writing all of it down would drown the signal. So the
+  first gate, the adaptive threshold filter (C2), lets through only the observations that genuinely
+  surprise the predictor, the ones whose error clears a moving bar set from the recent past:
+  \(\tau(t) = \mu_W + \alpha\sigma_W\), where the window \(W\) is the last 100 steps and \(\alpha = 2.0\)
+  picks off roughly the top 2.3% of recent errors.
+</p>
+<p>
+  The bar has to move, and that is the subtle part. As the adapter learns, the predictor gets better and
+  its everyday error shrinks. A fixed threshold would slowly fall silent, nothing ever clearing it again,
+  and the system would stop noticing anything. Tying the threshold to the recent error distribution keeps
+  "surprising" defined relative to how good the predictor currently is, so it stays alert in a new
+  environment instead of going numb.
+</p>
+
+<h3>What a single memory looks like</h3>
+<p>
+  Each thing written to the buffer is a small five-part record,
+  \((z_t, a_t, z_{t+1}, \varepsilon_t, \text{episode\_id})\), and every field is there for a reason.
+</p>
+<ul>
+  <li><strong>\(z_t\)</strong> is where the model was in representation space, the latent address of the moment.</li>
+  <li><strong>\(a_t\)</strong> is the action taken, needed later because the weight update has to predict what follows <em>given</em> what the agent did.</li>
+  <li><strong>\(z_{t+1}\)</strong> is where it actually ended up, the target the update is trained toward, with a stop-gradient so it stays a fixed goal.</li>
+  <li><strong>\(\varepsilon_t\)</strong> is how surprised the model was, which doubles as the entry's priority: the more surprising a memory, the longer it survives eviction.</li>
+  <li><strong>\(\text{episode\_id}\)</strong> tags where it came from, so the gate can see whether a pattern recurs across episodes or is just one episode's fluke.</li>
+</ul>
+<p>
+  All of it fits in about 7.5MB: 2048 entries of five 192-dim vectors. That smallness is intentional. The
+  buffer is not an archive of everything that happened. It is a compact, self-refreshing scratchpad of
+  recent surprises, just rich enough for the clustering step to find structure in.
+</p>
+
+<h3>Telling a real change from a passing fluke</h3>
+<p>
+  This is the heart of it, the failure mode nothing else in Section 5 could handle. The clustering step
+  (C4) takes each surprising \(z_t\) and drops it onto the nearest existing centroid if it is close enough
+  in cosine similarity, past \(\tau_\text{assign} = 0.85\), updating that centroid by EMA with decay
+  \(\beta = 0.95\). If nothing is close enough, it opens a new cluster. So the geometry of recent surprise
+  is always laid out in front of the gate, grouped and visible.
+</p>
+<p>
+  The \(\beta = 0.95\) decay gives each centroid a memory of about 20 steps, which is exactly what lets it
+  follow slow drift: as a scene gradually changes, its centroid slides along with it, and the distance it
+  has traveled, \(\|c_{k,t} - c_{k,0}\|\), is a number you can read off. A sudden change does something
+  different, it opens a fresh cluster rather than smearing an old one, and that is the right instinct,
+  because an abrupt change and a slow drift are genuinely different events and deserve different memories.
+</p>
+<p>
+  Now the discriminator the whole architecture turns on. When surprise spikes, is it real or noise? The
+  answer is in the shape of the cluster, not the size of the error. The gate (C5) measures
+  <strong>tightness</strong>:
+</p>
+<div class="math-block">
+  \[\text{tightness}(k) = \frac{1}{n_k}\sum_i \|z_i - c_k\|^2\]
+  <p>Noise scatters. A spike from sensor jitter or drift lands somewhere random, and a cluster of such spikes is loose and diffuse, with high within-cluster variance. A real change does the opposite: several observations of the same new thing pile up in the same region, forming a tight, coherent knot. Same error magnitude, completely different geometry.</p>
+  <p>This is what lets MAPA separate a true scene change from a compounding-error spike of identical size, the thing a magnitude threshold simply cannot do. It is also exactly the claim the matched-noise experiment is built to test: manufacture noise events with the same error magnitude as real changes, and check that the gate fires on the changes and stays quiet on the noise where an adaptive learning-rate schedule cannot tell the difference.</p>
+</div>
+<p>
+  Tightness alone is not enough, though, and the gate insists on all three of these at once:
+</p>
+<div class="math-block">
+  \[\text{(1)}\;\; \text{support}(k) \geq N_{\min} \qquad \text{enough evidence, not one stray point}\]
+  \[\text{(2)}\;\; \text{tightness}(k) \leq \sigma^2_{\max} \qquad \text{coherent in shape, not scattered noise}\]
+  \[\text{(3)}\;\; \text{novelty}(k) = \min_j \operatorname{sim}(c_k, L_j) \leq 1 - \delta_{\text{novel}} \qquad \text{genuinely new, not already known}\]
+  <p>Each guards a different way of being fooled. Drop support and the gate fires on a single lucky point. Drop tightness and it fires on noise. Drop novelty and it keeps re-learning something it already stored. Demanding all three together means a memory becomes permanent only when it is well-evidenced, coherent, and actually new, which is a high bar on purpose.</p>
+</div>
+
+<h3>Writing it in: a nudge, not an overwrite</h3>
+<p>
+  When the gate finally fires, the update is small and careful. The system pulls 32 records from a short
+  raw cache and runs 20 Adam steps at \(1\times10^{-4}\), and the only thing that moves is the LoRA adapter:
+</p>
+<div class="math-block">
+  \[\Delta\theta = B \cdot A, \qquad A \in \mathbb{R}^{r \times d_{\text{in}}},\;\; B \in \mathbb{R}^{d_{\text{out}} \times r},\;\; r = 8\]
+  <p>That is about 0.8% of the predictor's parameters, and the base weights θ never move. New knowledge lands entirely in the adapter, which means the core representation cannot be catastrophically overwritten: the adapter can overfit and be reset, and the model underneath is still intact.</p>
+</div>
+<p>
+  The two roads not taken are the point. Full fine-tuning would let each update trample the last, exactly
+  the forgetting we set out to avoid. A replay buffer would mean hauling around raw observations at a scale
+  the project deliberately refuses. LoRA is the smallest pathway that still writes: structured, durable,
+  and bounded enough that nothing it does is irreversible.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     9 · ARCHITECTURAL CHOICES AND PRE-TRAINING
+══════════════════════════════════════════ -->
+
+<h2>9. Architectural choices and pre-training design</h2>
+
+<p>
+  Two pre-training choices make everything in Section 8 actually work. They are easy to skip past as
+  implementation detail, but the gating quietly depends on both.
+</p>
+
+<h3>Why SIGReg and not an EMA encoder</h3>
+<p>
+  Standard JEPA keeps representations from collapsing by running a second, slowly-updating copy of the
+  encoder as a target, the exponential moving average trick. It works, but it doubles the trainable
+  parameters and bolts on real complexity. LeWorldModel showed you do not need it: a geometric
+  regularization loss prevents collapse just as well, with no shadow network at all. MAPA takes the same
+  route and trains its encoder with SIGReg, which adds that geometric term on top of the usual contrastive
+  loss.
+</p>
+<div class="math-block">
+  \[\mathcal{L} = \mathcal{L}_{\text{InfoNCE}} + \lambda_{\text{geo}} \cdot \mathcal{L}_{\text{geo}}\]
+  \[\mathcal{L}_{\text{geo}} = \mathbb{E}_{i,j}\!\left[\bigl(\|\varphi(s_i) - \varphi(s_j)\| - d_{\text{obs}}(s_i, s_j)\bigr)^2\right]\]
+  <p>The geometric term forces distances in latent space to track distances in the real world, which is the same as bounding how fast the encoder can stretch space. This is not housekeeping. The whole gate runs on cosine similarity, and cosine similarity only means "semantically alike" if the latent space is metrically honest. Skip SIGReg and two nearly identical scenes can land far apart, shattering one coherent place into a dozen phantom clusters and making the tightness test meaningless. The gate is only as trustworthy as the geometry underneath it.</p>
+</div>
+
+<h3>Why LeJEPA with multi-step targets</h3>
+<p>
+  The predictor is trained to look several steps ahead at once, \(k \in \{1, 2, 4, 8, 16\}\), not just one
+  step like vanilla JEPA. Two things follow, and both feed back into the memory system. First, a predictor
+  that is decent at long horizons has a lower baseline error, which gives the adaptive threshold a quieter
+  background to pick surprises out of. Second, training across timescales forces representations that mean
+  something at every scale, coarse enough for the long view, fine enough for the next frame. That is
+  exactly the split the memory relies on: the buffer works the fine grain, the landmarks hold the coarse.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 248" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <!-- Input -->
+  <rect x="8" y="8" width="664" height="38" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="340" y="32" text-anchor="middle" font-size="12" fill="#475569">Multi-episode unlabeled video observation stream</text>
+  <line x1="340" y1="46" x2="340" y2="68" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Stage 1: SIGReg -->
+  <rect x="8" y="72" width="664" height="72" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="340" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Stage 1 · SIGReg Encoder Pre-training</text>
+  <line x1="8" y1="100" x2="672" y2="100" stroke="#a78bfa" stroke-width="1"/>
+  <text x="340" y="116" text-anchor="middle" font-size="11" fill="#4c1d95">L = L_InfoNCE + λ_geo · L_geo &nbsp;·&nbsp; metric-preserving latent space</text>
+  <text x="340" y="132" text-anchor="middle" font-size="11" fill="#4c1d95">No EMA target network · halves trainable params · bounds encoder Lipschitz constant</text>
+
+  <line x1="340" y1="144" x2="340" y2="166" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Stage 2: LeJEPA -->
+  <rect x="8" y="170" width="664" height="72" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="340" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Stage 2 · LeJEPA Predictor Pre-training</text>
+  <line x1="8" y1="198" x2="672" y2="198" stroke="#60a5fa" stroke-width="1"/>
+  <text x="340" y="214" text-anchor="middle" font-size="11" fill="#1e3a8a">Multi-step targets k ∈ {1,2,4,8,16} &nbsp;·&nbsp; L_JEPA = ||f_θ(z_t,k) − sg[φ(s_{t+k})]||²</text>
+  <text x="340" y="230" text-anchor="middle" font-size="11" fill="#1e3a8a">Representations meaningful at multiple timescales · aligns with MAPA fast/slow memory split</text>
+
+  <line x1="340" y1="242" x2="340" y2="248" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="400" y="247" font-size="11" fill="#64748b">Frozen φ + initialized f_θ → MAPA runtime</text>
+</svg>
+</figure>
+<figcaption>Figure 4. Pre-training pipeline. SIGReg and LeJEPA are designed together to give MAPA's gating a metrically consistent latent space.</figcaption>
+
+<h3>The inference loop, step by step</h3>
+<p>
+  At runtime the encoder and base predictor are frozen; the only thing that ever moves is the adapter.
+  Each timestep runs the same seven steps:
+</p>
+<ol>
+  <li>Encode the observation: \(z_t = \varphi(s_t)\).</li>
+  <li>Pull the nearest landmark, \(\hat{L} = \arg\min_j \operatorname{sim}(z_t, L_j)\), to anchor the prediction.</li>
+  <li>Predict the next latent with the current adapter: \(\hat{z}_{t+1} = f_{\theta + \Delta\theta}(z_t, \hat{L})\).</li>
+  <li>Measure how wrong it was: \(\varepsilon_t = \|\hat{z}_t - z_t\|^2\).</li>
+  <li>If the surprise clears the threshold, \(\varepsilon_t > \tau(t)\), write the record to the buffer.</li>
+  <li>Assign it to a cluster and slide that centroid (C4).</li>
+  <li>If all three gate criteria hold, run the small LoRA update and lay down a new landmark.</li>
+</ol>
+<p>
+  Notice the asymmetry, because it is the point. Steps 1 through 4, including the landmark lookup, run every
+  single step; the gate in step 7 fires maybe once in a few thousand, only when the world genuinely shifts.
+  Almost all of MAPA's benefit at inference comes from that constant, cheap re-anchoring to what it already
+  knows, not from the rare, expensive moments of learning something new.
+</p>
+
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     10 · MODEL-AGNOSTIC CLAIM
+══════════════════════════════════════════ -->
+
+<h2>10. MAPA is model-agnostic</h2>
+
+<p>
+  Nothing about MAPA is wedded to LeWM. It asks only two things of whatever predictor it wraps: a
+  fixed-dimensional latent space to work in, and a place to inject a LoRA adapter. That is it, and both
+  hold right across the JEPA family. The long-horizon memory result rides on a metrically consistent
+  latent space, which any SIGReg-style encoder supplies, not on any one model's internals.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Base model</th><th>Latent dim</th><th>LoRA-injectable</th><th>MAPA-compatible</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>LeWM (ViT-S)</td><td>192</td><td class="yes">Yes</td><td class="yes">Yes — reference impl</td><td>SIGReg encoder; end-to-end from pixels</td></tr>
+      <tr><td>V-JEPA 2</td><td>384 / 768</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Resize buffer entries to match dim</td></tr>
+      <tr><td>HWM low-level</td><td>256</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Attach memory layer to low-level predictor</td></tr>
+      <tr><td>GPT-style LLM</td><td>variable</td><td class="yes">Yes</td><td class="partial">Partial</td><td>Buffer needs tokenization adapter</td></tr>
+      <tr><td>Diffusion model</td><td>n/a</td><td class="no">No</td><td class="no">No</td><td>No consistent latent; prediction objective incompatible</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  The pairing that writes itself is HWM plus MAPA. Look back at Section 5: HWM steadies prediction
+  <em>within</em> an episode by carving the horizon into subgoals, and MAPA carries knowledge
+  <em>across</em> episodes by gated memory. They solve different halves of the same problem and never
+  step on each other, so together they cover all five bottlenecks at once. The fit is even physical.
+  MAPA's landmarks can tell HWM's planner what a region usually looks like from past visits, and HWM's
+  subgoal boundaries hand MAPA ready-made anchor points to reset compounding error against. Two systems,
+  different levels, one loop.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     11 · EXPERIMENTS
+══════════════════════════════════════════ -->
+
+<h2>11. How to actually test this</h2>
+
+<p>
+  A clean idea is worth little until it survives a fair fight, so the plan is six months built to give
+  MAPA every chance to fail honestly. The protocol is preregistered on OSF before any ablation runs, which
+  locks the metrics and baselines in advance so nothing can be quietly chosen after the fact. Every number
+  comes from 10 independent seeds, varying the model's initialisation, the environment's reset schedule,
+  and the order of change events. Comparisons use paired t-tests with Bonferroni correction, and anything
+  that does not clear that bar is not reported as a result.
+</p>
+
+<h3>Month 1: prove the disease before prescribing the cure</h3>
+<p>
+  Before building anything, make the failure undeniable. Take a pretrained, stateless LeWM and walk it
+  through controlled non-stationary video: lights drifting slowly, an object swapped out in an instant, a
+  new room entered cold. Watch the prediction error climb, then send the sequence back to a scene it saw
+  earlier and watch how much it has forgotten. Split the curves by the kind of change, sudden against
+  gradual, reversible against permanent, small against large, so the diagnosis is specific rather than
+  vague.
+</p>
+<p>
+  <strong>Deliverable:</strong> baseline forgetting curves by change type. One diagnostic figure that
+  shows the stationarity problem as a measured fact, not a claim. It is the hook the whole paper hangs on:
+  the failure made visible before anything is offered to fix it.
+</p>
+
+<h3>Months 2–3: build it, then take it apart</h3>
+<p>
+  Add components C2 through C7 one at a time, testing each on its own before wiring it into the whole. Then
+  run the ablation that matters: pull each component out and measure what breaks, failure mode by failure
+  mode. This is not table-filling. It is how the modularity claim gets tested for real. If removing the
+  clustering step (C4) leaves return-visit performance untouched, then the story that C4 handles drift is
+  wrong and has to be rewritten.
+</p>
+<p>
+  <strong>Deliverable:</strong> the memory-augmented LeWM module, a full ablation grid of components
+  against failure modes, and the first head-to-head numbers against the stateless baseline.
+</p>
+
+<h3>Month 4: the four baselines, and the experiment that decides everything</h3>
+<p>
+  Each baseline exists to kill a specific objection before a reviewer can raise it.
+</p>
+<ul>
+  <li>
+    <strong>Stateless LeWM</strong> is the floor. No memory at all. Any memory mechanism has to clear it,
+    and clear it convincingly.
+  </li>
+  <li>
+    <strong>Extended-context LeWM</strong> is the "just give it more context" reflex. Same model, longer
+    buffer. If MAPA wins here, it wins on structure, not on having more to look at.
+  </li>
+  <li>
+    <strong>Full fine-tuning with a replay buffer</strong> is the strongest opponent, full weight updates
+    over stored experience. MAPA should reach this without ever storing raw experience to replay.
+  </li>
+  <li>
+    <strong>Adaptive learning-rate schedule</strong> is the "you just reinvented warm restarts" charge: a
+    schedule that updates harder when error is high, blind to any cluster geometry. This is the one the
+    central experiment is aimed at.
+  </li>
+</ul>
+<p>
+  That central experiment is the matched-noise control, and it is where the whole thesis is won or lost.
+  Build environments where a noise event and a real change produce the <em>exact same</em> error
+  magnitude, the same \(\varepsilon_t\). The adaptive-LR baseline, seeing only magnitude, fires on both
+  and corrupts itself on the noise. MAPA, reading the geometry, should fire on the real change, where
+  observations pile into a tight cluster, and stay silent on the noise, which scatters. If that
+  separation holds, the geometric gate is not a relabeled learning rate. It is doing something a learning
+  rate provably cannot.
+</p>
+<p>
+  <strong>Deliverable:</strong> the full baseline table, the matched-noise result establishing gate
+  selectivity, plus compute-matched and memory-matched ablations so neither resource can explain the win.
+</p>
+
+<h3>Month 5: the long-horizon stress test</h3>
+<p>
+  Now the hardest version of the claim. Put the agent in a multi-room world where the dynamics inside each
+  room drift on their own, and let it wander out and come back. The question is blunt: can it keep
+  predicting the room it is in without losing the rooms it left?
+</p>
+<p>
+  The contrast should be stark. The stateless model forgets room A while it is busy in room B, its curves
+  sagging on return. The replay baseline holds on, but only by hauling gigabytes of raw frames. MAPA
+  should hold on too, with bounded forgetting, on a landmark set and an adapter that together weigh
+  kilobytes.
+</p>
+<p>
+  <strong>Deliverable:</strong> multi-room navigation results, forgetting curves under revisits, the
+  dynamic-drift protocol, and return-visit performance curves.
+</p>
+
+<h3>Month 6: a bound, and the paper</h3>
+<p>
+  Finally, turn the empirical story into a guarantee. Model the predictor's latent dynamics as a perturbed
+  ODE and apply a Gronwall-type inequality to bound how fast the adapted predictor can drift away from the
+  true dynamics, as a function of gate selectivity and buffer size. A theorem to sit beside the curves.
+</p>
+<p>
+  <strong>Deliverable:</strong> an arXiv preprint, an open-source memory module that drops onto LeWM and
+  V-JEPA 2, the forgetting bound in the appendix, and every seed, config, and dataset released.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     12 · METRICS AND EVALUATION
+══════════════════════════════════════════ -->
+
+<h2>12. Knowing whether it actually worked</h2>
+
+<p>
+  A single aggregate score would hide more than it reveals. MAPA could lift average prediction while
+  quietly wrecking one failure mode to rescue another, and you would never see it. So each metric below is
+  pinned to a specific bottleneck, and they are read together. Only by watching all of them at once can you
+  tell the difference between "this works" and "this robbed Peter to pay Paul."
+</p>
+
+<h3>Primary prediction quality metrics</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>What it measures</th><th>Target behavior</th><th>Why it matters</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Long-horizon prediction error</strong><br><code>MSE(ẑ_{t+k}, z_{t+k})</code> at k=20,50,100</td>
+        <td>Autoregressive compounding at rollout depth k</td>
+        <td>Error growth sub-linear in k; no divergence</td>
+        <td>Core quality metric. Directly measures the compounding bottleneck.</td>
+      </tr>
+      <tr>
+        <td><strong>Return-visit prediction error</strong><br>MSE on revisited scenes</td>
+        <td>Return visit degradation</td>
+        <td>Error at visit N+1 ≤ error at visit 1</td>
+        <td>Direct measure of whether memory is being used productively.</td>
+      </tr>
+      <tr>
+        <td><strong>Forgetting curve AUC</strong><br>error(scene A) after N steps in scene B</td>
+        <td>Cross-scene forgetting rate</td>
+        <td>AUC lower than stateless baseline; bounded by theory</td>
+        <td>Multi-room test's primary outcome. Shows whether prior rooms are preserved.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Gate-specific metrics</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Definition</th><th>Target</th><th>What failure looks like</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Gate precision</strong></td>
+        <td>% of gate fires that correspond to genuine scene changes (as labeled in controlled environments)</td>
+        <td>&gt;90% — gate fires only on real changes</td>
+        <td>Low precision = gate fires on noise = overwrites good representations</td>
+      </tr>
+      <tr>
+        <td><strong>Gate recall</strong></td>
+        <td>% of genuine scene changes that trigger a gate fire</td>
+        <td>&gt;80% — doesn't miss real changes</td>
+        <td>Low recall = changes go unrecorded = model stays stale in changed environments</td>
+      </tr>
+      <tr>
+        <td><strong>Matched-noise precision</strong></td>
+        <td>Gate precision specifically on noise events matched in magnitude to real changes</td>
+        <td>&gt;85% — geometry separates noise from change even when magnitude doesn't</td>
+        <td>Low = the tightness criterion is not working; the gate is magnitude-dependent not geometry-dependent</td>
+      </tr>
+      <tr>
+        <td><strong>Gate latency</strong></td>
+        <td>Steps from genuine change to first gate fire</td>
+        <td>&lt;50 steps — fast detection, not stale adaptation</td>
+        <td>High latency = model operates with stale representations for too long after a real change</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Memory efficiency metrics</h3>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Definition</th><th>Target vs. baselines</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Landmark count</strong></td>
+        <td>Number of consolidated landmarks in \(\mathcal{L}\) after N episodes</td>
+        <td>Sub-linear growth in episode count; each landmark represents a distinct scene region</td>
+      </tr>
+      <tr>
+        <td><strong>Memory footprint</strong></td>
+        <td>Total bytes: buffer + landmarks + LoRA adapter</td>
+        <td>&lt;20MB at all times vs. replay buffer baseline (GB-scale)</td>
+      </tr>
+      <tr>
+        <td><strong>LoRA adapter drift</strong></td>
+        <td>\(\|\Delta\theta_t - \Delta\theta_0\|_F\) over time</td>
+        <td>Bounded, not diverging — confirms adapter isn't overwriting base knowledge</td>
+      </tr>
+      <tr>
+        <td><strong>Inference overhead</strong></td>
+        <td>Latency increase per step vs. stateless baseline</td>
+        <td>&lt;5% — memory layer should not be a compute bottleneck</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Hyperparameter sensitivity checks</h3>
+<p>
+  Before claiming results, sweep the following and report performance stability:
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th>Default</th><th>Sweep range</th><th>Instability signal</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>α</code> (threshold multiplier)</td><td>2.0</td><td>1.0 – 3.0</td><td>Large perf swing: gate is brittle to threshold</td></tr>
+      <tr><td><code>β</code> (EMA decay)</td><td>0.95</td><td>0.9 – 0.99</td><td>Centroid instability or slow drift detection</td></tr>
+      <tr><td><code>τ_assign</code> (cluster threshold)</td><td>0.85</td><td>0.75 – 0.95</td><td>Fragmentation or merging of semantic regions</td></tr>
+      <tr><td><code>N_min</code> (gate support)</td><td>5–10</td><td>3 – 20</td><td>Gate fires on flukes or misses genuine changes</td></tr>
+      <tr><td><code>r</code> (LoRA rank)</td><td>8</td><td>4 – 16</td><td>Underfitting new scenes or catastrophic forgetting</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  A result that only holds at one carefully chosen threshold is not a result, it is a coincidence. So the
+  sweep over \(\alpha\) has to show MAPA beating the stateless baseline across the whole range, not just at
+  the value that happened to be tuned. And because the protocol is preregistered, any departure from the
+  declared hyperparameters has to be written down and justified, not quietly adopted because it scored well.
+</p>
+
+<hr />
+
+<h2>Closing</h2>
+
+<p>
+  The whole argument collapses to a short chain. Intelligence over long horizons is prediction.
+  Prediction over long horizons needs memory. And memory, the kind that lasts, needs a gate: something
+  that writes fast, consolidates slow, and refuses to let noise become permanent. The brain has run this
+  design for hundreds of millions of years. Language models stumbled into it through the KV cache and
+  retrieval. JEPA world models, for all their elegance, still have not built it.
+</p>
+<p>
+  What it takes to give them one turns out to be small. On top of LeWM: a surprise filter, an episodic
+  buffer, an online clustering step, a three-part consolidation gate, a LoRA adapter, and a landmark set.
+  Seven pieces, each answering one specific failure, adding 0.8% to the parameter count and under 20MB of
+  state. The encoder never moves. The representations that cost so much to learn stay exactly as they were.
+</p>
+<p>
+  The claim is deliberately narrow. Not that this is enough for general intelligence, but that it is the
+  smallest thing sufficient to keep a world model predicting across long horizons without forgetting and
+  without a replay buffer. The six-month program exists to put that claim under real pressure:
+  preregistered, run across many seeds, corrected for multiple comparisons, with ablations sharp enough to
+  falsify any single component on its own.
+</p>
+<p>
+  If it holds, MAPA is a drop-in memory for any JEPA predictor that has to live in a changing world. If it
+  fails, the ablation grid will say exactly which piece gave way and why, and that, too, is worth knowing.
+  Either way, the field learns where the real bottleneck is.
+</p>
+
+<footer>MetaCognition Labs &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
+
+</div>
+</body>
+</html>
