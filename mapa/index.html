@@ -100,21 +100,47 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 .warn-box strong { color: #713f12; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; }
 </style>
 <script>
-function showPage(p) {
-  ['main','breakdowns'].forEach(function(id) {
-    document.getElementById(id+'-page').style.display = (id===p) ? '' : 'none';
-    var el = document.getElementById('nav-'+id);
-    el.className = (id===p) ? 'active' : '';
-  });
-  window.scrollTo(0,0);
+function render(view) {
+  var onBreakdowns = view === 'breakdowns' || view === 'glossary';
+  document.getElementById('main-page').style.display = onBreakdowns ? 'none' : '';
+  document.getElementById('breakdowns-page').style.display = onBreakdowns ? '' : 'none';
+  document.getElementById('nav-main').className = view === 'main' ? 'active' : '';
+  document.getElementById('nav-breakdowns').className = view === 'breakdowns' ? 'active' : '';
+  document.getElementById('nav-glossary').className = view === 'glossary' ? 'active' : '';
   if (window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});
+  if (view === 'glossary') {
+    setTimeout(function() {
+      var el = document.getElementById('glossary');
+      if (el) el.scrollIntoView({behavior:'smooth'});
+    }, 30);
+  } else {
+    window.scrollTo(0, 0);
+  }
 }
+
+function navigate(view) {
+  history.pushState({view: view}, '', view === 'main' ? location.pathname : '#' + view);
+  render(view);
+}
+
+function showPage(p) { navigate(p); }
+function showGlossary() { navigate('glossary'); }
+
+window.addEventListener('popstate', function() {
+  render(location.hash.replace('#', '') || 'main');
+});
+
+(function() {
+  var h = location.hash.replace('#', '');
+  if (h) render(h);
+}());
 </script>
 </head>
 <body>
 <nav class="site-nav">
   <a id="nav-main" class="active" onclick="showPage('main')">Main</a>
   <a id="nav-breakdowns" onclick="showPage('breakdowns')">Breakdowns</a>
+  <a id="nav-glossary" onclick="showGlossary()">Glossary</a>
 </nav>
 
 <div class="page">
@@ -2260,6 +2286,564 @@ this is a gap MAPA must partially fill. The closest existing benchmarks are:</p>
   LeWM does not use SIGReg because LeWM has no geometric requirement on its latent space — it only needs to predict, not cluster. MAPA imposes a new requirement (cosine similarity must be semantically meaningful) that LeWM's encoder was never trained to satisfy. MAPA therefore requires a modified encoder training objective. Whether native LeWM representations are "close enough" is an empirical question resolved by the SIGReg ablation in Month 2.
 </div>
 </div>
+
+<hr />
+
+<!-- ══════════════════════════════════════════
+     GLOSSARY
+══════════════════════════════════════════ -->
+<div class="bd-section" id="glossary">
+
+<h2>Glossary</h2>
+
+<p>
+  Every mechanism in this document rests on a set of ideas that are rarely explained where they appear.
+  Each entry below starts from the problem the idea was designed to solve, traces how it works
+  mechanically, and ends at what it means for MAPA specifically. They are ordered so each one builds
+  on what came before.
+</p>
+
+<!-- ── 1. Representations ─────────────────── -->
+<h3>Representations and latent space</h3>
+
+<p>
+  Raw sensor data is structured wrong for reasoning. A 224×224 video frame is 150,000 numbers, and most
+  of them are irrelevant to what is actually happening. Two frames of the same kitchen taken from
+  slightly different angles share almost no pixel values but mean the same thing. A system that
+  reasons at the pixel level drowns in coincidental surface differences.
+</p>
+<p>
+  An encoder — a neural network — maps each raw input to a compact vector in ℝ<sup>d</sup>, typically
+  d = 128 to 1024. This vector is the <strong>representation</strong> or <strong>latent code</strong>,
+  and the space those vectors live in is the <strong>latent space</strong>. What makes this useful is
+  the property good encoders learn: semantically similar inputs map to nearby vectors, semantically
+  different inputs map to distant ones. Two frames of the same room at different times land close
+  together. A frame of a car park lands far away — without any labels ever specifying which is which.
+  The geometry is inferred from the statistics of data during training.
+</p>
+<p>
+  Representations are also <em>abstractions</em>. The 192 numbers in MAPA's latent code do not store
+  pixel values or positions. They encode learned structure — object-like regions, motion patterns, scene
+  layout — distilled into an address in a space where meaning and distance are the same thing.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 205" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <rect x="10" y="22" width="100" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="60" y="39" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6">frame A₁</text>
+  <text x="60" y="54" text-anchor="middle" font-size="10" fill="#7c3aed">kitchen · angle 1</text>
+
+  <rect x="10" y="82" width="100" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="60" y="99" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6">frame A₂</text>
+  <text x="60" y="114" text-anchor="middle" font-size="10" fill="#7c3aed">kitchen · angle 2</text>
+
+  <rect x="10" y="142" width="100" height="42" rx="5" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="60" y="159" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1d4ed8">frame B₁</text>
+  <text x="60" y="174" text-anchor="middle" font-size="10" fill="#1e3a8a">car park · noon</text>
+
+  <line x1="110" y1="43" x2="218" y2="90" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+  <line x1="110" y1="103" x2="218" y2="101" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+  <line x1="110" y1="163" x2="218" y2="113" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <rect x="220" y="72" width="126" height="58" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="283" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Encoder φ</text>
+  <text x="283" y="114" text-anchor="middle" font-size="10.5" fill="#64748b">s ↦ z ∈ ℝ¹⁹²</text>
+
+  <line x1="346" y1="101" x2="386" y2="101" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="390" y="12" width="280" height="182" rx="6" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="530" y="31" text-anchor="middle" font-size="10.5" font-weight="700" fill="#94a3b8" letter-spacing="0.1em">LATENT SPACE  ℝ¹⁹²</text>
+
+  <circle cx="456" cy="82" r="10" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="456" y="86" text-anchor="middle" font-size="9" font-weight="700" fill="#5b21b6">A₁</text>
+  <circle cx="484" cy="98" r="10" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="484" y="102" text-anchor="middle" font-size="9" font-weight="700" fill="#5b21b6">A₂</text>
+  <ellipse cx="470" cy="90" rx="33" ry="22" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="470" y="130" text-anchor="middle" font-size="10" fill="#7c3aed">same place, different view</text>
+  <text x="470" y="143" text-anchor="middle" font-size="10" fill="#7c3aed">→ close together</text>
+
+  <circle cx="598" cy="148" r="10" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="598" y="152" text-anchor="middle" font-size="9" font-weight="700" fill="#1d4ed8">B₁</text>
+  <text x="598" y="172" text-anchor="middle" font-size="10" fill="#1e3a8a">different scene</text>
+  <text x="598" y="185" text-anchor="middle" font-size="10" fill="#1e3a8a">→ far apart</text>
+
+  <line x1="500" y1="97" x2="587" y2="142" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="550" y="108" text-anchor="middle" font-size="9" fill="#9ca3af" font-style="italic">large distance</text>
+</svg>
+</figure>
+<figcaption>The encoder collapses irrelevant variation — exact pixel values, viewing angle, lighting — and preserves what stays meaningfully the same. Distance in latent space becomes semantic distance.</figcaption>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  Every component — the adaptive threshold, the K-means clustering, cosine similarity checks, the
+  landmark set — operates entirely in the 192-dimensional latent space φ produces. SIGReg pre-training
+  enforces that geometric distances in this space track real-world distances, which is what makes the
+  gate's tightness criterion trustworthy.
+</div>
+
+<!-- ── 2. Frozen encoder ───────────────────── -->
+<h3>Frozen encoder</h3>
+
+<p>
+  Training a good encoder takes enormous compute and data. The result is a function that has learned
+  to organize experience into a coherent geometric structure. The risk in any downstream task: if you
+  let the encoder keep training, the new task's loss will gradually reshape those representations to
+  serve its objective, destroying the geometry that made them useful in the first place.
+</p>
+<p>
+  Freezing the encoder means setting <code>requires_grad = False</code> on every encoder parameter.
+  The forward pass is completely unchanged — inputs flow through, representations come out. But during
+  backpropagation, gradients stop at the encoder's boundary. No parameters update. From the optimizer's
+  perspective, the encoder is a fixed lookup table: deterministic, stable, impossible to overwrite.
+  Any two observations of the same scene will always produce the same latent vector, episode after
+  episode, year after year.
+</p>
+<p>
+  In MAPA, this stability is load-bearing. Every comparison the system makes — current z_t versus a
+  landmark, two cluster centroids drifting, predicted versus observed representation — is valid
+  precisely because the coordinate system never shifts underneath the comparison.
+</p>
+
+<!-- ── 3. Stop gradient ───────────────────── -->
+<h3>Stop gradient</h3>
+
+<p>
+  Self-supervised learning trains a network to learn without labels by making it compare its own
+  outputs. The obvious formulation: encode the same input two ways and minimize the distance between
+  the results. This fails immediately. The network discovers a degenerate solution: map every input
+  to the same single vector. Distance everywhere is zero. Loss is minimal. Nothing was learned. This
+  is <strong>representational collapse</strong>.
+</p>
+<p>
+  Stop gradient, written <code>sg[·]</code> or <code>.detach()</code> in PyTorch, is a one-way mirror
+  in the computation graph. In the forward pass it is an identity: <code>sg[x] = x</code>, the value
+  passes through unchanged. In the backward pass, the gradient is zero — everything behind this point
+  is invisible to backpropagation.
+</p>
+<p>
+  In JEPA the target side of the prediction loss is stopped:
+</p>
+<div class="math-block">
+  \[\mathcal{L} = \bigl\| f_\theta(z_t) \;-\; \operatorname{sg}\!\left[\varphi(s_{t+1})\right] \bigr\|^2\]
+  <p>The predictor f_θ receives gradients and trains to chase the target representation. The encoder on
+  the right side produces the target but is completely invisible to this loss — it cannot drift to make
+  the target easier to reach. Collapse is blocked: there is no gradient path that rewards sending
+  everything to one point without the predictor having genuinely solved the prediction problem.</p>
+</div>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 215" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <text x="10" y="16" font-size="10.5" font-weight="700" fill="#64748b" letter-spacing="0.08em">FORWARD PASS</text>
+
+  <rect x="10" y="24" width="68" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="44" y="48" text-anchor="middle" font-size="11" fill="#475569">s_t</text>
+
+  <rect x="104" y="18" width="110" height="50" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="159" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="159" y="56" text-anchor="middle" font-size="10" fill="#7c3aed">🔒 FROZEN</text>
+
+  <rect x="240" y="24" width="58" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="269" y="48" text-anchor="middle" font-size="11" fill="#475569">z_t</text>
+
+  <rect x="324" y="18" width="110" height="50" rx="5" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="379" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1d4ed8">Predictor f_θ</text>
+  <text x="379" y="56" text-anchor="middle" font-size="10" fill="#1e3a8a">trainable</text>
+
+  <rect x="460" y="24" width="70" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="495" y="48" text-anchor="middle" font-size="11" fill="#475569">ẑ_{t+1}</text>
+
+  <rect x="558" y="18" width="114" height="50" rx="5" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="615" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#92400e">Loss</text>
+  <text x="615" y="56" text-anchor="middle" font-size="10" fill="#78350f">‖ẑ − sg[z]‖²</text>
+
+  <line x1="78" y1="43" x2="104" y2="43" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="214" y1="43" x2="240" y2="43" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="298" y1="43" x2="324" y2="43" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="434" y1="43" x2="460" y2="43" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="530" y1="43" x2="558" y2="43" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+
+  <!-- Target path -->
+  <rect x="10" y="126" width="68" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="44" y="150" text-anchor="middle" font-size="11" fill="#475569">s_{t+1}</text>
+
+  <rect x="104" y="120" width="110" height="50" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="159" y="141" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="159" y="158" text-anchor="middle" font-size="10" fill="#7c3aed">🔒 FROZEN</text>
+
+  <rect x="236" y="120" width="78" height="50" rx="5" fill="#fff5f5" stroke="#f87171" stroke-width="1.5"/>
+  <text x="275" y="141" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">sg[ · ]</text>
+  <text x="275" y="158" text-anchor="middle" font-size="10" fill="#b91c1c">stop gradient</text>
+
+  <rect x="340" y="126" width="68" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="374" y="150" text-anchor="middle" font-size="11" fill="#475569">z_{t+1}</text>
+
+  <line x1="78" y1="145" x2="104" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="214" y1="145" x2="236" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="314" y1="145" x2="340" y2="145" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="408" y1="148" x2="553" y2="68" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+
+  <text x="10" y="202" font-size="10.5" font-weight="700" fill="#94a3b8" letter-spacing="0.08em">BACKWARD PASS  (gradients)</text>
+  <line x1="558" y1="72" x2="434" y2="72" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+  <text x="497" y="66" text-anchor="middle" font-size="9.5" fill="#3b82f6">∇ flows through predictor</text>
+  <line x1="340" y1="178" x2="320" y2="178" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="230" y="195" text-anchor="middle" font-size="9.5" fill="#dc2626">✕ gradient stops at sg[ · ] — and frozen encoder sees nothing</text>
+</svg>
+</figure>
+<figcaption>Top path: the trainable predictor forward and backward. Bottom (target) path: same frozen encoder, but stop-gradient erases the backward signal before it can reach anything. Gradients only touch the predictor.</figcaption>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  The encoder is frozen <em>and</em> the JEPA training target uses stop gradient — a double lock.
+  No training signal from any loss can modify the latent space that MAPA's gate logic depends on.
+</div>
+
+<!-- ── 4. Teacher–student ─────────────────── -->
+<h3>Teacher–student networks</h3>
+
+<p>
+  The general paradigm that stop gradient and EMA both belong to. One network — the
+  <strong>teacher</strong> — provides training targets; the other — the <strong>student</strong> — is
+  trained to match them. The loss trains only the student. Gradients never reach the teacher. This
+  asymmetry is the whole point: targets the gradient cannot reach cannot be trivially gamed.
+</p>
+<p>
+  The teacher can take many forms. In <strong>knowledge distillation</strong> it is a large pretrained
+  model, completely frozen, whose soft output distributions the student is trained to replicate —
+  compressing a bigger model's knowledge into fewer parameters. In <strong>EMA architectures</strong>
+  (below) the teacher is a slowly-updated shadow copy of the student itself. In JEPA, the frozen
+  encoder acting as target-provider is effectively the teacher; the predictor is the student. The
+  design principle is the same across all three: separate the target-provider from the learner so
+  that learning has something stable to aim at.
+</p>
+
+<!-- ── 5. EMA ──────────────────────────────── -->
+<h3>EMA target network</h3>
+
+<p>
+  Stop gradient blocks collapse but leaves a stability problem. The target is produced by the same
+  encoder the student is updating. Each gradient step shifts the online encoder, which shifts the
+  targets it produces, which shifts the loss landscape again. The student is chasing a goalpost that
+  moves every batch.
+</p>
+<p>
+  The EMA fix maintains two encoder copies. The <strong>online encoder</strong> is updated by gradient
+  descent every batch. The <strong>target encoder</strong> never receives a gradient — it is updated
+  only by an exponential moving average of the online encoder's weights:
+</p>
+<div class="math-block">
+  \[\theta_{\text{target}} \;\leftarrow\; m\,\theta_{\text{target}} \;+\; (1-m)\,\theta_{\text{online}}\]
+  <p>With m ≈ 0.996–0.999 the target network moves roughly 0.4% toward the online network each step.
+  It embodies the online encoder's state over the last ~250 steps rather than its current state —
+  a slow, temporally smoothed ghost that provides stable targets. Used in BYOL, MoCo v3, and early
+  JEPA variants.</p>
+</div>
+<p>
+  The cost is real: double the encoder's parameter count and forward-pass memory, plus a sensitive
+  momentum hyperparameter. LeWorldModel — and therefore MAPA — replaces this entirely with SIGReg,
+  a geometric regularization loss that prevents collapse structurally by constraining the encoder's
+  latent space to preserve real-world distances. A space that preserves distances cannot collapse.
+  No shadow network needed.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 196" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <rect x="40" y="20" width="220" height="68" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="150" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Online Encoder</text>
+  <line x1="40" y1="52" x2="260" y2="52" stroke="#60a5fa" stroke-width="1"/>
+  <text x="150" y="70" text-anchor="middle" font-size="10.5" fill="#1e3a8a">θ_online · updated every step by ∇</text>
+
+  <rect x="420" y="20" width="220" height="68" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="530" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Target Encoder</text>
+  <line x1="420" y1="52" x2="640" y2="52" stroke="#a78bfa" stroke-width="1"/>
+  <text x="530" y="70" text-anchor="middle" font-size="10.5" fill="#4c1d95">θ_target · no gradient ever</text>
+
+  <path d="M260,36 C330,8 390,8 420,36" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)" stroke-dasharray="5,3"/>
+  <text x="340" y="12" text-anchor="middle" font-size="10" fill="#64748b">EMA update each step</text>
+  <text x="340" y="25" text-anchor="middle" font-size="9.5" fill="#94a3b8">θ_t ← m·θ_t + (1–m)·θ_online</text>
+
+  <line x1="150" y1="88" x2="150" y2="128" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="172" y="114" font-size="10" fill="#3b82f6">∇ gradient</text>
+
+  <line x1="530" y1="88" x2="530" y2="118" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="548" y="107" font-size="10" fill="#dc2626">✕ no gradient</text>
+
+  <rect x="260" y="148" width="160" height="38" rx="5" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="340" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">Loss</text>
+  <text x="340" y="179" text-anchor="middle" font-size="10" fill="#78350f">predictor vs. target encoder</text>
+
+  <line x1="295" y1="148" x2="163" y2="128" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+  <text x="530" y="145" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">slow ghost of the online network</text>
+  <text x="530" y="158" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">— stable targets, smooth loss</text>
+</svg>
+</figure>
+<figcaption>The target encoder is a temporally smoothed copy of the online network, updated by EMA and never by gradients. It provides stable prediction targets while the online encoder trains freely.</figcaption>
+
+<!-- ── 6. Linear probe ────────────────────── -->
+<h3>Linear probe</h3>
+
+<p>
+  After training an encoder without labels, you want to know if it learned anything semantically
+  meaningful. Fine-tuning the whole network would answer the wrong question — it would measure
+  trainability, not the quality of the representations before any supervised signal was applied.
+</p>
+<p>
+  A linear probe answers the right question. Freeze the encoder entirely. Attach a single linear layer
+  — one weight matrix, one bias, no hidden layers, no nonlinearities:
+</p>
+<div class="math-block">
+  \[\hat{y} = W \cdot z + b \qquad z = \varphi(x) \;\text{frozen}\]
+  <p>Train only W and b on a labeled dataset. A linear layer cannot manufacture information that isn't
+  already in z — it can only re-weight and linearly recombine what the encoder placed there. If it
+  correctly classifies, the answer was already present in z in a linearly accessible form. The encoder
+  solved the hard part before any label was introduced.</p>
+</div>
+<p>
+  High linear probe accuracy is the benchmark for self-supervised representation quality. It means the
+  latent space has the <em>linear separability property</em>: geometric structure in the space directly
+  reflects semantic structure in the world. That is the same property MAPA's cosine similarity and
+  tightness criterion depend on.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 148" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <rect x="10" y="28" width="88" height="56" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="54" y="54" text-anchor="middle" font-size="12" fill="#475569">Input x</text>
+  <text x="54" y="70" text-anchor="middle" font-size="10" fill="#94a3b8">(image/video)</text>
+
+  <rect x="128" y="20" width="178" height="72" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="217" y="48" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="217" y="65" text-anchor="middle" font-size="11" fill="#7c3aed">🔒 FROZEN</text>
+  <text x="217" y="81" text-anchor="middle" font-size="10" fill="#4c1d95">requires_grad = False</text>
+
+  <rect x="336" y="28" width="68" height="56" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="370" y="55" text-anchor="middle" font-size="12" fill="#475569">z</text>
+  <text x="370" y="72" text-anchor="middle" font-size="10" fill="#94a3b8">192-dim</text>
+
+  <rect x="434" y="28" width="130" height="56" rx="5" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="499" y="54" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">Linear  W</text>
+  <text x="499" y="71" text-anchor="middle" font-size="10.5" fill="#14532d">only this layer trains</text>
+
+  <rect x="594" y="34" width="76" height="44" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="632" y="60" text-anchor="middle" font-size="11.5" fill="#475569">ŷ</text>
+
+  <line x1="98" y1="56" x2="128" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="306" y1="56" x2="336" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="404" y1="56" x2="434" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+  <line x1="564" y1="56" x2="594" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"/>
+
+  <line x1="594" y1="110" x2="564" y2="110" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <line x1="434" y1="110" x2="404" y2="110" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="499" y="130" text-anchor="middle" font-size="9.5" fill="#16a34a">∇ gradient flows through linear W only</text>
+  <line x1="336" y1="110" x2="312" y2="110" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="196" y="130" text-anchor="middle" font-size="9.5" fill="#dc2626">✕ frozen encoder sees no gradient at all</text>
+</svg>
+</figure>
+<figcaption>The frozen encoder maps inputs to representations. The linear layer — the only part that trains — can only re-weight what the encoder already placed in z. If it succeeds, the structure was already there.</figcaption>
+
+<!-- ── 7. Contrastive / InfoNCE ───────────── -->
+<h3>Contrastive learning and InfoNCE</h3>
+
+<p>
+  Without labels, what should the encoder learn to put close together? Contrastive learning defines
+  similarity structurally. Two augmented views of the same input — different random crops, colour
+  jitter, brightness shifts — form a <strong>positive pair</strong>. Every other sample in the batch
+  is a <strong>negative</strong>. The loss pushes positives together and negatives apart.
+</p>
+<p>
+  Because positives are different-looking versions of the same underlying input, the encoder is forced
+  to discard whatever changes between augmentations — exact pixel values, minor colour, precise crop
+  position — and keep only what stays invariant: object identity, scene layout, semantic structure.
+  The geometric organization of latent space is shaped entirely by invariance, without any labels.
+</p>
+<div class="math-block">
+  \[\mathcal{L}_{\text{InfoNCE}} = -\log \frac{\exp\!\left(\operatorname{sim}(z_i,\, z_j)/\tau\right)}{\displaystyle\sum_{k=1}^{N} \exp\!\left(\operatorname{sim}(z_i,\, z_k)/\tau\right)}\]
+  <p>z_i and z_j are the two views of the same input (the positive pair). The sum runs over all N
+  samples — the other N−1 are negatives. The loss is minimised when the positive pair's similarity
+  is high relative to all negatives. Temperature τ controls sharpness: lower τ forces harder
+  separation between positives and negatives.</p>
+</div>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 192" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <rect x="295" y="8" width="90" height="44" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="340" y="28" text-anchor="middle" font-size="11.5" fill="#475569">input x</text>
+  <text x="340" y="44" text-anchor="middle" font-size="10" fill="#94a3b8">(same image)</text>
+
+  <line x1="314" y1="52" x2="185" y2="80" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+  <line x1="366" y1="52" x2="495" y2="80" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="214" y="76" text-anchor="middle" font-size="10" fill="#64748b">aug 1</text>
+  <text x="466" y="76" text-anchor="middle" font-size="10" fill="#64748b">aug 2</text>
+
+  <rect x="100" y="82" width="140" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="170" y="99" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="170" y="115" text-anchor="middle" font-size="10" fill="#7c3aed">shared weights</text>
+
+  <rect x="440" y="82" width="140" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="510" y="99" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="510" y="115" text-anchor="middle" font-size="10" fill="#7c3aed">shared weights</text>
+
+  <circle cx="170" cy="158" r="14" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="170" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">z_i</text>
+  <circle cx="510" cy="158" r="14" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="510" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">z_j</text>
+
+  <line x1="170" y1="124" x2="170" y2="144" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+  <line x1="510" y1="124" x2="510" y2="144" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <path d="M184,153 Q340,124 496,153" stroke="#166534" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M496,163 Q340,192 184,163" stroke="#166534" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="340" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#166534">positive pair — pulled together</text>
+
+  <circle cx="58" cy="155" r="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="58" y="159" text-anchor="middle" font-size="9" fill="#92400e">z_k</text>
+  <text x="58" y="178" text-anchor="middle" font-size="9" fill="#d97706">negative</text>
+  <circle cx="622" cy="155" r="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="622" y="159" text-anchor="middle" font-size="9" fill="#92400e">z_k</text>
+  <text x="622" y="178" text-anchor="middle" font-size="9" fill="#d97706">negative</text>
+
+  <line x1="156" y1="155" x2="72" y2="155" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+  <line x1="524" y1="155" x2="610" y2="155" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+  <text x="110" y="147" text-anchor="middle" font-size="9" fill="#d97706">pushed apart</text>
+  <text x="570" y="147" text-anchor="middle" font-size="9" fill="#d97706">pushed apart</text>
+</svg>
+</figure>
+<figcaption>Two augmented views of the same image form a positive pair and are trained to converge in latent space. Other samples in the batch are negatives and are pushed away. The encoder learns structure through contrast, no labels required.</figcaption>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  The encoder is pre-trained with <em>L = L_InfoNCE + λ_geo · L_geo</em>. InfoNCE shapes the semantic
+  clustering; the SIGReg geometric term additionally forces that structure to respect real-world distances
+  — the property the consolidation gate depends on.
+</div>
+
+<!-- ── 8. LoRA ──────────────────────────────── -->
+<h3>LoRA — Low-Rank Adaptation</h3>
+
+<p>
+  Adapting a pretrained model to new data via full fine-tuning risks catastrophic forgetting: the
+  gradient signal for the new task overwrites parameters that encoded the base model's prior knowledge.
+  It is also expensive — updating every parameter for every gate fire at inference time is not viable.
+</p>
+<p>
+  The key observation is that most meaningful adaptations live in a low-dimensional subspace of the
+  full weight space. You rarely need every weight to change independently; you need a structured update
+  along a small number of directions. Instead of modifying W ∈ ℝ<sup>d × d</sup> directly, freeze W
+  and learn two smaller matrices whose product becomes the update:
+</p>
+<div class="math-block">
+  \[\Delta W = B \cdot A \qquad B \in \mathbb{R}^{d_{\text{out}} \times r},\;\; A \in \mathbb{R}^{r \times d_{\text{in}}},\;\; r \ll d\]
+  <p>The effective weight at inference is W + BA. Base weights never change. With d = 192 and r = 8,
+  each layer's update has 2 × 192 × 8 = 3,072 free parameters instead of 192 × 192 = 36,864 — a 12×
+  reduction in the size of the update. B is initialised to zero, so ΔW starts at zero and the model
+  begins from exact base weights, deviating only as the adapter is trained.</p>
+</div>
+<p>
+  Because W is untouched, it is recoverable at any point: discard B and A and the original model is
+  exactly intact. The adaptation is isolated, inspectable, and fully reversible.
+</p>
+
+<figure>
+<svg width="100%" viewBox="0 0 680 196" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
+  <rect x="10" y="22" width="148" height="148" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="84" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">W</text>
+  <text x="84" y="65" text-anchor="middle" font-size="10.5" fill="#64748b">d × d matrix</text>
+  <text x="84" y="80" text-anchor="middle" font-size="10" fill="#94a3b8">(192 × 192)</text>
+  <text x="84" y="108" text-anchor="middle" font-size="20" fill="#94a3b8">🔒</text>
+  <text x="84" y="136" text-anchor="middle" font-size="11" fill="#64748b">FROZEN</text>
+  <text x="84" y="153" text-anchor="middle" font-size="10" fill="#94a3b8">never updated</text>
+
+  <text x="175" y="105" text-anchor="middle" font-size="28" fill="#94a3b8">+</text>
+
+  <rect x="198" y="22" width="48" height="148" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="222" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6" transform="rotate(-90,222,100)">B  (d × r)</text>
+  <text x="222" y="182" text-anchor="middle" font-size="9" fill="#7c3aed">d×r</text>
+
+  <text x="262" y="105" text-anchor="middle" font-size="16" fill="#94a3b8">×</text>
+
+  <rect x="278" y="78" width="148" height="48" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="352" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">A  (r × d)</text>
+  <text x="352" y="140" text-anchor="middle" font-size="9" fill="#7c3aed">r × d</text>
+
+  <text x="352" y="163" text-anchor="middle" font-size="10.5" fill="#5b21b6">ΔW = BA · rank r=8</text>
+  <text x="352" y="178" text-anchor="middle" font-size="10" fill="#7c3aed">3,072 params per layer · LEARNED</text>
+
+  <text x="447" y="105" text-anchor="middle" font-size="28" fill="#94a3b8">=</text>
+
+  <rect x="467" y="22" width="203" height="148" rx="6" fill="#ecfdf5" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="568" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">W + BA</text>
+  <text x="568" y="65" text-anchor="middle" font-size="10.5" fill="#14532d">effective weight at inference</text>
+  <text x="568" y="100" text-anchor="middle" font-size="12" fill="#14532d">base knowledge</text>
+  <text x="568" y="118" text-anchor="middle" font-size="12" fill="#14532d">+ new dynamics</text>
+  <text x="568" y="150" text-anchor="middle" font-size="10" fill="#166534">drop BA → original W recovered</text>
+</svg>
+</figure>
+<figcaption>LoRA decomposes the weight update into two thin matrices whose product has rank r. The base weights W are never touched. The adaptation is fully reversible — discard B and A and the original model is exactly intact.</figcaption>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  C6 applies LoRA with rank r = 8 to the predictor. The ~120,000 parameters in B and A across all
+  layers (~0.8% of the predictor) absorb every weight change from a gate fire. The base predictor's
+  15M parameters — its understanding of general scene dynamics from pre-training — are preserved exactly
+  regardless of what the adapter accumulates over the system's lifetime.
+</div>
+
+<!-- ── 9. Cosine similarity ───────────────── -->
+<h3>Cosine similarity</h3>
+
+<p>
+  In high-dimensional spaces, Euclidean distance is unreliable as a measure of semantic closeness. Two
+  vectors can be far apart in Euclidean terms simply because one has larger magnitude — longer, but
+  pointing in exactly the same direction. For representations, magnitude is usually an artifact of
+  normalization rather than meaningful signal. What matters is direction.
+</p>
+<div class="math-block">
+  \[\operatorname{sim}(a, b) = \frac{a \cdot b}{\|a\| \cdot \|b\|}\]
+  <p>Dividing out both magnitudes makes the measure scale-invariant — only the angle between the vectors
+  matters. The result runs from −1 (opposite directions) through 0 (orthogonal, unrelated) to 1
+  (identical direction). Two representations pointing the same way score near 1 regardless of how far
+  from the origin either vector happens to sit.</p>
+</div>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  C4 assigns each incoming z_t to the nearest cluster centroid using cosine similarity with threshold
+  τ_assign = 0.85. A score of 0.85 corresponds to an angle of roughly 32° — in 192 dimensions, a tight
+  constraint meaning the representations are pointing in nearly the same semantic direction. Below 0.85,
+  the observation is different enough to spawn a new cluster rather than update an existing one.
+</div>
+
+<!-- ── 10. Lipschitz continuity ───────────── -->
+<h3>Lipschitz continuity</h3>
+
+<p>
+  Autoregressive prediction feeds the model's output back as its next input. Any error in step t
+  becomes part of the input to step t+1, so errors can amplify. To characterize exactly how fast, you
+  need a bound on how much the predictor can stretch small input differences into larger output
+  differences. That bound is the Lipschitz constant.
+</p>
+<p>
+  A function f is L-Lipschitz if for any two inputs x and y:
+</p>
+<div class="math-block">
+  \[\|f(x) - f(y)\| \;\leq\; L \cdot \|x - y\|\]
+  <p>L is the maximum stretch factor across all input pairs. L = 1 preserves distances — errors
+  neither grow nor shrink. L &lt; 1 contracts them. L &gt; 1 means errors can grow by up to L per
+  step; over k autoregressive steps the worst-case error compounds as ε_0 · L^k. Writing L_f = 1 + λ
+  makes the per-step growth explicit: at λ = 0.02 the error after 100 steps is 7× the original; at
+  λ = 0.05 it is 131×. These are not edge cases — they describe the regime real JEPA predictors
+  operate in.</p>
+</div>
+
+<div class="verdict">
+  <strong>In MAPA</strong>
+  SIGReg training bounds the encoder's Lipschitz constant as a structural consequence of the
+  metric-preservation loss — an encoder constrained to preserve real-world distances cannot have an
+  arbitrarily large L_f. MAPA's landmark re-anchoring at every inference step is mechanically a
+  periodic reset of the predictor's input to a known-good representation, which prevents accumulated
+  drift ε_0 from ever growing large enough for (1+λ)^k to matter.
+</div>
+
+</div><!-- /glossary bd-section -->
 
 <hr />
 <footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
