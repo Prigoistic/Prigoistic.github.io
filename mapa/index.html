@@ -372,8 +372,10 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
   against a hallucination.
 </p>
 <div class="math-block">
+  \[\varepsilon_{t+k} \approx \varepsilon_t \cdot L_f^{\,k}\]
+  <p>Here \(L_f\) is the Lipschitz constant of the predictor \(f_\theta\): if \(f_\theta\) maps two latent states that are \(\delta\) apart to outputs that are at most \(L_f \cdot \delta\) apart, then each autoregressive step can amplify the current error by up to \(L_f\). Writing \(L_f = 1 + \lambda\) makes the per-step growth rate explicit:</p>
   \[\varepsilon_{t+k} \approx \varepsilon_t \cdot (1 + \lambda)^k\]
-  <p>The growth is geometric. At λ = 0.02 the error is 7× larger after 100 steps. At λ = 0.05 it is 131× larger. Shaving down the per-step error helps a little, but it only changes λ. What actually tames this is re-anchoring the rollout to a real observation now and then, resetting the drift before it can run away.</p>
+  <p><strong>Important:</strong> this \(\lambda\) is not a loss hyperparameter. It is a geometric property of the predictor — specifically \(L_f - 1\), the amount by which each forward pass stretches small input errors. A predictor with \(L_f = 1\) is a perfect contraction and errors stay bounded; any \(L_f > 1\) causes geometric blowup over long rollouts. At \(\lambda = 0.02\) the error is 7× larger after 100 steps; at \(\lambda = 0.05\) it is 131× larger. Shaving per-step error helps a little but only changes \(\lambda\) marginally. What actually tames this is re-anchoring the rollout to a real observation periodically, resetting the accumulated drift before it can blow up.</p>
 </div>
 
 <h3>No write mechanism</h3>
@@ -511,22 +513,23 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
   <text x="510" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
 
   <text x="340" y="258" text-anchor="middle" font-size="10.5" fill="#94a3b8">Subgoal boundaries act as re-anchor points · high-level plan persists across low-level noise</text>
-  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#94a3b8">Error per interval: (1+λ)^(N/K) vs full rollout: (1+λ)^N — a dramatic reduction in worst-case drift</text>
+  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#94a3b8">Error per interval: L_f^(N/K) vs free rollout: L_f^N where L_f = 1+λ is the predictor Lipschitz constant</text>
 </svg>
 </figure>
 <figcaption>Figure 2. HWM architecture. The hierarchy bounds error compounding per subgoal interval rather than across the full rollout.</figcaption>
 
 <h3>How subgoal decomposition counters predictive error compounding</h3>
 <p>
-  Recall that error grows as \((1+\lambda)^N\) over an \(N\)-step rollout, the snowball from the previous
-  section. Now cut that rollout into \(K\) subgoals. Inside each one the predictor only runs free for
-  \(N/K\) steps before it hits a boundary and the high-level plan pins it back to a known target. So the
-  worst the error can get is no longer set by the full horizon, only by the length of one segment.
+  Recall from Section 4 that the predictor's Lipschitz constant \(L_f = 1 + \lambda\) sets the per-step
+  amplification rate of any input error, so over an \(N\)-step free rollout the worst-case drift grows as
+  \(L_f^N = (1+\lambda)^N\). Now cut that rollout into \(K\) subgoals. Inside each interval the predictor
+  only runs free for \(N/K\) steps before the high-level plan pins it back to a known abstract target.
+  The maximum drift is no longer set by the full horizon, only by the length of one segment.
 </p>
 <div class="math-block">
   \[\text{Flat rollout: } \varepsilon_{\max} = \varepsilon_0 \cdot (1+\lambda)^N\]
   \[\text{With } K \text{ subgoals: } \varepsilon_{\max} = \varepsilon_0 \cdot (1+\lambda)^{N/K}\]
-  <p>Take λ = 0.02, N = 100, K = 5. The worst-case drift falls from 7.2× down to 1.49×. The subgoal boundary is, in effect, a free anchor: the same re-anchoring trick the compounding problem was crying out for, supplied here by the plan rather than by memory.</p>
+  <p>(\(\lambda = L_f - 1\) is the predictor's per-step error amplification rate, a geometric property of \(f_\theta\), not a loss weight.) At \(\lambda = 0.02\), \(N = 100\), \(K = 5\): worst-case drift falls from 7.2× to 1.49×. The subgoal boundary is a free anchor — the same re-anchoring the compounding problem was asking for, delivered here by the plan rather than by memory.</p>
 </div>
 <p>
   That free anchor is the whole story. Because the high-level plan holds steady while the low-level
