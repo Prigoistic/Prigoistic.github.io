@@ -2137,6 +2137,131 @@ this is a gap MAPA must partially fill. The closest existing benchmarks are:</p>
 </div>
 
 <hr />
+
+<!-- ── Q12 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-12">
+<h2>12. Why does LeWM use a plain ViT encoder and not a SIGReg-based one like LeJEPA?</h2>
+
+<p>
+  This question exposes a gap the main MAPA document glosses over. The short answer: LeWM does not use
+  SIGReg because LeWM does not need it. MAPA does — and that means MAPA is not using LeWM out of the
+  box. It is proposing a specific modification to LeWM's encoder training that the original paper never
+  required. Unpacking why leads to a clearer understanding of what SIGReg is actually for and why the
+  distinction matters.
+</p>
+
+<h3>What LeWM's goal is and why SIGReg is irrelevant to it</h3>
+<p>
+  LeWM's sole job is to learn to predict the next latent representation from the current one, as stably
+  and accurately as possible. The encoder \(\varphi\) needs to produce representations that are
+  <em>predictable</em> — that have enough structure for the predictor to learn from. It does not need
+  the latent space to be metrically consistent. It does not care whether cosine similarity between
+  arbitrary latent pairs means anything semantically. The prediction loss does not depend on this.
+</p>
+<p>
+  The collapse problem — the risk that the encoder maps everything to the same point, making
+  prediction trivial but useless — is the one geometric property LeWM does care about.
+  Standard JEPA solves this with an EMA (exponential moving average) target encoder: a slowly
+  updating second copy of the encoder whose outputs serve as the training target, preventing the
+  primary encoder from collapsing toward a constant. LeWM solved this differently: by designing a
+  two-term loss (InfoNCE contrastive term + prediction term) and an asymmetric architecture that
+  prevents collapse without a separate target network. No SIGReg required. The result is a
+  self-contained system that trains stably on a single GPU from raw pixels.
+</p>
+
+<h3>What SIGReg actually enforces and why LeWM doesn't have it</h3>
+<p>
+  SIGReg adds a geometric regularization term on top of the contrastive loss during encoder training:
+</p>
+<div class="math-block">
+  \[\mathcal{L}_{\text{geo}} = \mathbb{E}_{i,j}\!\left[\bigl(\|\varphi(s_i) - \varphi(s_j)\| - d_{\text{obs}}(s_i, s_j)\bigr)^2\right]\]
+  <p>This loss penalizes any mismatch between distances in latent space and distances in observation space. It enforces \emph{isometry}: the encoder must approximately preserve relative distances from the observation space into the latent space. As a consequence, the encoder's Lipschitz constant is bounded from above and below — it cannot stretch or collapse distances by more than a bounded factor.</p>
+</div>
+<p>
+  LeWM's encoder, trained without this term, may learn representations that are metrically
+  distorted relative to observation space. Two semantically similar scenes could map to distant
+  latent vectors if that happens to make prediction easier; two dissimilar scenes could map to
+  nearby latents if their dynamics happen to be similar. From LeWM's perspective, this is fine
+  — prediction quality is unaffected by this geometric distortion. The loss never penalizes it.
+</p>
+
+<h3>Why MAPA needs SIGReg but LeWM does not</h3>
+<p>
+  MAPA's clustering and gating mechanism makes a specific claim that depends entirely on the
+  latent space being metrically consistent: <em>tight clusters in latent space correspond to
+  semantically coherent scene configurations</em>. If this is false, the tightness criterion
+  in the gate cannot separate real changes from noise, and the entire MAPA architecture fails
+  at the step it depends on most.
+</p>
+<p>
+  Specifically: at step C4 (K-means clustering), MAPA assigns surprising \(z_t\) vectors to
+  clusters by cosine similarity and uses within-cluster variance (tightness) as the discriminator
+  between real change and noise. This works only if:
+</p>
+<ul>
+  <li>Multiple observations of the same new scene configuration map to <em>nearby</em> latent vectors (tight cluster).</li>
+  <li>Random noise events — which have no consistent semantic content — map to <em>dispersed</em> latent vectors (loose cluster).</li>
+</ul>
+<p>
+  The first point is guaranteed by SIGReg: if \(\varphi\) is approximately isometric, then similar
+  observations in the world produce nearby latent vectors. Without SIGReg, this is not guaranteed.
+  LeWM's encoder might happen to satisfy it empirically for most scenes, or it might not. There
+  is no training objective enforcing it. MAPA's gate would be unreliable on a native LeWM encoder
+  in ways that cannot be predicted without running the matched-noise experiment.
+</p>
+
+<h3>What this means for the MAPA implementation</h3>
+<p>
+  MAPA as proposed is not a wrapper around LeWM with no changes to the base model. It requires a
+  modified encoder training procedure. The ViT architecture can stay identical; what changes is
+  the training objective:
+</p>
+<div class="math-block">
+  \[\underbrace{\mathcal{L}_{\text{LeWM}} = \mathcal{L}_{\text{InfoNCE}} + \mathcal{L}_{\text{pred}}}_{\text{no metric preservation}} \quad\longrightarrow\quad \underbrace{\mathcal{L}_{\text{MAPA}} = \mathcal{L}_{\text{InfoNCE}} + \lambda_{\text{geo}}\,\mathcal{L}_{\text{geo}}}_{\text{SIGReg: metric-preserving}}\]
+  <p>The predictor training (LeJEPA multi-step targets) runs second, on top of the SIGReg-trained encoder. The encoder is then frozen. From this point forward, both LeWM's predictor and MAPA's memory layer operate in a latent space where cosine similarity is semantically meaningful — a property the original LeWM never required or enforced.</p>
+</div>
+
+<h3>The open empirical question</h3>
+<p>
+  It is not known in advance how much metric distortion LeWM's native encoder has. If LeWM's
+  representations happen to be approximately metrically consistent — because the combination of
+  InfoNCE contrastive loss and prediction loss implicitly encourages metric structure — then the
+  MAPA gate might work acceptably on a native LeWM encoder without SIGReg. If not, gate precision
+  on the matched-noise experiment will degrade substantially.
+</p>
+<p>
+  This makes the SIGReg ablation a high-priority experiment for Month 2. Two conditions:
+</p>
+<ul>
+  <li><strong>Condition A:</strong> MAPA with SIGReg encoder. The baseline claimed in the proposal.</li>
+  <li><strong>Condition B:</strong> MAPA with native LeWM encoder (no SIGReg). Tests whether the metric preservation assumption is actually necessary in practice.</li>
+</ul>
+<p>
+  If Condition B performs within 5% of Condition A on gate precision and RVPR, the SIGReg modification
+  may not be worth the added training complexity. If Condition B shows substantially worse gate
+  precision — especially on the matched-noise experiment — SIGReg is confirmed as necessary and the
+  modified encoder training is non-optional.
+</p>
+
+<h3>Why LeJEPA uses SIGReg and LeWM does not</h3>
+<p>
+  LeJEPA and LeWM are separate research efforts with different design goals. LeJEPA (or the
+  "Le-JEPA" family more broadly) introduced SIGReg as an alternative to EMA target networks,
+  showing that geometric regularization can provide the same collapse-prevention guarantee more
+  efficiently — halving trainable parameter count by removing the shadow encoder. LeWM solved the
+  same collapse problem through its asymmetric two-loss design without needing either EMA or
+  SIGReg. Both solutions work for their stated goals. MAPA borrows LeWM's parameter efficiency
+  and trains-from-scratch simplicity, but needs to add SIGReg from the LeJEPA side to satisfy
+  the metric consistency requirement that MAPA's memory architecture depends on.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  LeWM does not use SIGReg because LeWM has no geometric requirement on its latent space — it only needs to predict, not cluster. MAPA imposes a new requirement (cosine similarity must be semantically meaningful) that LeWM's encoder was never trained to satisfy. MAPA therefore requires a modified encoder training objective. Whether native LeWM representations are "close enough" is an empirical question resolved by the SIGReg ablation in Month 2.
+</div>
+</div>
+
+<hr />
 <footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
 
 </div><!-- /breakdowns-page -->
