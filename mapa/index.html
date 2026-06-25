@@ -87,10 +87,38 @@ code {
 }
 .note strong { color: #333; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 4px; }
 footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; text-align: center; font-size: 13px; color: #bbb; }
+.site-nav { position: fixed; top: 18px; left: 24px; display: flex; gap: 8px; z-index: 200; }
+.site-nav a { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600; color: #6b7280; text-decoration: none; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,0.92); border: 1px solid #e5e7eb; backdrop-filter: blur(6px); letter-spacing: 0.02em; cursor: pointer; }
+.site-nav a:hover { color: #111; border-color: #d1d5db; }
+.site-nav a.active { color: #111; background: #f3f4f6; border-color: #d1d5db; }
+.bd-section { margin-bottom: 72px; }
+.bd-section h2 { margin-top: 52px; }
+.bd-section h3 { margin-top: 32px; }
+.verdict { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14.5px; color: #166534; }
+.verdict strong { color: #14532d; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; }
+.warn-box { background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14.5px; color: #854d0e; }
+.warn-box strong { color: #713f12; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; }
 </style>
+<script>
+function showPage(p) {
+  ['main','breakdowns'].forEach(function(id) {
+    document.getElementById(id+'-page').style.display = (id===p) ? '' : 'none';
+    var el = document.getElementById('nav-'+id);
+    el.className = (id===p) ? 'active' : '';
+  });
+  window.scrollTo(0,0);
+  if (window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});
+}
+</script>
 </head>
 <body>
+<nav class="site-nav">
+  <a id="nav-main" class="active" onclick="showPage('main')">Main</a>
+  <a id="nav-breakdowns" onclick="showPage('breakdowns')">Breakdowns</a>
+</nav>
+
 <div class="page">
+<div id="main-page">
 
 <!-- shared arrow markers -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden">
@@ -1361,8 +1389,776 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
   Either way, the field learns where the real bottleneck is.
 </p>
 
-<footer>MetaCognition Labs &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
+<footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
 
+</div><!-- /main-page -->
+
+<!-- ════════════════════════════════════════════════════════
+     BREAKDOWNS PAGE
+════════════════════════════════════════════════════════ -->
+<div id="breakdowns-page" style="display:none">
+
+<div class="title-block" style="margin-top:48px">
+  <h1 style="font-size:clamp(24px,4vw,38px)">Architecture Breakdowns</h1>
+  <p class="date">Every design decision, justified from first principles</p>
 </div>
+
+<p>
+  Eleven questions that go below the surface of the MAPA architecture. Each answer traces the
+  reasoning from first principles, compares alternatives, states the mathematical grounding, and
+  names where the claim could fail. These are not summaries of the main piece — they are the
+  working that justifies it.
+</p>
+
+<hr />
+
+<!-- ── Q1 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-1">
+<h2>1. How is z_t produced, and where does ẑ_t come from?</h2>
+
+<p>
+  The encoder φ and the predictor f_θ are two separate networks running sequentially at every step.
+  They are not parallel. The pipeline for a single timestep is strictly ordered:
+</p>
+<ol>
+  <li>Frame s_t arrives. Encoder computes <strong>z_t = φ(s_t)</strong>. This is the current latent, a 192-dim vector.</li>
+  <li>Predictor takes z_t (plus the nearest retrieved landmark) and produces <strong>ẑ_{t+1} = f_θ(z_t, L̂)</strong>. This is the prediction for the next step.</li>
+  <li>At step t+1, the encoder produces z_{t+1} and we compare it against ẑ_{t+1} that was just stored.</li>
+</ol>
+<p>
+  So ẑ_t — the predicted latent for the current step — was produced one step earlier by the predictor
+  operating on z_{t-1}. You never compute ẑ_t and z_t at the same time. They come from different
+  sources at different moments, which is why the error measurement makes temporal sense.
+</p>
+
+<h3>The encoder architecture in LeWM</h3>
+<p>
+  LeWM's encoder is a Vision Transformer (ViT) trained end-to-end from raw pixels with no external
+  pretraining. It takes 16×16 patches of the input frame and produces a single 192-dim pooled
+  representation. The training objective is:
+</p>
+<div class="math-block">
+  \[\mathcal{L}_{\text{LeWM}} = \left\|f_\theta\!\left(z_t\right) - \operatorname{sg}\!\left[\varphi(s_{t+1})\right]\right\|^2\]
+  <p>The stop-gradient on the right side means the encoder is never directly optimized to move toward the predictor's output — only the predictor is trained to approach the encoder's output on the next frame. This is what prevents representation collapse without needing an EMA target network.</p>
+</div>
+<p>
+  At MAPA inference time, φ is completely frozen. z_t for any given frame s_t is always the same
+  value — deterministic, reproducible, never changing. The LoRA adapter only modifies f_θ, not φ.
+  This is what makes cross-episode comparison of z vectors meaningful: they live in a fixed space.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  z_t comes from the frozen encoder at time t. ẑ_t was produced by the predictor at t-1. They are compared to measure how surprised the system is. The encoder runs once per frame, sequentially before the predictor.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q2 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-2">
+<h2>2. What is the landmark set actually doing — and how is it different from HWM subgoals?</h2>
+
+<h3>The fundamental difference</h3>
+<p>
+  HWM subgoals are <em>forward-looking</em>: they are abstract states the high-level planner
+  wants to reach in the future, used to condition the low-level predictor on where to go next.
+  They are computed fresh from the current state and plan at each episode.
+</p>
+<p>
+  MAPA landmarks are <em>backward-looking</em>: they are consolidated representations of places and
+  scene configurations the model has already been to, retrieved from memory when the current observation
+  resembles something previously consolidated. They tell the predictor not where to go but what it
+  already knows about where it is.
+</p>
+
+<h3>How a landmark is used at inference</h3>
+<p>
+  At each step t, the system finds the nearest landmark:
+</p>
+<div class="math-block">
+  \[\hat{L}_t = \arg\max_{L_j \in \mathcal{L}} \operatorname{cosine\_sim}(z_t, L_j)\]
+  <p>This retrieved landmark is concatenated with or added to z_t before it enters the predictor: f_θ(z_t, L̂_t) → ẑ_{t+1}. The predictor's input is augmented with a stable reference point from consolidated memory.</p>
+</div>
+<p>
+  The effect on autoregressive compounding: without landmarks, the predictor is in pure free rollout
+  mode, and errors compound geometrically as (1+λ)^N. With landmark retrieval at every step, the
+  predictor is never more than one step away from a re-anchor. It does not reset the error to zero —
+  it does not see a real observation — but it does see a geometrically stable reference that was
+  itself derived from real observations that were fully consolidated. This reduces the effective
+  drift rate without requiring episode interruption.
+</p>
+
+<h3>What information the landmark actually carries</h3>
+<p>
+  A landmark is a 192-dim centroid: the EMA-averaged latent position of a cluster of surprising
+  observations that the gate determined were a stable, novel, coherent change. It encodes the
+  "typical" latent position of that scene configuration — a kind of averaged representation
+  of multiple observations of the same new thing, smoothed over time by the EMA decay.
+</p>
+<p>
+  It does not encode specific object positions, pixel colors, or frame-level details. It encodes
+  the semantic structure of the scene as the encoder sees it: the kind of place this is, at the
+  level of abstraction LeWM has learned. This is why it is useful as an anchor — it is abstract
+  enough to match across different visits to the same kind of scene, specific enough to distinguish
+  different scene types.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  Landmarks are past-consolidated scene centroids retrieved to anchor current predictions. HWM subgoals are future-planned goal states used to direct the predictor forward. The two are orthogonal and complementary — MAPA can and should sit below HWM in a combined architecture.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q3 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-3">
+<h2>3. How are z_t and ẑ_t compared — the math, the justification, and what SIGReg actually does</h2>
+
+<h3>The comparison metric</h3>
+<p>
+  The error is computed as squared L2 distance in latent space:
+</p>
+<div class="math-block">
+  \[\varepsilon_t = \left\|\hat{z}_t - z_t\right\|^2\]
+  <p>This is the same objective as the JEPA training loss. It is not Fourier-based, not contrastive, not any special metric — plain L2. The reason L2 is valid here is not obvious and requires the SIGReg justification below.</p>
+</div>
+
+<h3>Why L2 in latent space needs SIGReg to be meaningful</h3>
+<p>
+  In a generic neural network latent space, L2 distance means almost nothing semantically. Two
+  very similar frames could map to latent vectors that are far apart; two very different frames
+  could map to nearby latents. If that were true of φ, then a large ε_t could mean either genuine
+  scene change or just arbitrary geometric distortion from the encoder — you could not tell which.
+</p>
+<p>
+  SIGReg fixes this by adding a geometric regularization term to the encoder training loss:
+</p>
+<div class="math-block">
+  \[\mathcal{L} = \mathcal{L}_{\text{InfoNCE}} + \lambda_{\text{geo}} \cdot \mathcal{L}_{\text{geo}}\]
+  \[\mathcal{L}_{\text{geo}} = \mathbb{E}_{i,j}\!\left[\bigl(\|\varphi(s_i) - \varphi(s_j)\| - d_{\text{obs}}(s_i, s_j)\bigr)^2\right]\]
+  <p>The geometric loss penalizes any mismatch between latent distances and observation distances. It forces the encoder to be approximately isometric — to preserve the relative distances between observations in latent space. As a consequence, the encoder's Lipschitz constant is bounded from above (cannot stretch distances by more than a bounded factor) and from below (cannot collapse distances either).</p>
+</div>
+<p>
+  Once the encoder is isometric, L2 in latent space is a faithful proxy for semantic distance in
+  observation space. A large ε_t genuinely means the predicted scene and the actual scene are
+  semantically far apart. A small ε_t means they are semantically similar.
+</p>
+
+<h3>What the ECF / Fourier approach is for (and what it is not)</h3>
+<p>
+  The user asked about ECF (Energy-based Characteristic Functions) and Fourier approaches. These
+  appear in some formulations of distribution matching for encoder training — they are used to
+  compute d_obs(s_i, s_j) in the geometric loss, or to enforce distributional alignment of the
+  encoder's output. This is part of the encoder training procedure and does not appear at inference
+  time. The inference comparison is always plain L2, justified by the encoder's trained isometry.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  L2 is used because SIGReg makes the latent space geometrically faithful. Without SIGReg, L2 would be meaningless. The Fourier/ECF aspect of SIGReg is an encoder training detail, not the inference metric.
+</div>
+<div class="warn-box">
+  <strong>Open question</strong>
+  How well d_obs is approximated matters. If the semantic distance measure used during training is wrong or incomplete, the isometry guarantee becomes noisy. This is worth an ablation: train with SIGReg vs without, and compare gate precision on the matched-noise experiment.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q4 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-4">
+<h2>4. The adaptive threshold — mechanism, cold start, adaptivity, and validation</h2>
+
+<h3>What actually enters the threshold</h3>
+<p>
+  Only the scalar ε_t enters. Not z_t, not ẑ_t, not their difference — just the single number
+  that is their squared L2 distance. The threshold is a scalar comparison:
+</p>
+<div class="math-block">
+  \[\tau(t) = \mu_W(t) + \alpha \cdot \sigma_W(t), \qquad \alpha = 2.0\]
+  <p>where μ_W(t) and σ_W(t) are the mean and standard deviation of the last W=100 error values. Any ε_t that clears this bar is deemed "surprising enough" and written to the buffer. Everything below is discarded.</p>
+</div>
+<p>
+  Setting α=2.0 targets the top ~2.3% of recent error values under a normal distribution assumption.
+  This keeps the buffer sparse — most steps produce nothing — which is the intention.
+</p>
+
+<h3>The cold start problem</h3>
+<p>
+  For the first W=100 steps, there is no history window and τ(t) cannot be computed. Three strategies:
+</p>
+<ul>
+  <li>
+    <strong>Warmup write-all:</strong> for the first 100 steps, write every observation to the buffer
+    (τ=0 effectively). Let the window fill before applying the adaptive rule. Simple but may flood the
+    buffer with irrelevant data on a stable initial scene.
+  </li>
+  <li>
+    <strong>Pretraining statistics prior:</strong> run LeWM on a held-out validation set during training
+    and record the distribution of prediction errors. Use μ_prior and σ_prior computed on this
+    distribution as the initial window statistics. This starts the threshold at a sensible default
+    before any deployment evidence arrives.
+  </li>
+  <li>
+    <strong>Growing window:</strong> start with W=10, increase to W=100 as data accumulates.
+    This is noisy at first but avoids the warmup flood.
+  </li>
+</ul>
+<p>
+  The recommended approach is option 2 combined with a short warmup: use pretraining statistics for
+  the first 50 steps, then transition to the full rolling window. This is empirically common in
+  continual learning systems.
+</p>
+
+<h3>Why the threshold needs to be adaptive</h3>
+<p>
+  As the LoRA adapter improves the predictor's performance on a new scene, the average prediction
+  error falls. A fixed threshold τ would eventually be above the typical error even for genuinely
+  surprising events, causing the system to stop noticing changes it should notice. The rolling
+  window ensures τ tracks the predictor's current quality:
+</p>
+<div class="math-block">
+  \[\text{If adapter improves: } \mu_W \downarrow \Rightarrow \tau \downarrow \Rightarrow \text{sensitivity maintained}\]
+  <p>The system stays alert to genuine surprise relative to its current competence, not relative to where it started. Without adaptivity, MAPA would gradually go blind in environments it has learned well.</p>
+</div>
+
+<h3>Validation</h3>
+<p>
+  The threshold mechanism is validated indirectly by the matched-noise experiment: if the adaptive
+  threshold correctly admits real changes and rejects matched-magnitude noise events at the buffer
+  write level, the downstream gate will have clean input to work with. A miscalibrated threshold
+  (too low: floods buffer with noise; too high: misses changes) will show up immediately in gate
+  precision and recall metrics.
+</p>
+<p>
+  Additionally, the α sweep (see experiments section) tests robustness: if MAPA's advantage over the
+  stateless baseline only holds at exactly α=2.0, the mechanism is brittle. It should hold across
+  α ∈ [1.5, 3.0] if the design is sound.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  Only ε_t (scalar) hits the threshold. Cold start is handled via pretraining statistics as a prior. Adaptivity is necessary because the predictor improves over deployment. The α sweep validates robustness.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q5 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-5">
+<h2>5. The episodic buffer — write mechanism, storage format, and cross-episode communication</h2>
+
+<h3>It is not a key-value store</h3>
+<p>
+  PAM (Predictive Associative Memory) uses a key-value store: write an observation in, retrieve
+  the most similar stored observation when you see something similar later. The buffer IS the
+  memory being read from.
+</p>
+<p>
+  MAPA's buffer does none of this. Nothing is ever retrieved from the buffer. It is a
+  <em>signal accumulator</em> — a collection of recent surprising events whose geometric structure
+  feeds the clustering and gate mechanisms. Once an observation has been written in and contributes
+  to a gate fire, its role is complete. The permanent memory is in the landmarks and the adapter,
+  not the buffer.
+</p>
+
+<h3>The physical write mechanism</h3>
+<p>
+  The buffer is a fixed-capacity ring buffer (circular array) of 2048 slots. Each slot holds one
+  5-tuple. When the buffer is full and a new surprising observation arrives, the eviction policy
+  removes the entry with the lowest ε_t (the least surprising surviving entry) — this is the
+  priority-weighted LRU. Highly surprising old entries survive longer than mildly surprising recent ones.
+</p>
+<p>
+  Each 5-tuple entry contains:
+</p>
+<div class="math-block">
+  \[(z_t,\; a_t,\; z_{t+1},\; \varepsilon_t,\; \text{episode\_id})\]
+  <p>z_t and z_{t+1}: the current and next latent vectors — what the predictor needs to update on. a_t: the action taken — needed because the predictor is action-conditioned. ε_t: the surprise score — the eviction weight. episode_id: which episode this came from — required for cross-episode gate logic.</p>
+</div>
+
+<h3>How cross-episode memory works</h3>
+<p>
+  This is the central structural difference from standard JEPA. The buffer does NOT flush at episode
+  boundaries. Entries from episode 1, episode 5, and episode 23 coexist in the same buffer.
+</p>
+<p>
+  When an agent returns to scene A after visiting scenes B, C, D across episodes 2-4, new z_t
+  observations of scene A cluster with old entries from episode 1. The clustering step (C4) assigns
+  these new points to centroids that were seeded by the earlier episode. The support criterion in
+  the gate then accumulates evidence across episodes: "I have seen this configuration in episode 1
+  (4 entries) and now in episode 5 (3 entries), total support = 7 observations across episodes."
+  This cross-episode evidence is what allows the gate to fire on genuine scene structure rather than
+  single-episode flukes.
+</p>
+<p>
+  The episode_id field prevents a different failure: if a random single-episode cluster happens
+  to pass the support and tightness criteria, the gate could still reject it if all entries share
+  the same episode_id (indicating no cross-episode confirmation). The exact form of this check
+  is an implementation decision: require at least 2 distinct episode_ids in a cluster before
+  the gate fires, or weight support by distinct episodes rather than raw count.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  The buffer is a circular ring, not a KV store. It accumulates evidence for the gate, not retrieved memories. Cross-episode communication works because the buffer persists across episode boundaries and entries carry episode_id metadata.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q6 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-6">
+<h2>6. Online streaming K-means — why K-means, why not better alternatives, the geometry, and the math</h2>
+
+<h3>Why K-means specifically</h3>
+<p>
+  The core requirement for MAPA's clustering step is: given a stream of 192-dim latent vectors
+  arriving one at a time, maintain a compact representation of their geometric structure in
+  constant time per point. K-means with EMA centroid updates satisfies this exactly:
+</p>
+<ul>
+  <li><strong>O(K) per new point</strong>: compare against K centroids, assign, update one centroid. K=8–16 so this is trivial.</li>
+  <li><strong>The centroid IS the memory</strong>: the centroid is directly usable as a landmark (192-dim vector in the same space as z_t). No secondary representation needed.</li>
+  <li><strong>EMA update is noise-robust</strong>: β=0.95 smooths over individual noisy points without requiring batch processing.</li>
+  <li><strong>Works with cosine similarity natively</strong>: normalize centroids after each update, all comparisons become cosine sim.</li>
+</ul>
+
+<h3>Why not DBSCAN, GMM, spectral, or hierarchical</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Algorithm</th><th>Online streaming?</th><th>O(1) update?</th><th>Natural centroid?</th><th>Problem</th></tr></thead>
+    <tbody>
+      <tr><td>DBSCAN</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>Needs full density estimates, can't stream</td></tr>
+      <tr><td>GMM (EM)</td><td class="no">No</td><td class="no">No</td><td class="partial">Partially</td><td>EM requires multiple passes, batch E-step</td></tr>
+      <tr><td>Spectral</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>Requires O(N²) affinity matrix</td></tr>
+      <tr><td>Agglomerative</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td>O(N² log N), purely batch</td></tr>
+      <tr><td>Online K-means</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td>None for this use case</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>The data sparsity concern in SSL</h3>
+<p>
+  SSL representations in JEPA are high-dimensional (192-dim) and the surprising observations
+  written to the buffer are sparse — there are far fewer of them than in supervised learning
+  settings. The cosine similarity assignment threshold τ_assign=0.85 addresses this directly:
+  if an incoming point is not within 0.85 cosine similarity of any existing centroid, it spawns
+  a new cluster rather than being forced into an inappropriate one. This prevents the common
+  K-means failure mode of assigning irrelevant points to the nearest (but semantically wrong) centroid.
+</p>
+
+<h3>The geometric argument for why clustering detects real changes</h3>
+<p>
+  This is the core claim that needs the most justification, and it rests entirely on SIGReg.
+</p>
+<p>
+  When a real change happens — new object, layout shift, lighting change — the encoder φ maps
+  multiple observations of this new configuration to a tight region of latent space. Why? Because
+  SIGReg trained φ to be approximately isometric: similar things in the world → nearby latent
+  vectors. Multiple views of the same new scene configuration are "similar in the world" by
+  definition, so they map to nearby latent vectors. Their cluster is geometrically coherent.
+</p>
+<p>
+  When noise happens — rendering stochasticity, compounding error spike, sensor jitter — the
+  "cause" is random perturbation with no consistent semantic content. Different noise events
+  map to random locations in latent space (again by SIGReg: random perturbations in observation
+  space → random displacements in latent space). The cluster is geometrically dispersed.
+</p>
+<div class="math-block">
+  \[\text{Real change: }\operatorname{tightness}(k) = \frac{1}{n_k}\sum_i \|z_i - c_k\|^2 \;\text{ is small}\]
+  \[\text{Noise: }\operatorname{tightness}(k) \;\text{ is large (random scatter)}\]
+  <p>The EMA decay β=0.95 gives each centroid an effective memory of approximately 1/(1-0.95)=20 timesteps. This means the centroid represents a smoothed average of recent similar events, not a snapshot of one. This is exactly what catches gradual drift: each observation slightly displaces the centroid, and the accumulated displacement ‖c_{k,t} − c_{k,0}‖ becomes measurable.</p>
+</div>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  Online K-means is the right algorithm because it streams in O(K) time and the centroid is directly the stored landmark. The geometric detection of real changes vs noise depends entirely on SIGReg's metric preservation — without it, the tightness discriminator fails.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q7 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-7">
+<h2>7. The consolidation gate — where the three criteria come from, their real-world validity</h2>
+
+<h3>Why three criteria and not one</h3>
+<p>
+  Each criterion blocks a specific failure mode. Drop any one and a different class of bad update
+  gets through. They are not redundant — they are orthogonal gates blocking orthogonal failure modes.
+</p>
+
+<h3>Criterion 1: Support ≥ N_min (enough evidence)</h3>
+<p>
+  Origin: hypothesis testing. To distinguish a true cluster from a random coincidence of points,
+  you need sufficient sample size. With too few observations, the tightness estimate is unreliable —
+  2 or 3 points can appear tight by chance. N_min (5–10 in the reference implementation) is the
+  minimum sample size for the tightness estimate to be statistically reliable.
+</p>
+<p>
+  Biological analogue: hippocampal long-term potentiation requires repeated synaptic activation,
+  not a single event. One stimulus does not create long-term memory.
+</p>
+<p>
+  Real-world validity: in controlled experiments, the gate should have near-zero false positives
+  when N_min is set correctly. The value is a hyperparameter whose sensitivity is tested by the
+  N_min sweep in the ablation study.
+</p>
+
+<h3>Criterion 2: Tightness ≤ σ²_max (geometrically coherent)</h3>
+<p>
+  Origin: the geometric structure of SIGReg-trained latent spaces (described in Section 6).
+  Real changes produce tight clusters; noise produces dispersed ones. This is the central
+  discriminator — the one the matched-noise experiment is specifically designed to test.
+</p>
+<div class="math-block">
+  \[\operatorname{tightness}(k) = \frac{1}{n_k}\sum_{i=1}^{n_k} \|z_i - c_k\|^2 \leq \sigma^2_{\max}\]
+  <p>σ²_max is set based on the expected within-cluster variance for a semantically coherent group of observations in LeWM's latent space. This can be calibrated from the pretraining data: compute the average within-class variance across semantic categories in the training set.</p>
+</div>
+<p>
+  Real-world validity: this criterion is validated by the matched-noise control experiment.
+  Construct environments where noise events produce the same ε_t as real changes. An adaptive
+  learning rate baseline (which has no access to cluster geometry) cannot separate them. MAPA's
+  gate should pass real changes (tight clusters) and block noise (dispersed clusters). If this
+  separation holds experimentally, criterion 2 is validated. If it does not, the SIGReg metric
+  preservation is insufficient and needs strengthening.
+</p>
+
+<h3>Criterion 3: Novelty ≥ δ_novel (genuinely new)</h3>
+<p>
+  Origin: information theory. Consolidating already-known information has zero information gain
+  and wastes a LoRA update. If the new cluster centroid is similar to an existing landmark (cosine
+  sim above 1−δ_novel), the scene it represents is already in memory. No update is needed.
+</p>
+<div class="math-block">
+  \[\operatorname{novelty}(k) = \min_{j} \operatorname{sim}(c_k,\, L_j) \leq 1 - \delta_{\text{novel}}\]
+  <p>If the minimum similarity to any existing landmark is high, the cluster is NOT novel — it matches known territory. Only clusters that are far enough from all existing landmarks (low maximum similarity) trigger an update.</p>
+</div>
+<p>
+  Real-world validity: over many episodes, the landmark set grows until it covers the agent's
+  environment. The novelty criterion should naturally drive the gate-fire rate toward zero as
+  the agent becomes more familiar with its world. A healthy system shows declining gate-fire
+  frequency over time in a fixed environment — measurable directly.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  The three criteria are orthogonal: support blocks statistical flukes, tightness blocks geometric noise, novelty blocks redundant updates. Each has an independent experimental validation. Dropping any one of them degrades a different metric.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q8 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-8">
+<h2>8. LoRA adapters — why LoRA and not EWC, GEM, replay, or other continual learning methods</h2>
+
+<h3>What MAPA needs from a weight update mechanism</h3>
+<p>Three hard requirements:</p>
+<ol>
+  <li><strong>Base knowledge must be perfectly preserved</strong>, not just approximately. Any degradation of the frozen encoder's semantic structure breaks the entire gating mechanism.</li>
+  <li><strong>Updates must be reversible</strong>. If a bad gate fire corrupts the adapter, it must be possible to reset without losing the core model.</li>
+  <li><strong>Memory overhead must be fixed and small</strong> regardless of how many gate fires occur.</li>
+</ol>
+
+<h3>Why every alternative fails at least one requirement</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Method</th><th>Base preserved?</th><th>Reversible?</th><th>Fixed memory?</th><th>Why not</th></tr></thead>
+    <tbody>
+      <tr><td>Full fine-tuning</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td>Overwrites θ. Next gate fire overwrites previous learning. Catastrophic forgetting by construction.</td></tr>
+      <tr><td>EWC</td><td class="partial">Penalized</td><td class="no">No</td><td class="yes">Yes</td><td>Requires computing Fisher Information Matrix (FIM) — expensive. Still changes base weights, just more slowly. FIM computation needs a dataset pass.</td></tr>
+      <tr><td>GEM / A-GEM</td><td class="no">No</td><td class="no">No</td><td class="no">Grows</td><td>Requires exemplar buffer that grows. QP solve per update. Still updates base weights.</td></tr>
+      <tr><td>Progressive Networks</td><td class="yes">Yes</td><td class="no">No</td><td class="no">Grows</td><td>New columns added per task. Memory grows linearly with gate fires. Cannot bound footprint.</td></tr>
+      <tr><td>PackNet</td><td class="no">Pruned</td><td class="no">No</td><td class="yes">Yes</td><td>Prunes weights between tasks. Fixed capacity shared between old and new. Reduces expressivity.</td></tr>
+      <tr><td>LoRA</td><td class="yes">Yes — frozen</td><td class="yes">Yes — reset BA to 0</td><td class="yes">Yes — r(d_in+d_out)</td><td>Satisfies all three requirements.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>The unique advantage of LoRA's structure</h3>
+<div class="math-block">
+  \[\Delta\theta = B \cdot A, \qquad A \in \mathbb{R}^{r \times d_{\text{in}}},\; B \in \mathbb{R}^{d_{\text{out}} \times r},\; r = 8\]
+  <p>The base θ is not penalized, not regularized, not slowly decayed — it is completely frozen. The isolation between θ and Δθ is total. Multiple consecutive gate fires accumulate in Δθ (the matrices B and A absorb each update additively). If Δθ becomes corrupted or overfits, it can be zeroed out exactly, restoring the original predictor, with zero effect on θ.</p>
+</div>
+<p>
+  The parameter count is 2 × r × d for each adapted layer. At r=8 and d≈192, this is 2×8×192=3072
+  parameters per layer, or roughly 0.8% of the predictor's total. This is fixed regardless of
+  how many episodes have elapsed or how many gate fires have occurred.
+</p>
+
+<h3>Is there a better choice?</h3>
+<p>
+  Hypernetworks for continual learning (generating adapter weights from context) are an interesting
+  alternative but require a separate hypernetwork (significant overhead) and are harder to interpret.
+  AdaLoRA (adaptive rank selection) could improve parameter efficiency by allocating more rank to
+  the layers that need it — this is a valid optimization direction for MAPA Month 5.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  LoRA is the correct choice because it provides total base-weight isolation, reversibility, and fixed memory — requirements that EWC, GEM, and full fine-tuning all fail. The choice is not arbitrary; it is the only standard continual learning method that preserves the frozen encoder's integrity completely.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q9 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-9">
+<h2>9. The permanent landmark set — storage format, real implementation, and cross-episode persistence</h2>
+
+<h3>What it actually is in memory</h3>
+<p>
+  The landmark set is a Python list of 192-dim float32 tensors (or equivalently, a torch.Tensor
+  of shape [N_landmarks, 192]) held in RAM during the MAPA session. It is not written to a database,
+  not stored in a key-value store, not serialized per-step. It lives in working memory alongside
+  the LoRA adapter weights.
+</p>
+<p>
+  Each landmark is 192 × 4 bytes = 768 bytes. Storage scales linearly:
+</p>
+<div class="math-block">
+  <p>10 landmarks ≈ 7.5 KB &nbsp;·&nbsp; 100 landmarks ≈ 75 KB &nbsp;·&nbsp; 1000 landmarks ≈ 750 KB</p>
+  <p>Even 10,000 landmarks = 7.5 MB. The set is permanent but tiny by any modern standard. The entire MAPA memory system (buffer + landmarks + LoRA adapter) stays under 20 MB.</p>
+</div>
+
+<h3>How it persists across episodes</h3>
+<p>
+  The landmark set is initialized <em>once</em> when the MAPA wrapper is instantiated, before
+  episode 1 begins. It is never flushed, never reset, never cleared between episodes. When the
+  agent finishes episode 5 and starts episode 6, the landmark set from episodes 1–5 is still
+  fully intact and available for retrieval. This is the entire cross-episode memory mechanism
+  for the predictive anchoring function.
+</p>
+<p>
+  In contrast to the buffer (which IS flushed by eviction but not by episode boundary), landmarks
+  are permanent until explicitly pruned. The gate's novelty criterion ensures they do not grow
+  indefinitely with redundant copies — each landmark represents genuinely new territory.
+</p>
+
+<h3>Retrieval at scale</h3>
+<p>
+  Retrieval is O(N_landmarks × 192) per step: compute cosine similarity against all landmarks and
+  take the argmax. For small N (under a few hundred), this is negligible. For large N, approximate
+  nearest neighbor search (FAISS, ScaNN, or HNSW) can reduce this to O(log N) with a small
+  accuracy trade-off. The FAISS IVF-PQ index is the recommended choice for deployment at scale
+  because it supports dynamic insertion of new landmarks without full rebuild.
+</p>
+
+<h3>In a real LeWM implementation</h3>
+<p>
+  The MAPA wrapper sits around the LeWM module. In Python/PyTorch, the structure would look like:
+</p>
+<div class="math-block">
+  <p>MAPAWrapper(encoder=lewm.encoder, predictor=lewm.predictor, lora_adapter=LoRAAdapter(r=8), landmark_set=LandmarkSet(), buffer=EpisodicBuffer(capacity=2048), clustering=OnlineKMeans(K=16, tau=0.85, beta=0.95), gate=ConsolidationGate(N_min=5, sigma2_max=0.1, delta_novel=0.15))</p>
+  <p>The encoder is a reference (not a copy) to the frozen LeWM encoder. Landmarks are stored as numpy arrays or torch tensors on CPU. The LoRA adapter is on GPU alongside the predictor. Buffer entries are on CPU (192 × 5 × 4 bytes = 3.75KB per entry, 7.5MB total).</p>
+</div>
+
+<h3>Serialization for persistent deployment</h3>
+<p>
+  For long-running deployment where the agent must persist memory across power cycles, the landmark
+  set and LoRA adapter can be serialized to disk (pickle, safetensors, or HDF5). Loading them back
+  restores the agent's accumulated memory exactly. The buffer does not need to be serialized — it
+  is transient and will refill after a few hundred surprising steps.
+</p>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  The landmark set is a RAM tensor, persisted across episodes by never being flushed. Storage is negligible (kilobytes to low megabytes). For large deployments, FAISS enables sub-millisecond retrieval. Serialization to disk enables long-term persistent memory across sessions.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q10 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-10">
+<h2>10. Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</h2>
+
+<h3>Existing JEPA-adjacent benchmarks</h3>
+<p>No published benchmark specifically tests cross-episode memory in JEPA-based world models —
+this is a gap MAPA must partially fill. The closest existing benchmarks are:</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Benchmark</th><th>What it tests</th><th>Relevance to MAPA</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Push-T</strong></td><td>2D manipulation task success rate</td><td>Tests planning quality (HWM baseline)</td><td>Single episode, no memory</td></tr>
+      <tr><td><strong>Calvin Kitchen</strong></td><td>5 consecutive long-horizon tasks</td><td>Tests chained task completion with implicit memory</td><td>No explicit episode boundaries</td></tr>
+      <tr><td><strong>MiniHack</strong></td><td>Procedural dungeon navigation</td><td>Tests generalization, navigation memory</td><td>Reset dynamics per episode</td></tr>
+      <tr><td><strong>Habitat PointNav</strong></td><td>3D navigation to goal</td><td>Tests spatial memory across a scene</td><td>Single scene per episode</td></tr>
+      <tr><td><strong>Crafter</strong></td><td>Open-world long-horizon game</td><td>Tests long-horizon planning with world model</td><td>No explicit return-visit test</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The LLM memory benchmarks (LongMemEval, LoCoMo, FEVER) test recall accuracy and latency
+  for language models with explicit memory. The MAPA equivalent does not yet exist as a published
+  standard — part of Month 5 is building the multi-room return-visit protocol that could become
+  such a benchmark.
+</p>
+
+<h3>MAPA-specific primary metrics</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Metric</th><th>Formula</th><th>Target</th><th>What failure looks like</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Long-Horizon Prediction Error</strong></td><td>MSE(ẑ_{t+k}, z_{t+k}) at k=20,50,100</td><td>Sub-linear growth in k; no divergence</td><td>Exponential error growth past k=20</td></tr>
+      <tr><td><strong>Return-Visit Performance Ratio (RVPR)</strong></td><td>ε at visit N / ε at visit 1</td><td>RVPR &lt; 1.0 (improves with visits)</td><td>RVPR &gt; 1.0: model degrades on return</td></tr>
+      <tr><td><strong>Forgetting Rate (FR)</strong></td><td>dε_A/dN_B (error in A per steps in B)</td><td>FR ≪ stateless baseline</td><td>FR matches stateless: memory not working</td></tr>
+      <tr><td><strong>Scene Identification Accuracy (SIA)</strong></td><td>Nearest landmark similarity &gt; δ when in known scene</td><td>&gt;90% recognition accuracy</td><td>Landmarks don't generalize across visits</td></tr>
+      <tr><td><strong>Gate Selectivity Score (GSS)</strong></td><td>Precision × recall on matched-noise experiment</td><td>&gt;0.72 (90% precision × 80% recall)</td><td>GSS near random: tightness criterion is failing</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Memory efficiency metrics</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Metric</th><th>Definition</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Memory footprint</strong></td><td>Total MB: buffer + landmarks + LoRA</td><td>Must stay &lt;20MB; validates the "no replay buffer" claim</td></tr>
+      <tr><td><strong>Landmark growth rate</strong></td><td>ΔN_landmarks per episode</td><td>Should decrease over time in a fixed environment</td></tr>
+      <tr><td><strong>LoRA adapter drift</strong></td><td>‖Δθ_t − Δθ_0‖_F over time</td><td>Bounded drift confirms no catastrophic forgetting in adapter</td></tr>
+      <tr><td><strong>Inference overhead</strong></td><td>Latency increase per step vs. stateless</td><td>Must be &lt;5% to be deployable</td></tr>
+      <tr><td><strong>Gate fire rate</strong></td><td>Gate fires per 1000 steps</td><td>Should decrease as environment is explored; healthy system goes quiet</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  No published benchmark directly tests MAPA's cross-episode memory claim — MAPA must partially create its own evaluation protocol. The Return-Visit Performance Ratio and Forgetting Rate are the two metrics most directly tied to the core claim.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q11 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-11">
+<h2>11. Experiments — 6-month plan, statistical rigor, and Bonferroni explained</h2>
+
+<h3>What Bonferroni correction means</h3>
+<p>
+  When you run multiple hypothesis tests simultaneously, the probability that at least one
+  produces a false positive (incorrectly rejects the null hypothesis) grows with the number of tests.
+  If you run K tests each at significance level α:
+</p>
+<div class="math-block">
+  \[P(\text{at least one false positive}) = 1 - (1-\alpha)^K \approx K\alpha \text{ for small } \alpha\]
+  <p>Example: 20 tests at α=0.05 → P(at least one false positive) ≈ 64%. Bonferroni correction: test each hypothesis at α/K instead of α. For 20 tests: α_bonferroni = 0.05/20 = 0.0025. This is conservative — it controls the family-wise error rate but requires larger effect sizes to achieve significance.</p>
+</div>
+<p>
+  In MAPA's case: 5 metrics × 4 baselines = 20 primary comparisons per experiment phase.
+  Bonferroni threshold = 0.0025. A paired t-test with 10 seeds against this threshold requires
+  large effect sizes — approximately Cohen's d &gt; 1.2 — to achieve significance. If MAPA's
+  advantages are real, they should clear this bar. If they require α=0.05 to show significance
+  with 10 seeds, the effect is too small to make strong claims.
+</p>
+
+<h3>Month 1: Characterize the failure — experimental design</h3>
+<p>
+  <strong>Environment:</strong> Multi-room MiniHack with 3 scene change types: (a) gradual illumination
+  drift, (b) sudden object swap, (c) new room entry. Each change type at 3 magnitudes (small, medium, large).
+</p>
+<p>
+  <strong>Protocol:</strong> 10 seeds. Each seed runs 5000 steps with alternating stable-scene and
+  changed-scene phases. Prediction error logged at every step. After a change event, the sequence
+  returns to the prior scene after 500 steps (return-visit test).
+</p>
+<p>
+  <strong>Analysis:</strong> Plot error vs time for each change type/magnitude. Compute FR (forgetting
+  rate) and RVPR for each condition. No statistical testing needed — this is a descriptive phase
+  establishing the baseline and the shape of the failure.
+</p>
+<p>
+  <strong>Expected outcomes:</strong> Gradual drift produces smooth monotonic error increase; abrupt
+  changes produce step-function spikes; return visits show 3–7× error increase vs first visit.
+  These numbers motivate the rest of the project.
+</p>
+
+<h3>Months 2–3: Build and ablate</h3>
+<p>
+  <strong>Experimental design:</strong> Build components C2–C7 incrementally, testing each before
+  integrating. Then run the ablation: remove one component at a time, measure effect on each of the
+  5 failure modes. This gives a 7 (ablations: full system, −C2, −C3, −C4, −C5, −C6, −C7) × 5
+  (failure modes) × 10 (seeds) = 350 conditions.
+</p>
+<p>
+  <strong>Statistical analysis:</strong> Paired t-tests (pair by seed) for each ablation vs full
+  system, on each metric. Bonferroni correction across 35 ablation × metric pairs: α/35 = 0.00143.
+</p>
+<p>
+  <strong>Expected outcomes:</strong> Removing C5 (gate): gate fires on noise, corrupts adapter,
+  long-term performance degrades. Removing C4 (clustering): drift goes undetected (no EMA centroid
+  accumulation). Removing C7 (landmarks): compounding error grows faster (no re-anchoring). Each
+  ablation should clearly degrade a distinct metric, validating modularity.
+</p>
+
+<h3>Month 4: Full baselines + matched-noise control</h3>
+<p>
+  <strong>Baselines:</strong>
+</p>
+<ul>
+  <li><strong>Stateless LeWM</strong>: no memory, frozen predictor. The floor.</li>
+  <li><strong>Extended-context LeWM</strong>: same LeWM but with episode buffer extended to match MAPA's memory budget in MB. Tests whether more context achieves what MAPA claims.</li>
+  <li><strong>Full fine-tuning + replay</strong>: predictor fine-tuned at each episode boundary using a fixed-size replay buffer of raw z_t vectors. Same memory budget. Tests whether a simpler continual learning baseline suffices.</li>
+  <li><strong>Adaptive-LR schedule</strong>: learning rate increases when error is high, decreases when low. No access to cluster geometry. This is the direct competing hypothesis for the gate's behavior.</li>
+</ul>
+<p>
+  <strong>Matched-noise control:</strong> construct environments where a calibrated noise source
+  produces prediction errors matching the magnitude of genuine scene changes
+  (‖noise_error‖² ≈ ‖change_error‖²). Run 10 seeds. Measure gate precision for MAPA vs
+  adaptive-LR baseline. MAPA should suppress noise updates (tightness fails for noise clusters);
+  adaptive-LR fires on both (magnitude is identical).
+</p>
+<p>
+  <strong>Expected outcomes:</strong> MAPA matches or exceeds full fine-tuning on RVPR and FR while
+  using &lt;20MB vs the replay buffer's GB-scale. Adaptive-LR shows poor gate precision on
+  matched-noise experiment (cannot distinguish magnitude-matched noise from real change).
+</p>
+
+<h3>Month 5: Multi-room stress test</h3>
+<p>
+  <strong>Environment:</strong> 5-room navigation world. Each room has distinct dynamics. Scene
+  dynamics drift gradually within each room (1% per 100 episodes). Agent navigates between rooms,
+  spending 200 steps per room, 10 rounds (100 room transitions total, returning to each room 10×).
+</p>
+<p>
+  <strong>Analysis:</strong> RVPR curve across visits 1–10 for each room. FR measured for each
+  room while agent is in other rooms. Gate-fire rate per room over time (should decrease as rooms
+  become familiar). Drift detection: does the gate fire appropriately when room dynamics drift by
+  10% after 1000 episodes?
+</p>
+<p>
+  <strong>Expected outcomes:</strong> Stateless baseline: RVPR&gt;3 by visit 5. Full fine-tuning:
+  RVPR≈1 but memory cost ~1GB. MAPA: RVPR&lt;1.2 with &lt;20MB. Landmark growth rate decreases
+  after all 5 rooms are consolidated (gate goes quiet). Drift re-triggers gate after substantial
+  room change.
+</p>
+
+<h3>Month 6: Theory — forgetting-rate bound</h3>
+<p>
+  Model the predictor's latent dynamics as a perturbed ODE. With LoRA adapter Δθ and Lipschitz
+  constant L_f+Δ (where Δ is the adapter's contribution), and the gate firing every T steps:
+</p>
+<div class="math-block">
+  \[\text{Forgetting rate} \leq \frac{(L_f + \Delta)^T - 1}{T} \cdot \varepsilon_0 + \mathcal{O}(\delta_{\text{gate}})\]
+  <p>where δ_gate is the gate's error rate (false positive rate). This bound states: the worse the gate (high δ_gate) and the larger the Lipschitz constant (high L_f+Δ), the faster forgetting occurs. The bound provides a theoretical guarantee that with a well-calibrated gate and a stable adapter, forgetting is bounded, not runaway. The Gronwall inequality provides the tools for the formal proof.</p>
+</div>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  Bonferroni correction means you need strong effect sizes (Cohen's d &gt; 1.2 with 10 seeds at α=0.05/K). Each experimental phase has a specific deliverable and expected outcome range. The matched-noise control in Month 4 is the single most important experiment — if it fails, the central claim of the paper fails.
+</div>
+</div>
+
+<hr />
+<footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
+
+</div><!-- /breakdowns-page -->
+
+</div><!-- /page -->
 </body>
 </html>
