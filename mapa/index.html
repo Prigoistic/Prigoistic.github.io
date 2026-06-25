@@ -166,6 +166,40 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
   whole system turns on. Lose it in one direction and you forget everything; lose it in the other and you
   never learn anything new.
 </p>
+<p>
+  What holds that gate is not a single sentinel neuron or a dedicated circuit. It turns out to be a class
+  of cell that neuroscience spent the better part of a century treating as passive scaffolding: astrocytes.
+  The classical picture of a synapse is two neurons exchanging signals across a narrow gap. The actual
+  structure is three. A perisynaptic astrocyte process wraps both terminals, and it is not passive. For
+  a synapse to strengthen in the lasting way that memory consolidation requires — the mechanism is called
+  long-term potentiation — the receiving neuron's NMDA receptors have to open fully. They need two signals
+  at once: glutamate arriving from the sending neuron, and D-serine released by the astrocyte. Without the
+  astrocyte's contribution the receptor stays half-closed, and the synapse does not learn, regardless of
+  how often or how loudly the neuron fires. The astrocyte is not a bystander. It is a required cosignatory:
+  the gate at the level of the individual synapse, deciding whether this particular connection is even
+  permitted to strengthen.
+</p>
+<p>
+  Above that molecular gate sits a second one, systemic and slower. Throughout waking hours, neural
+  activity generates ATP as a metabolic byproduct, and astrocytes convert that ATP into adenosine.
+  Adenosine accumulates as a direct function of how hard the network has been working — it is the brain's
+  usage meter. When it crosses a threshold the brain enters slow-wave sleep: acetylcholine falls, the
+  cortex produces coordinated slow oscillations, and the hippocampus fires sharp-wave ripples, compressed
+  replays of recent experience broadcast to the neocortex in rapid sequential bursts. The neocortex's
+  weights shift a little with each replay. Over many nights the patterns that recur get distilled into
+  something lasting, and the ones that do not quietly fade. Outside that mode — during waking, during REM —
+  the same replay and the same weight changes do not happen. Astrocytes are, in this sense, the metabolic
+  clock that decides when the consolidation window opens at all.
+</p>
+<p>
+  So the quiet hinge is actually two hinges stacked. The first is molecular: the astrocyte active,
+  D-serine present, NMDA open, plasticity chemically permitted at a specific synapse. The second is
+  systemic: adenosine high enough, slow-wave mode engaged, the hippocampus replaying rather than encoding.
+  Both have to be aligned for a memory to cross from the hippocampus's scratchpad to the neocortex's
+  permanent store. The content of an experience — how surprising it was, how often it recurred — is only
+  half the question. The other half is whether the brain is currently in a state that permits consolidation
+  at all.
+</p>
 
 <figure>
 <svg width="100%" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
@@ -637,6 +671,19 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
   in between. The brain's design, ported to a predictor.
 </p>
 <p>
+  That port is faithful in one direction and a deliberate simplification in another. The content
+  filtering — evidence accumulated, geometry tight, genuine novelty confirmed — mirrors what the biological
+  gate cares about, and it handles the most dangerous failure mode: noise triggering false permanent
+  updates. What it does not replicate is the mode question. The biological system uses astrocytic adenosine
+  buildup to separate encoding and consolidation into temporally distinct phases; the consolidation window
+  opens only when the brain's usage meter crosses a threshold, not whenever a content criterion is met.
+  MAPA runs its gate continuously during inference rather than in a dedicated offline window. This is a
+  known simplification, and a justified one: the three-part content gate already blocks the cases the mode
+  separation was evolved to prevent. But the biological system asks two questions before it consolidates —
+  <em>is this worth keeping?</em> and <em>is now a time when keeping things is permitted?</em> — and MAPA,
+  by design, only asks the first.
+</p>
+<p>
   Stated plainly, the bet is this: <strong>a two-timescale memory in the predictor, a fast episodic buffer
   in latent space feeding a consolidation-gated slow weight update, is the minimal sufficient mechanism for
   continual world-model prediction across long horizons, tracking non-stationary scenes with bounded
@@ -669,79 +716,139 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 </p>
 
 <figure>
-<svg width="100%" viewBox="0 0 680 598" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
-  <!-- Frozen base -->
-  <rect x="8" y="8" width="664" height="100" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5,3"/>
-  <text x="340" y="28" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">FROZEN BASE (never updated at inference)</text>
-  <rect x="22" y="35" width="300" height="63" rx="5" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
-  <text x="172" y="55" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Encoder φ</text>
-  <text x="172" y="72" text-anchor="middle" font-size="11" fill="#475569">ViT · 192-dim · SIGReg-trained</text>
-  <text x="172" y="87" text-anchor="middle" font-size="11" fill="#475569">Maps observations → latent z_t</text>
-  <rect x="358" y="35" width="300" height="63" rx="5" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
-  <text x="508" y="55" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Predictor f_θ + LoRA Δθ</text>
-  <text x="508" y="72" text-anchor="middle" font-size="11" fill="#475569">LeWM predictor · rank r=8 adapter</text>
-  <text x="508" y="87" text-anchor="middle" font-size="11" fill="#475569">~0.8% params · only Δθ updates</text>
+<svg width="100%" viewBox="0 0 720 492" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif">
 
-  <!-- Arrow -->
-  <line x1="340" y1="108" x2="340" y2="133" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-  <text x="360" y="125" font-size="10.5" fill="#64748b">z_t ∈ ℝ¹⁹²</text>
+  <!-- ══ BAND BACKGROUNDS ══ -->
+  <rect x="0" y="0" width="720" height="143" rx="0" fill="#f8fafc"/>
+  <rect x="0" y="153" width="720" height="140" rx="0" fill="#dbeafe" opacity="0.35"/>
+  <rect x="0" y="303" width="720" height="189" rx="0" fill="#dcfce7" opacity="0.35"/>
 
-  <!-- C2 -->
-  <rect x="8" y="137" width="664" height="58" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
-  <text x="340" y="157" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">C2 · Adaptive Threshold Filter</text>
-  <text x="340" y="173" text-anchor="middle" font-size="11" fill="#78350f">τ(t) = μ_W + α·σ_W &nbsp;(W=100 steps, α=2.0) &nbsp;·&nbsp; only "surprising" observations pass through</text>
-  <text x="340" y="187" text-anchor="middle" font-size="10.5" fill="#92400e">adapts as predictor improves · maintains sensitivity even as baseline error falls</text>
+  <!-- Band labels -->
+  <text x="10" y="12" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.1em">EVERY STEP</text>
+  <text x="10" y="164" font-size="9" font-weight="700" fill="#2563eb" letter-spacing="0.08em">WHEN PREDICTION ERROR EXCEEDS THRESHOLD</text>
+  <text x="10" y="314" font-size="9" font-weight="700" fill="#16a34a" letter-spacing="0.08em">WHEN GATE FIRES — RARE</text>
 
-  <line x1="340" y1="195" x2="340" y2="218" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ══ BAND 1: Every step (left → right) ══ -->
 
-  <!-- C3 -->
-  <rect x="8" y="222" width="664" height="60" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
-  <text x="340" y="242" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d4ed8">C3 · Fast Episodic Buffer &nbsp;←&nbsp; hippocampus</text>
-  <text x="340" y="258" text-anchor="middle" font-size="11" fill="#1e3a8a">2048 entries · 5-tuple × 192-dim · ~7.5MB · (z_t, a_t, z_{t+1}, ε_t, episode_id)</text>
-  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#1e3a8a">surprise-weighted LRU eviction · fast write at every surprising timestep</text>
+  <!-- Box 1: Observation -->
+  <rect x="8" y="20" width="96" height="108" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="56" y="56" text-anchor="middle" font-size="17" fill="#1e293b" font-weight="700">s_t</text>
+  <text x="56" y="76" text-anchor="middle" font-size="10" fill="#64748b">Observation</text>
+  <text x="56" y="90" text-anchor="middle" font-size="10" fill="#64748b">raw frame</text>
+  <text x="56" y="118" text-anchor="middle" font-size="8.5" fill="#94a3b8" font-style="italic">every timestep</text>
 
-  <line x1="340" y1="282" x2="340" y2="305" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="104" y1="74" x2="122" y2="74" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- C4 -->
-  <rect x="8" y="309" width="664" height="60" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
-  <text x="340" y="329" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">C4 · Online Streaming K-Means</text>
-  <text x="340" y="345" text-anchor="middle" font-size="11" fill="#14532d">K=8–16 clusters · cosine similarity · τ_assign=0.85 · EMA centroids β=0.95</text>
-  <text x="340" y="360" text-anchor="middle" font-size="10.5" fill="#166534">tracks gradual scene drift via centroid movement · sudden shifts spawn new clusters</text>
+  <!-- Box 2: Encoder -->
+  <rect x="124" y="20" width="130" height="108" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="189" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <line x1="124" y1="46" x2="254" y2="46" stroke="#a78bfa" stroke-width="1"/>
+  <text x="189" y="62" text-anchor="middle" font-size="10" fill="#4c1d95">Frozen — never updated</text>
+  <text x="189" y="77" text-anchor="middle" font-size="10" fill="#4c1d95">s_t → z_t ∈ ℝ¹⁹²</text>
+  <text x="189" y="93" text-anchor="middle" font-size="10" fill="#4c1d95">abstract representation</text>
+  <text x="189" y="118" text-anchor="middle" font-size="8.5" fill="#7c3aed" font-style="italic">SIGReg-trained, metric-preserving</text>
 
-  <line x1="340" y1="369" x2="340" y2="392" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="254" y1="74" x2="272" y2="74" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- C5 -->
-  <rect x="8" y="396" width="664" height="68" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
-  <text x="340" y="416" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">C5 · Consolidation Gate &nbsp;—&nbsp; ALL THREE required</text>
-  <text x="340" y="433" text-anchor="middle" font-size="11" fill="#78350f">① support(k) ≥ N_min &nbsp;·&nbsp; ② tightness(k) ≤ σ²_max &nbsp;·&nbsp; ③ novelty(k) ≥ δ_novel</text>
-  <text x="340" y="449" text-anchor="middle" font-size="10.5" fill="#92400e">tightness is the noise discriminator: noise = dispersed clusters · real change = tight clusters</text>
-  <text x="340" y="463" text-anchor="middle" font-size="10.5" fill="#92400e">any single criterion is gameable by noise · all three together are not</text>
+  <!-- Box 3: z_t + error -->
+  <rect x="274" y="20" width="154" height="108" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="351" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">z_t and ε_t</text>
+  <line x1="274" y1="46" x2="428" y2="46" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="351" y="62" text-anchor="middle" font-size="10" fill="#475569">z_t = φ(s_t)</text>
+  <text x="351" y="77" text-anchor="middle" font-size="10" fill="#475569">ε_t = ‖ẑ_t − z_t‖²</text>
+  <text x="351" y="92" text-anchor="middle" font-size="9.5" fill="#64748b">ẑ_t: predicted at t−1</text>
+  <text x="351" y="107" text-anchor="middle" font-size="9.5" fill="#64748b">z_t: actual right now</text>
 
-  <!-- Fork -->
-  <path d="M340,464 L340,488 L178,488" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
-  <path d="M340,488 L502,488" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
-  <text x="340" y="484" text-anchor="middle" font-size="10" fill="#9ca3af" font-style="italic">gate fires</text>
+  <line x1="428" y1="74" x2="446" y2="74" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- C6 -->
-  <rect x="8" y="492" width="328" height="68" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
-  <text x="172" y="512" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">C6 · LoRA Update</text>
-  <line x1="8" y1="519" x2="336" y2="519" stroke="#a78bfa" stroke-width="1"/>
-  <text x="172" y="535" text-anchor="middle" font-size="11" fill="#4c1d95">32-entry raw cache · 20 Adam steps · lr=1e-4</text>
-  <text x="172" y="550" text-anchor="middle" font-size="11" fill="#4c1d95">discard cache after update · only Δθ=BA persists</text>
+  <!-- Box 4: Predictor -->
+  <rect x="448" y="20" width="258" height="108" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="577" y="39" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1d4ed8">Predictor f_θ + LoRA Δθ</text>
+  <line x1="448" y1="46" x2="706" y2="46" stroke="#60a5fa" stroke-width="1"/>
+  <text x="577" y="62" text-anchor="middle" font-size="10" fill="#1e3a8a">inputs: z_t + nearest landmark</text>
+  <text x="577" y="77" text-anchor="middle" font-size="10" fill="#1e3a8a">output: ẑ_{t+1} (stored for next step)</text>
+  <text x="577" y="93" text-anchor="middle" font-size="9.5" fill="#3b82f6">LoRA adapter Δθ is updated when gate fires</text>
+  <text x="577" y="118" text-anchor="middle" font-size="8.5" fill="#6b7280" font-style="italic">runs every step · uses landmark from C7</text>
 
-  <!-- C7 -->
-  <rect x="344" y="492" width="328" height="68" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
-  <text x="508" y="512" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">C7 · Landmark Set &nbsp;←&nbsp; neocortex</text>
-  <line x1="344" y1="519" x2="672" y2="519" stroke="#4ade80" stroke-width="1"/>
-  <text x="508" y="535" text-anchor="middle" font-size="11" fill="#14532d">one 192-dim centroid per gate fire</text>
-  <text x="508" y="550" text-anchor="middle" font-size="11" fill="#14532d">kilobytes total · permanent · queryable</text>
+  <!-- ε_t → threshold routing arrow (down then left) -->
+  <path d="M351,128 L351,148 L83,148 L83,173" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <text x="220" y="144" text-anchor="middle" font-size="9" fill="#92400e">ε_t if above threshold</text>
 
-  <!-- Feedback arrow: C7 landmark retrieval feeds predictor at every step -->
-  <path d="M620,556 L638,556 L638,55 L622,55" stroke="#4ade80" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-  <text x="642" y="310" font-size="9" fill="#4ade80" transform="rotate(90,642,310)">retrieval at every step</text>
+  <!-- ══ BAND 2: Memory triggered ══ -->
+
+  <!-- C2: Threshold -->
+  <rect x="8" y="175" width="148" height="108" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="82" y="194" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">C2 Threshold</text>
+  <line x1="8" y1="201" x2="156" y2="201" stroke="#fcd34d" stroke-width="1"/>
+  <text x="82" y="217" text-anchor="middle" font-size="10" fill="#78350f">τ(t) = μ_W + 2σ_W</text>
+  <text x="82" y="231" text-anchor="middle" font-size="9.5" fill="#78350f">100-step rolling window</text>
+  <text x="82" y="248" text-anchor="middle" font-size="9.5" fill="#92400e">ε_t > τ → write to buffer</text>
+  <text x="82" y="263" text-anchor="middle" font-size="9.5" fill="#a16207">ε_t ≤ τ → discard</text>
+  <text x="82" y="276" text-anchor="middle" font-size="8.5" fill="#a16207" font-style="italic">adapts as predictor improves</text>
+
+  <line x1="156" y1="229" x2="172" y2="229" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C3: Buffer -->
+  <rect x="174" y="175" width="174" height="108" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="261" y="194" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">C3 Episodic Buffer</text>
+  <line x1="174" y1="201" x2="348" y2="201" stroke="#60a5fa" stroke-width="1"/>
+  <text x="261" y="217" text-anchor="middle" font-size="10" fill="#1e3a8a">2048 entries · ~7.5MB</text>
+  <text x="261" y="232" text-anchor="middle" font-size="9.5" fill="#1e3a8a">(z_t, a_t, z_{t+1}, ε_t, ep_id)</text>
+  <text x="261" y="248" text-anchor="middle" font-size="9.5" fill="#1e3a8a">surprise-weighted LRU eviction</text>
+  <text x="261" y="276" text-anchor="middle" font-size="8.5" fill="#3b82f6" font-style="italic">fast buffer — hippocampus analogue</text>
+
+  <line x1="348" y1="229" x2="364" y2="229" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- C4: K-Means -->
+  <rect x="366" y="175" width="202" height="108" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="467" y="194" text-anchor="middle" font-size="11" font-weight="700" fill="#166534">C4 Online K-Means</text>
+  <line x1="366" y1="201" x2="568" y2="201" stroke="#4ade80" stroke-width="1"/>
+  <text x="467" y="217" text-anchor="middle" font-size="10" fill="#14532d">groups z_t by cosine similarity</text>
+  <text x="467" y="232" text-anchor="middle" font-size="9.5" fill="#14532d">tight cluster → real change</text>
+  <text x="467" y="247" text-anchor="middle" font-size="9.5" fill="#14532d">scattered → noise</text>
+  <text x="467" y="263" text-anchor="middle" font-size="9.5" fill="#14532d">EMA centroids track slow drift</text>
+  <text x="467" y="276" text-anchor="middle" font-size="8.5" fill="#15803d" font-style="italic">β=0.95 · ~20 step memory per centroid</text>
+
+  <!-- C4 → Gate routing arrow -->
+  <path d="M467,283 L467,299 L278,299 L278,323" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <text x="375" y="296" text-anchor="middle" font-size="9" fill="#64748b">check gate criteria</text>
+
+  <!-- ══ BAND 3: Gate fires ══ -->
+
+  <!-- C5: Gate (wide) -->
+  <rect x="8" y="325" width="548" height="82" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="282" y="344" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">C5 Consolidation Gate — all three must hold</text>
+  <line x1="8" y1="351" x2="556" y2="351" stroke="#f59e0b" stroke-width="1"/>
+  <text x="282" y="367" text-anchor="middle" font-size="10.5" fill="#78350f">① support(k) ≥ N_min · enough observations in this cluster, not a one-off fluke</text>
+  <text x="282" y="382" text-anchor="middle" font-size="10.5" fill="#78350f">② tightness(k) ≤ σ²_max · cluster is geometrically tight = real change, not scattered noise</text>
+  <text x="282" y="397" text-anchor="middle" font-size="10.5" fill="#78350f">③ novelty(k) ≥ δ_novel · centroid is far from existing landmarks = genuinely new</text>
+
+  <!-- Fork from gate -->
+  <path d="M160,407 L160,418 L124,418 L124,426" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <path d="M404,407 L404,418 L580,418 L580,426" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <text x="282" y="415" text-anchor="middle" font-size="8.5" fill="#9ca3af" font-style="italic">gate fires</text>
+
+  <!-- C6: LoRA -->
+  <rect x="8" y="428" width="232" height="58" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="124" y="447" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">C6 LoRA Update</text>
+  <line x1="8" y1="454" x2="240" y2="454" stroke="#a78bfa" stroke-width="1"/>
+  <text x="124" y="468" text-anchor="middle" font-size="10" fill="#4c1d95">32 entries · 20 Adam steps · lr=1e-4</text>
+  <text x="124" y="480" text-anchor="middle" font-size="9.5" fill="#6d28d9">nudges predictor to new scene dynamics</text>
+
+  <!-- C7: Landmark -->
+  <rect x="464" y="428" width="242" height="58" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="585" y="447" text-anchor="middle" font-size="11.5" font-weight="700" fill="#166534">C7 Landmark Set</text>
+  <line x1="464" y1="454" x2="706" y2="454" stroke="#4ade80" stroke-width="1"/>
+  <text x="585" y="468" text-anchor="middle" font-size="10" fill="#14532d">192-dim centroid · permanent · kilobytes</text>
+  <text x="585" y="480" text-anchor="middle" font-size="9.5" fill="#15803d">retrieved every step → anchors predictor</text>
+
+  <!-- Feedback: Landmark → Predictor (dashed green, up right edge) -->
+  <path d="M706,457 L712,457 L712,74 L706,74" stroke="#4ade80" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+  <text x="715" y="305" font-size="8.5" fill="#4ade80" transform="rotate(90,715,305)" text-anchor="middle">retrieved every step</text>
+
 </svg>
 </figure>
-<figcaption>Figure 3. The MAPA system end to end. Gate fires are rare, happening only when evidence is sufficient. Landmark retrieval (dashed arrow) happens at every single step, anchoring predictions continuously.</figcaption>
+<figcaption>Figure 3. MAPA architecture as three frequency bands. Top (gray): runs every single timestep. Middle (blue): triggered only when the prediction error clears the adaptive threshold. Bottom (green): the gate fires rarely, only when a cluster is tight, novel, and well-evidenced. The dashed green arrow is the landmark feedback — it runs every step, anchoring the predictor to what it has already learned.</figcaption>
 
 <p>
   One contrast with PAM is worth pausing on, because it is the whole design philosophy in miniature. PAM's
