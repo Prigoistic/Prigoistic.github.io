@@ -1986,26 +1986,68 @@ window.addEventListener('popstate', function() {
 <div class="bd-section" id="bd-10">
 <h2>10. Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</h2>
 
-<h3>Existing JEPA-adjacent benchmarks</h3>
-<p>No published benchmark specifically tests cross-episode memory in JEPA-based world models —
-this is a gap MAPA must partially fill. The closest existing benchmarks are:</p>
+<h3>What actually exists — corrected picture</h3>
+<p>
+  Earlier versions of this document claimed no benchmarks existed for world model memory. That was
+  wrong. A set of relevant benchmarks have been published in 2025–2026, and one in particular is
+  directly targeting the problem MAPA addresses.
+</p>
+
+<h3>MIND — the closest existing benchmark</h3>
+<p>
+  <strong>MIND: Benchmarking Memory Consistency and Action Control in World Models</strong>
+  (arXiv 2602.08025, February 2026) is the first open-domain closed-loop benchmark specifically
+  measuring memory consistency in world models. It contains 250 high-quality 1080p videos across
+  8 diverse scenes, covering both first-person and third-person viewpoints under shared and varied
+  action spaces. The two core evaluation axes:
+</p>
+<ul>
+  <li><strong>Memory consistency:</strong> does the world model remember what it generated in earlier frames when producing new ones? Tests temporal stability and contextual coherence across a single generation rollout.</li>
+  <li><strong>Action control:</strong> does the model generalise correctly across different character movement speeds and camera rotation angles?</li>
+</ul>
+<p>
+  MIND is the right benchmark to report MAPA results on. It is, however, testing
+  <em>within-episode</em> memory — whether the model stays consistent across frames inside
+  a single generation. This is not the same as what MAPA introduces. MAPA's claim is about
+  <em>cross-episode</em> memory — whether knowledge from episode 1 makes predictions in
+  episode 5 more accurate. MIND does not test this. MAPA needs to extend it.
+</p>
+
+<h3>Other relevant benchmarks (2025–2026)</h3>
 <div class="table-wrap">
   <table>
-    <thead><tr><th>Benchmark</th><th>What it tests</th><th>Relevance to MAPA</th><th>Limitation</th></tr></thead>
+    <thead><tr><th>Benchmark</th><th>What it tests</th><th>Relevance to MAPA</th><th>Limitation for MAPA</th></tr></thead>
     <tbody>
-      <tr><td><strong>Push-T</strong></td><td>2D manipulation task success rate</td><td>Tests planning quality (HWM baseline)</td><td>Single episode, no memory</td></tr>
-      <tr><td><strong>Calvin Kitchen</strong></td><td>5 consecutive long-horizon tasks</td><td>Tests chained task completion with implicit memory</td><td>No explicit episode boundaries</td></tr>
-      <tr><td><strong>MiniHack</strong></td><td>Procedural dungeon navigation</td><td>Tests generalization, navigation memory</td><td>Reset dynamics per episode</td></tr>
-      <tr><td><strong>Habitat PointNav</strong></td><td>3D navigation to goal</td><td>Tests spatial memory across a scene</td><td>Single scene per episode</td></tr>
-      <tr><td><strong>Crafter</strong></td><td>Open-world long-horizon game</td><td>Tests long-horizon planning with world model</td><td>No explicit return-visit test</td></tr>
+      <tr><td><strong>MIND</strong> (Feb 2026)</td><td>Memory consistency + action control in world models</td><td>Direct — memory in world model generation</td><td>Within-episode only, not cross-episode</td></tr>
+      <tr><td><strong>WorldPrediction</strong></td><td>JEPA models identifying actions explaining state transitions</td><td>JEPA-native evaluation, VL-JEPA baseline exists</td><td>Action understanding, not memory persistence</td></tr>
+      <tr><td><strong>V-JEPA 2 physical reasoning benchmarks</strong> (June 2025)</td><td>Motion understanding (SSv2), action anticipation (Epic-Kitchens), video QA</td><td>JEPA-native, strong baselines to compare against</td><td>Single-episode, no cross-episode memory</td></tr>
+      <tr><td><strong>WBench</strong> (May 2026)</td><td>Multi-turn interactive video world model evaluation</td><td>Tests world model over multiple interactions</td><td>Multi-turn within a session, not cross-episode</td></tr>
+      <tr><td><strong>Out of Sight, Out of Mind</strong> (Mar 2026)</td><td>State evolution in video world models — does model track objects that leave frame?</td><td>Tests a form of memory: off-screen state persistence</td><td>Object-level state, not scene-level cross-episode</td></tr>
+      <tr><td><strong>LMEB</strong> (Mar 2026)</td><td>Long-horizon memory embedding evaluation</td><td>Memory retrieval accuracy and latency</td><td>Text-based, not latent-space video prediction</td></tr>
+      <tr><td><strong>AMA-Bench</strong> (Feb 2026)</td><td>Long-horizon memory for agentic applications</td><td>Agentic memory retention, close in spirit</td><td>Agent policy memory, not world model predictor memory</td></tr>
+      <tr><td><strong>Calvin Kitchen</strong></td><td>5 consecutive long-horizon robot tasks</td><td>Long-horizon task chaining</td><td>No explicit episode reset or return-visit test</td></tr>
+      <tr><td><strong>Push-T</strong></td><td>2D manipulation success rate</td><td>HWM planning baseline</td><td>Single episode, no memory</td></tr>
     </tbody>
   </table>
 </div>
+
+<h3>The gap that still exists</h3>
 <p>
-  The LLM memory benchmarks (LongMemEval, LoCoMo, FEVER) test recall accuracy and latency
-  for language models with explicit memory. The MAPA equivalent does not yet exist as a published
-  standard — part of Month 5 is building the multi-room return-visit protocol that could become
-  such a benchmark.
+  The benchmarks above — including MIND — test memory <em>within</em> a single generation or session.
+  None of them test the specific capability MAPA introduces: whether a world model predictor that has
+  visited a scene in episode 1 is more accurate about that scene in episode 5. This
+  <strong>cross-episode predictor memory</strong> gap is real and still open.
+</p>
+<p>
+  MAPA's Month 5 multi-room return-visit protocol is designed to fill this gap. The correct
+  positioning is: evaluate on MIND as the closest existing standard, then extend with the
+  return-visit protocol to demonstrate the cross-episode capability that MIND cannot test.
+  If this protocol is rigorous enough, it becomes a standalone benchmark contribution of its own.
+</p>
+<p>
+  For LLM memory analogues: LongMemEval and LoCoMo test recall accuracy and latency across
+  conversation sessions. The MAPA equivalent measures prediction accuracy improvement across
+  environment episodes. Same structural idea, different modality.
 </p>
 
 <h3>MAPA-specific primary metrics</h3>
