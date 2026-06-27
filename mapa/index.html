@@ -2888,6 +2888,168 @@ window.addEventListener('popstate', function() {
 </div><!-- /glossary bd-section -->
 
 <hr />
+
+<!-- ── Q13 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-13">
+<h2>13. Future optimizations — what changes after the 6-month baseline</h2>
+
+<p>
+  The 6-month plan delivers a working, principled baseline. It is not the final architecture.
+  Several components have known limitations that become engineering priorities after the baseline
+  is validated. Here is what changes, why, and when it matters.
+</p>
+
+<h3>Cluster-aware buffer eviction — the most important near-term fix</h3>
+<p>
+  The current buffer uses surprise-weighted LRU: the least surprising entry gets evicted first.
+  This has a structural flaw. The gate's support criterion needs a cluster to accumulate enough
+  members before firing. But outlier entries — the most surprising — are by definition geometrically
+  isolated. They are the entries that survive longest under surprise-weighted eviction, even though
+  they contribute the least to cluster formation. The entries that matter most for the gate (those
+  forming tight emerging clusters) can get evicted early if their surprise score is moderate.
+</p>
+<p>
+  The fix: <strong>cluster-aware eviction</strong>. Instead of evicting by surprise score alone,
+  evict by cluster membership:
+</p>
+<ul>
+  <li>Evict entries from the <em>largest</em> clusters first. Those clusters already have enough support — losing a few members doesn't hurt the gate.</li>
+  <li>Protect entries from <em>small emerging clusters</em>. Those are the ones that haven't yet reached \(N_{\min}\) and need every member to survive to pass support.</li>
+</ul>
+<p>
+  This requires the buffer to know which cluster each entry belongs to at eviction time —
+  meaning the clustering step must tag each buffer entry with its current cluster assignment.
+  Small implementation cost, meaningful improvement to gate sensitivity on low-frequency events.
+  This is a Month 2–3 implementation decision during the ablation phase.
+</p>
+
+<h3>Running centroid support counter — fixing cross-episode support tracking</h3>
+<p>
+  The current support criterion counts buffer entries currently assigned to a cluster.
+  If old entries from episode 1 were evicted when the buffer filled in episodes 2–4, the cluster
+  appears to have low support when the agent returns in episode 5, even though it was well-evidenced
+  in episode 1. The gate fails to fire on a genuine return visit because it cannot see the historical evidence.
+</p>
+<p>
+  The fix: each cluster centroid maintains a persistent running counter of total observations
+  ever assigned to it, plus a set of distinct episode IDs that contributed:
+</p>
+<div class="math-block">
+  \[\text{support}(k) = \text{historical\_count}(k), \quad \text{episodes}(k) = \{\text{ep\_id}_1, \text{ep\_id}_2, \ldots\}\]
+  <p>Gate support criterion becomes: \(\text{historical\_count}(k) \geq N_{\min}\) AND \(|\text{episodes}(k)| \geq 2\). This fires on genuine cross-episode evidence and stays silent on single-episode flukes, even after the original buffer entries have been evicted. The counter persists as long as the centroid exists — trivial memory overhead (two integers per cluster).</p>
+</div>
+
+<h3>Hierarchical LoRA adapters — separating timescales of adaptation</h3>
+<p>
+  The current single rank-8 adapter absorbs all adaptations — both environment-level changes (new
+  room type, new object density) and scene-level changes (specific object positions, current layout).
+  These operate at different timescales and updating one can degrade the other.
+</p>
+<p>
+  The fix: two stacked adapters with different ranks:
+</p>
+<ul>
+  <li><strong>Coarse adapter (rank 4):</strong> updates slowly, only on gate fires with high support and strong novelty. Captures environment-level dynamics — room type, lighting regime, object density class.</li>
+  <li><strong>Fine adapter (rank 4):</strong> updates on every gate fire. Captures scene-level dynamics — specific positions, current layout, transient configurations.</li>
+</ul>
+<p>
+  Total parameters stay the same (2 × rank-4 = same as rank-8) but the two timescales are now
+  architecturally separated. An abrupt scene change fires the fine adapter immediately without
+  disturbing the coarse representation of environment type. This mirrors HWM's two-level hierarchy
+  applied to the adapter rather than the planner.
+</p>
+
+<h3>Contrastive buffer sampling for LoRA updates</h3>
+<p>
+  The current LoRA update pulls 32 random entries from the raw cache of the triggering cluster.
+  All 32 entries are positive examples — observations of the same new thing. This risks the adapter
+  collapsing toward a mode that fits only the trigger cluster, reducing its generalization to the
+  broader scene.
+</p>
+<p>
+  The fix: contrastive sampling. When collecting the 32 entries for an update, include:
+</p>
+<ul>
+  <li><strong>Positive pairs (20 entries):</strong> observations from the triggering cluster — what the adapter is learning about.</li>
+  <li><strong>Hard negatives (12 entries):</strong> observations from other clusters in the same environment — semantically related but distinct. These prevent the adapter from overfitting to the trigger cluster at the expense of nearby scene structure.</li>
+</ul>
+<p>
+  The LoRA update objective becomes contrastive: minimize prediction error on positives, maintain
+  prediction quality on hard negatives. This is a direct analogue of hard-negative mining in metric
+  learning, applied to the adapter update step.
+</p>
+
+<h3>Landmark graph — enabling relational queries</h3>
+<p>
+  The current landmark set is an unstructured flat array. Retrieval is argmax cosine similarity —
+  "which landmark is most similar to my current \(z_t\)?" This answers "where am I?" but not
+  "how did I get here?" or "which landmarks are nearby in semantic space?"
+</p>
+<p>
+  The fix: at consolidation time, when a new landmark \(L_{\text{new}}\) is written, compute its
+  cosine similarity against all existing landmarks and add edges to the top-\(k\) most similar
+  ones above a connectivity threshold. The result is a sparse proximity graph:
+</p>
+<div class="math-block">
+  \[\mathcal{G} = (V, E), \quad E = \{(L_i, L_j) : \operatorname{sim}(L_i, L_j) > \theta_{\text{graph}}\}\]
+  <p>Retrieval becomes graph traversal: find the nearest landmark, then traverse edges to semantically adjacent landmarks. This enables multi-hop relational queries — "what do I know about regions adjacent to where I am?" — and supports the kind of spatial reasoning that hippocampal grid cells enable: not just place recognition but relational navigation.</p>
+</div>
+<p>
+  This is a Month 5+ optimization. The flat array suffices for the baseline, but the graph becomes
+  necessary as \(N_{\text{landmarks}}\) grows into the hundreds.
+</p>
+
+<h3>Drift velocity estimation — proactive re-consolidation</h3>
+<p>
+  The current system is purely reactive: it consolidates when surprised. It has no mechanism for
+  predicting when an existing landmark is about to become stale.
+</p>
+<p>
+  The fix: track the rate of centroid movement per episode for each cluster. Define drift velocity
+  as the distance the centroid moves per episode visit:
+</p>
+<div class="math-block">
+  \[v_k = \|c_{k,\text{episode }n} - c_{k,\text{episode }n-1}\|\]
+  <p>High \(v_k\) means this scene is changing quickly — the landmark will go stale soon. The system can proactively lower the gate's novelty threshold for this cluster, making it easier to trigger a re-consolidation update before the prediction error has time to grow. This converts MAPA from purely reactive (update when surprised) to partially predictive (update when drift predicts upcoming staleness).</p>
+</div>
+
+<h3>AdaLoRA — adaptive rank allocation</h3>
+<p>
+  The current adapter uses fixed rank \(r = 8\) across all adapted layers. Some layers of the
+  predictor carry more of the dynamic scene information than others — spending the same rank budget
+  on every layer is inefficient.
+</p>
+<p>
+  AdaLoRA (adaptive LoRA) redistributes rank budget dynamically based on the importance of each
+  layer's singular values during training. Less important layers get lower rank; more important
+  layers get higher rank. The total parameter count stays fixed. For MAPA this would allocate more
+  adapter capacity to the layers of the predictor most responsible for scene dynamics, improving
+  adaptation quality per parameter without increasing memory overhead.
+</p>
+
+<h3>Summary — what changes and when</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Optimization</th><th>When to implement</th><th>Why it matters</th><th>Complexity</th></tr></thead>
+    <tbody>
+      <tr><td>Running centroid support counter</td><td>Month 2 — during implementation</td><td>Fixes cross-episode support tracking, core correctness issue</td><td>Low — 2 integers per cluster</td></tr>
+      <tr><td>Cluster-aware buffer eviction</td><td>Month 2–3 — ablation phase</td><td>Protects emerging clusters from premature eviction</td><td>Low — tag entries with cluster id</td></tr>
+      <tr><td>Contrastive buffer sampling</td><td>Month 3 — after basic update works</td><td>Prevents adapter overfitting to trigger cluster</td><td>Medium — sampling strategy change</td></tr>
+      <tr><td>Hierarchical LoRA adapters</td><td>Month 4–5 — after baseline validated</td><td>Separates timescales of adaptation</td><td>Medium — two adapters instead of one</td></tr>
+      <tr><td>Drift velocity estimation</td><td>Month 5 — stress test phase</td><td>Proactive re-consolidation before staleness</td><td>Medium — per-cluster velocity tracking</td></tr>
+      <tr><td>Landmark graph</td><td>Month 5+ — when \(N > 200\)</td><td>Enables relational queries, spatial reasoning</td><td>Medium — graph build at consolidation</td></tr>
+      <tr><td>AdaLoRA</td><td>Month 5–6 — theory phase</td><td>Better parameter efficiency per layer</td><td>High — requires importance scoring</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="verdict">
+  <strong>Takeaway</strong>
+  The two most important fixes — running support counter and cluster-aware eviction — should go into the Month 2 implementation, not be deferred. They address correctness issues in cross-episode evidence accumulation, not just performance improvements. Everything else is a Month 4+ optimization once the baseline is proven to work.
+</div>
+</div>
+
+<hr />
 <footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
 
 </div><!-- /breakdowns-page -->
