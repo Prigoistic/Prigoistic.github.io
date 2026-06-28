@@ -2088,119 +2088,271 @@ window.addEventListener('popstate', function() {
 
 <!-- ── Q11 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-11">
-<h2>11. Experiments — 6-month plan, statistical rigor, and Bonferroni explained</h2>
+<h2>11. The 6-month plan — reality-based, month by month</h2>
 
-<h3>What Bonferroni correction means</h3>
 <p>
-  When you run multiple hypothesis tests simultaneously, the probability that at least one produces a
-  false positive grows with the number of tests. If you run \(K\) tests each at significance level \(\alpha\):
+  The honest time budget for this project: roughly 60–80 hours of irreplaceable focused research work
+  over 6 months. That is approximately 10–13 hours per month of high-quality work — not calendar time,
+  not compute time, not read-and-review time. Actual design, implementation, debugging, and analysis.
+  The plan below is calibrated to that reality, not to an imaginary full-time research team.
+</p>
+<p>
+  Compute time (running experiments, waiting for seeds) is separate and can happen in parallel.
+  The constraint is focused human decision-making time, which cannot be parallelised.
+</p>
+
+<h3>A word on Bonferroni before the plan</h3>
+<p>
+  Every comparison in MAPA's experiments is a hypothesis test. Run enough tests and one will produce
+  a false positive purely by chance. If you run \(K\) tests each at significance level \(\alpha\):
 </p>
 <div class="math-block">
-  \[P(\text{at least one false positive}) = 1 - (1-\alpha)^K \approx K\alpha \quad \text{for small } \alpha\]
-  <p>Example: 20 tests at \(\alpha = 0.05\) gives \(P \approx 64\%\). Bonferroni correction: test each hypothesis at \(\alpha/K\) instead of \(\alpha\). For 20 tests: \(\alpha_{\text{Bonferroni}} = 0.05/20 = 0.0025\). This controls the family-wise error rate but requires larger effect sizes to achieve significance.</p>
+  \[P(\text{at least one false positive}) = 1 - (1-\alpha)^K \approx K\alpha\]
+  <p>With 20 comparisons at \(\alpha = 0.05\): \(P \approx 64\%\). Bonferroni correction fixes this by testing each comparison at \(\alpha / K\) instead. For 20 tests: threshold = 0.0025. This requires Cohen's \(d > 1.2\) to achieve significance with 10 seeds — a real bar. If MAPA's advantages are real, they clear it. If they only show up at \(\alpha = 0.05\), the effect is too small to claim.</p>
 </div>
 <p>
-  In MAPA's case: 5 metrics × 4 baselines = 20 primary comparisons per experiment phase. Bonferroni
-  threshold = 0.0025. A paired t-test with 10 seeds against this threshold requires approximately
-  Cohen's \(d > 1.2\) to achieve significance. If MAPA's advantages are real, they should clear this
-  bar. If they require \(\alpha = 0.05\) with 10 seeds, the effect is too small to make strong claims.
+  All comparisons in the plan below are preregistered on OSF before the ablation phase begins.
+  Any deviation from the preregistered metrics or analysis plan is documented in an appendix.
 </p>
 
-<h3>Month 1: Characterize the failure — experimental design</h3>
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 1 -->
+<h3>Month 1 — Understand the disease before writing the prescription</h3>
+<p><em>~12 hours focused work. Mostly running experiments and reading outputs carefully.</em></p>
+
 <p>
-  <strong>Environment:</strong> Multi-room MiniHack with 3 scene change types: (a) gradual illumination
-  drift, (b) sudden object swap, (c) new room entry. Each change type at 3 magnitudes (small, medium, large).
-</p>
-<p>
-  <strong>Protocol:</strong> 10 seeds. Each seed runs 5000 steps with alternating stable-scene and
-  changed-scene phases. Prediction error logged at every step. After a change event, the sequence
-  returns to the prior scene after 500 steps (return-visit test).
-</p>
-<p>
-  <strong>Analysis:</strong> Plot error vs time for each change type/magnitude. Compute FR (forgetting
-  rate) and RVPR for each condition. No statistical testing needed — this is a descriptive phase
-  establishing the baseline and the shape of the failure.
-</p>
-<p>
-  <strong>Expected outcomes:</strong> Gradual drift produces smooth monotonic error increase; abrupt
-  changes produce step-function spikes; return visits show 3–7× error increase vs first visit.
-  These numbers motivate the rest of the project.
+  The only job this month is to make the failure modes concrete and measurable. Every number that
+  comes out of Month 1 becomes the baseline the rest of the paper argues against. If this baseline
+  is sloppy, the entire argument is built on sand.
 </p>
 
-<h3>Months 2–3: Build and ablate</h3>
+<p><strong>What gets done:</strong></p>
+<ol>
+  <li><strong>Environment setup (~3h):</strong> Get LeWM running on the target compute. Verify it reproduces published prediction quality numbers. Choose the evaluation environment — MiniHack multi-room is the default; if it doesn't give clean controllable scene transitions, switch to a custom GridWorld wrapper. Don't spend more than one week deciding. Pick and move.</li>
+  <li><strong>Failure mode protocol design (~2h):</strong> Design 3 controlled change types: (a) gradual illumination drift over 200 steps, (b) sudden object swap at a specific timestep, (c) new room entry. Each at two magnitudes — small and large. This gives 6 conditions total.</li>
+  <li><strong>Baseline experiments (~4h + compute):</strong> Run stateless LeWM through each condition. 5 seeds minimum. Log \(\varepsilon_t\) at every step. After each change event, run 300 more steps then return to the original scene and measure prediction error on return. This is the return-visit test.</li>
+  <li><strong>Analysis and documentation (~3h):</strong> Plot forgetting curves for each condition. Compute RVPR (return visit error / first visit error) for each. These numbers are the paper hook — they need to be striking enough to motivate the problem.</li>
+</ol>
+
+<p><strong>Expected outputs:</strong> Gradual drift → smooth monotonic error rise. Abrupt change → step function spike. Return visit → 3–7× error relative to first visit. If RVPR is less than 2×, either the environment is too simple or LeWM is already partially handling it — investigate before proceeding.</p>
+
+<p><strong>Biggest risk:</strong> LeWM setup takes longer than expected, eats into experiment time. Mitigation: use the first two weeks purely for environment setup. If still not working by week 2, use a smaller JEPA implementation as a proxy and note it in the paper.</p>
+
+<div class="verdict">
+  <strong>Month 1 deliverable</strong>
+  Baseline forgetting curves across 6 conditions, RVPR measured for each. One diagnostic figure that makes the failure undeniable. This is the paper's Figure 1.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 2 -->
+<h3>Month 2 — Build C2, C3, C4 and fix the two correctness issues</h3>
+<p><em>~15 hours focused work. Most technically dense month — implementation with no margin for sloppiness.</em></p>
+
 <p>
-  <strong>Experimental design:</strong> Build components C2–C7 incrementally, testing each before
-  integrating. Then run the ablation: remove one component at a time, measure effect on each of the
-  5 failure modes. This gives a 7 (ablations: full system, −C2, −C3, −C4, −C5, −C6, −C7) × 5
-  (failure modes) × 10 (seeds) = 350 conditions.
-</p>
-<p>
-  <strong>Statistical analysis:</strong> Paired t-tests (pair by seed) for each ablation vs full
-  system, on each metric. Bonferroni correction across 35 ablation × metric pairs: α/35 = 0.00143.
-</p>
-<p>
-  <strong>Expected outcomes:</strong> Removing C5 (gate): gate fires on noise, corrupts adapter,
-  long-term performance degrades. Removing C4 (clustering): drift goes undetected (no EMA centroid
-  accumulation). Removing C7 (landmarks): compounding error grows faster (no re-anchoring). Each
-  ablation should clearly degrade a distinct metric, validating modularity.
+  This is the hardest implementation month. Three components get built, unit-tested independently,
+  and then integrated. Two correctness issues identified in Q13 get fixed here rather than deferred —
+  because fixing them later means re-running all experiments.
 </p>
 
-<h3>Month 4: Full baselines + matched-noise control</h3>
+<p><strong>What gets built:</strong></p>
+<ol>
+  <li>
+    <strong>C2 — Adaptive threshold filter (~3h):</strong> rolling window of size \(W=100\),
+    compute \(\mu_W + 2\sigma_W\), filter \(\varepsilon_t\). Handle cold start with
+    pretraining statistics as prior for the first 100 steps. Unit test: verify buffer write rate
+    is ~2–3% of steps on a stable scene, spikes to ~20–30% immediately after a scene change.
+  </li>
+  <li>
+    <strong>C3 — Episodic buffer (~5h):</strong> ring buffer of 2048 slots storing 5-tuples
+    \((z_t, a_t, z_{t+1}, \varepsilon_t, \text{episode\_id})\). Implement cluster-aware eviction
+    (Q13 fix 1): tag each entry with its current cluster assignment; evict from the largest cluster
+    first. Implement running support counter (Q13 fix 2): each centroid tracks total historical
+    observation count and distinct episode IDs seen, persisting even after buffer entries are evicted.
+    Unit test: verify cross-episode entries coexist; verify eviction protects small emerging clusters.
+  </li>
+  <li>
+    <strong>C4 — Online K-means (~5h):</strong> assign incoming \(z_t\) by cosine similarity with
+    threshold \(\tau_{\text{assign}} = 0.85\), EMA update \(\beta = 0.95\), spawn new cluster if
+    no match. Implement with the running counter per centroid from C3. Unit test: verify tight
+    clusters on repeated Room X observations, verify dispersed clusters on noise inputs.
+  </li>
+  <li>
+    <strong>C2+C3+C4 integration (~2h):</strong> wire together, run one full episode, verify the
+    data flow from encoder output to buffer write to cluster assignment is correct end-to-end.
+  </li>
+</ol>
+
+<p><strong>Biggest risk:</strong> The LoRA injection into LeWM's predictor (coming in Month 3) is architecturally tricky. Spend 1–2 hours this month reading LeWM's predictor code and confirming exactly where the adapter will be inserted. Do not start implementing it yet, just confirm the insertion point exists and is accessible.</p>
+
+<div class="verdict">
+  <strong>Month 2 deliverable</strong>
+  C2, C3, C4 implemented with unit tests passing. Cluster-aware eviction and running support counter built in. No integration with the full system yet — that's Month 3.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 3 -->
+<h3>Month 3 — Build C5, C6, C7, first end-to-end run, first ablation table</h3>
+<p><em>~15 hours focused work. First moment the full system is alive.</em></p>
+
+<p><strong>What gets built:</strong></p>
+<ol>
+  <li>
+    <strong>C5 — Consolidation gate (~4h):</strong> three-criterion check using the running counter
+    from C3 (support), within-cluster variance (tightness), and cosine similarity to existing landmarks
+    (novelty). Calibrate \(\sigma^2_{\max}\) from LeWM's pretraining data — run the pretrained encoder
+    over a validation set and compute average within-class variance across semantic categories.
+    This gives a data-driven threshold rather than a hand-tuned one.
+  </li>
+  <li>
+    <strong>C6 — LoRA adapter (~5h):</strong> wrap LeWM's predictor with a LoRA adapter at rank
+    \(r=8\). This is the highest-risk component. The adapter needs to be injected at the right
+    layer, the base weights must be frozen, and the update step (20 Adam steps on 32 buffer entries)
+    must only modify \(B \cdot A\). Verify by checking that \(\|\theta_{\text{after}} - \theta_{\text{before}}\|_F = 0\)
+    and \(\|\Delta\theta_{\text{after}} - \Delta\theta_{\text{before}}\|_F > 0\) after an update.
+  </li>
+  <li>
+    <strong>C7 — Landmark set (~2h):</strong> torch.Tensor of shape \((N, 192)\) on CPU. Retrieval by
+    argmax cosine similarity. Write one centroid per gate fire.
+  </li>
+  <li>
+    <strong>Full integration (~2h):</strong> wire all 7 components into the MAPA wrapper. Run one
+    full episode through the complete pipeline. Verify gate fires occur, landmarks are written,
+    adapter updates happen correctly.
+  </li>
+  <li>
+    <strong>First ablation results (~2h):</strong> remove one component at a time (\(-C5\), \(-C7\),
+    \(-C4\)), run 3 seeds per condition on the Month 1 environment. Not the full ablation — a quick
+    sanity check that each component is doing something. If removing C5 makes no difference, something
+    is wrong with the gate implementation.
+  </li>
+</ol>
+
+<p><strong>Biggest risk:</strong> The LoRA adapter update corrupts the predictor instead of improving it — prediction error gets worse after a gate fire. If this happens, check: (1) learning rate too high, (2) 32 entries are not representative (buffer might have class imbalance), (3) stop-gradient missing on \(z_{t+1}\) target. Debug before moving to Month 4.</p>
+
+<div class="verdict">
+  <strong>Month 3 deliverable</strong>
+  Full MAPA system running end-to-end. Sanity ablation showing each component contributes. First head-to-head numbers against stateless LeWM on Month 1's failure modes.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 4 -->
+<h3>Month 4 — Full ablation table + baseline comparison + matched-noise control</h3>
+<p><em>~12 hours focused work. Mostly designing experiments and interpreting results. Compute runs in background.</em></p>
+
 <p>
-  <strong>Baselines:</strong>
+  This is the month where the central claim is tested for real. The matched-noise control is the
+  single most important experiment in the paper — it either validates the geometric gate or exposes
+  that MAPA is just an adaptive learning rate in disguise.
 </p>
+
+<p><strong>Full ablation (~4h design + compute):</strong> 7 conditions × 5 failure modes × 10 seeds = 350 conditions. Most of this is compute. The focused work is: setting up the 350 runs correctly, verifying they start without errors, then analyzing the results table. Statistical analysis: paired t-tests per ablation × metric pair, Bonferroni correction across 35 pairs (\(\alpha = 0.05/35 = 0.00143\)).</p>
+
+<p><strong>4 baselines (~3h design + compute):</strong></p>
 <ul>
-  <li><strong>Stateless LeWM</strong>: no memory, frozen predictor. The floor.</li>
-  <li><strong>Extended-context LeWM</strong>: same LeWM but with episode buffer extended to match MAPA's memory budget in MB. Tests whether more context achieves what MAPA claims.</li>
-  <li><strong>Full fine-tuning + replay</strong>: predictor fine-tuned at each episode boundary using a fixed-size replay buffer of raw z_t vectors. Same memory budget. Tests whether a simpler continual learning baseline suffices.</li>
-  <li><strong>Adaptive-LR schedule</strong>: learning rate increases when error is high, decreases when low. No access to cluster geometry. This is the direct competing hypothesis for the gate's behavior.</li>
+  <li><strong>Stateless LeWM:</strong> the floor. Every experiment is measured against this.</li>
+  <li><strong>Extended-context LeWM:</strong> longer episode buffer matching MAPA's 20MB budget. Tests whether "just add context" achieves the same result — the expected first rebuttal from a reviewer.</li>
+  <li><strong>Full fine-tuning + replay buffer:</strong> full weight updates using stored \(z_t\) vectors. Same memory budget. The strongest possible baseline — if MAPA doesn't beat this while using less memory, the efficiency claim fails.</li>
+  <li><strong>Adaptive learning-rate schedule:</strong> LR increases when \(\varepsilon_t\) is high, decreases when low. No cluster geometry. The direct test of whether the gate is doing something beyond "update more when error is high."</li>
 </ul>
+
+<p><strong>Matched-noise control (~3h design + compute):</strong> Build an environment where a calibrated noise source produces prediction errors equal in magnitude to genuine scene changes: \(\|\varepsilon_{\text{noise}}\|^2 \approx \|\varepsilon_{\text{change}}\|^2\). Run both MAPA and the adaptive-LR baseline on this environment. Measure gate precision for each. MAPA's gate should suppress noise (dispersed clusters, tightness fails); adaptive-LR fires on both. If MAPA also fires on noise here, the tightness criterion is not working and needs recalibration — raise \(\sigma^2_{\max}\) or increase \(N_{\min}\).</p>
+
+<p><strong>Analysis (~2h):</strong> Compile the full results table. Compute compute-matched ablation (MAPA vs a larger stateless LeWM that uses the same inference FLOPs) and memory-matched ablation (MAPA vs replay buffer at the same MB budget). These close the two obvious reviewer objections.</p>
+
+<div class="verdict">
+  <strong>Month 4 deliverable</strong>
+  Full ablation table across all 7 conditions and 5 metrics. Baseline comparison showing MAPA vs 4 competitors. Matched-noise experiment result. This is the core results section of the paper.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 5 -->
+<h3>Month 5 — Multi-room stress test + first optimizations</h3>
+<p><em>~13 hours focused work. Half implementation (environment + optimizations), half experiment design and analysis.</em></p>
+
 <p>
-  <strong>Matched-noise control:</strong> construct environments where a calibrated noise source
-  produces prediction errors matching the magnitude of genuine scene changes
-  (‖noise_error‖² ≈ ‖change_error‖²). Run 10 seeds. Measure gate precision for MAPA vs
-  adaptive-LR baseline. MAPA should suppress noise updates (tightness fails for noise clusters);
-  adaptive-LR fires on both (magnitude is identical).
-</p>
-<p>
-  <strong>Expected outcomes:</strong> MAPA matches or exceeds full fine-tuning on RVPR and FR while
-  using &lt;20MB vs the replay buffer's GB-scale. Adaptive-LR shows poor gate precision on
-  matched-noise experiment (cannot distinguish magnitude-matched noise from real change).
+  This is the hardest test of the long-horizon claim. The single-room experiments in Months 1–4
+  show MAPA works in isolation. The multi-room test shows it doesn't break when the agent must
+  maintain models of multiple scenes simultaneously.
 </p>
 
-<h3>Month 5: Multi-room stress test</h3>
+<p><strong>Multi-room environment (~4h):</strong> Build a 5-room navigation world on top of MiniHack
+or a simple custom GridWorld. Each room has distinct visual dynamics. The agent transitions between
+rooms by passing through doorways. Room dynamics drift at 1% per 100 episodes — slow enough to be
+undetectable in a single visit but measurable across 10 visits. If building from scratch takes more
+than 4 hours, use a simplified 3-room version and note it as a limitation.</p>
+
+<p><strong>Return-visit experiment (~3h design + compute):</strong> Agent runs 200 steps per room,
+10 full rounds (100 room transitions total, each room visited 10× over the full run). Measure:
+RVPR curve per room across visits 1–10, forgetting rate for room A while agent is in rooms B–E,
+gate-fire rate per room over time (should approach zero as rooms are consolidated), drift detection
+when room dynamics have shifted by 10%.</p>
+
+<p><strong>Expected picture:</strong> Stateless LeWM — RVPR climbs to 3–5× by visit 5, no improvement
+with return visits. Full fine-tuning + replay — RVPR near 1 but ~1GB memory. MAPA — RVPR below 1.3
+at &lt;20MB, gate-fire rate declining toward zero as each room is consolidated.</p>
+
+<p><strong>Two key optimizations (~4h):</strong> Implement hierarchical LoRA adapters (coarse rank-4
++ fine rank-4) as a Month 5 ablation — test whether separated timescales improve RVPR. Implement
+contrastive buffer sampling for the LoRA update and test whether it reduces gate-fire rate on
+already-consolidated rooms (fewer spurious re-consolidations).</p>
+
+<div class="verdict">
+  <strong>Month 5 deliverable</strong>
+  Multi-room return-visit results. RVPR curves across 10 visits per room. Gate-fire rate decay curves. Two optimization ablations. If RVPR doesn't improve with visits 1→10, the landmark retrieval mechanism is not working as expected — investigate before Month 6.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<!-- Month 6 -->
+<h3>Month 6 — Theoretical bound, paper, and open-source release</h3>
+<p><em>~10 hours focused work. Split evenly between theory derivation and writing.</em></p>
+
 <p>
-  <strong>Environment:</strong> 5-room navigation world. Each room has distinct dynamics. Scene
-  dynamics drift gradually within each room (1% per 100 episodes). Agent navigates between rooms,
-  spending 200 steps per room, 10 rounds (100 room transitions total, returning to each room 10×).
-</p>
-<p>
-  <strong>Analysis:</strong> RVPR curve across visits 1–10 for each room. FR measured for each
-  room while agent is in other rooms. Gate-fire rate per room over time (should decrease as rooms
-  become familiar). Drift detection: does the gate fire appropriately when room dynamics drift by
-  10% after 1000 episodes?
-</p>
-<p>
-  <strong>Expected outcomes:</strong> Stateless baseline: RVPR&gt;3 by visit 5. Full fine-tuning:
-  RVPR≈1 but memory cost ~1GB. MAPA: RVPR&lt;1.2 with &lt;20MB. Landmark growth rate decreases
-  after all 5 rooms are consolidated (gate goes quiet). Drift re-triggers gate after substantial
-  room change.
+  The theory bound does two things: it gives the paper a second contribution beyond the empirical
+  results, and it makes the forgetting guarantees precise rather than observational.
 </p>
 
-<h3>Month 6: Theory — forgetting-rate bound</h3>
-<p>
-  Model the predictor's latent dynamics as a perturbed ODE. With LoRA adapter \(\Delta\theta\) and
-  Lipschitz constant \(L_f + \delta\) (where \(\delta\) is the adapter's contribution to the Lipschitz
-  constant), and the gate firing every \(T\) steps:
-</p>
+<p><strong>Forgetting-rate bound (~5h):</strong> Model the predictor as a dynamical system with LoRA
+perturbation. The adapted predictor has effective Lipschitz constant \(L_f + \delta\) where \(\delta\)
+is the adapter's contribution. With the gate firing every \(T\) steps:</p>
+
 <div class="math-block">
   \[\text{Forgetting rate} \leq \frac{(L_f + \delta)^T - 1}{T} \cdot \varepsilon_0 + \mathcal{O}(\delta_{\text{gate}})\]
-  <p>where \(\delta_{\text{gate}}\) is the gate's false-positive rate. The bound states: the worse the gate (high \(\delta_{\text{gate}}\)) and the larger the Lipschitz constant (high \(L_f + \delta\)), the faster forgetting occurs. With a well-calibrated gate and a stable adapter, forgetting is bounded. The Gronwall inequality provides the formal tools for the proof.</p>
+  <p>Gronwall's inequality bounds the divergence between the adapted predictor and the true dynamics as a function of \(L_f + \delta\) and the gate's false-positive rate \(\delta_{\text{gate}}\). The bound is tight when the gate is well-calibrated (low \(\delta_{\text{gate}}\)) and the adapter is small (low \(\delta\)). This is the theoretical guarantee that distinguishes MAPA from "just update more" approaches — the bound depends on gate quality, not just update frequency.</p>
+</div>
+
+<p><strong>Paper and release (~5h):</strong> Write the paper with the biological interpretation as a secondary theoretical contribution. Release the MAPA module as open-source, compatible with LeWM and V-JEPA 2. Release all seeds, configs, and dataset generation scripts. Submit to arXiv.</p>
+
+<div class="verdict">
+  <strong>Month 6 deliverable</strong>
+  arXiv preprint. Open-source MAPA module. Forgetting-rate bound in appendix. All experimental code and seeds released. The paper is done when reviewers can reproduce every number in the results table from the released code without contacting the authors.
+</div>
+
+<hr style="border-top:1px dashed #e5e7eb; margin:36px 0"/>
+
+<h3>The honest risk table — what derails this and what to do</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>LoRA injection into LeWM corrupts predictor</td><td>Medium</td><td>High — blocks Month 3</td><td>Spend 2h in Month 2 locating exact injection point. Test with rank-1 adapter first before rank-8.</td></tr>
+      <tr><td>Matched-noise experiment: MAPA also fires on noise</td><td>Medium</td><td>High — invalidates central claim</td><td>Recalibrate \(\sigma^2_{\max}\) and \(N_{\min}\). If tightness criterion fundamentally doesn't separate — revisit SIGReg encoder training quality.</td></tr>
+      <tr><td>LeWM environment setup takes 3+ weeks</td><td>Low-Medium</td><td>Medium — delays Month 1 results</td><td>Use a smaller proxy JEPA if LeWM is blocked. Note it as a limitation.</td></tr>
+      <tr><td>RVPR doesn't improve with more visits in Month 5</td><td>Low</td><td>High — cross-episode claim fails</td><td>Check landmark retrieval: are landmarks actually being fed to predictor? Check if SIGReg training is producing metrically consistent space.</td></tr>
+      <tr><td>10-seed ablation doesn't pass Bonferroni threshold</td><td>Medium</td><td>Medium — weakens statistical claims</td><td>Accept that effects are smaller than expected. Report means and CIs honestly. Do not inflate claims.</td></tr>
+      <tr><td>Multi-room environment build takes too long</td><td>Medium</td><td>Low — Month 5 delayed but not blocked</td><td>Use 3-room instead of 5-room. Scope down before cutting the experiment entirely.</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="verdict">
   <strong>Takeaway</strong>
-  Bonferroni correction requires Cohen's \(d > 1.2\) with 10 seeds at \(\alpha = 0.05/K\). Each experimental phase has a specific deliverable and expected outcome range. The matched-noise control in Month 4 is the single most important experiment — if it fails, the central claim of the paper fails.
+  60–80 hours of focused work over 6 months is the real budget. The matched-noise control in Month 4 is the single experiment that decides whether the paper's central claim holds. Everything else is context for it. Months 2 and 3 are the most technically risky — the LoRA injection and gate calibration are where unknown unknowns hide. Months 4–6 are mostly running the system that was built in 2–3.
 </div>
 </div>
 
