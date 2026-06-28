@@ -2050,37 +2050,132 @@ window.addEventListener('popstate', function() {
   environment episodes. Same structural idea, different modality.
 </p>
 
-<h3>MAPA-specific primary metrics</h3>
+<h3>Why standard video prediction metrics don't apply to MAPA</h3>
+<p>
+  The standard video generation metrics — FVD (Fréchet Video Distance), SSIM, PSNR, LPIPS — all
+  operate in pixel space. MAPA operates entirely in latent space. There are no generated pixels to
+  compare against. This is not a limitation to work around; it is a feature. Pixel fidelity is
+  exactly what JEPA's design rejects as a training objective. Using FVD to evaluate MAPA would be
+  like grading a translation on how similar the ink looks rather than whether the meaning was preserved.
+</p>
+<p>
+  Additionally, research published in 2025 found that pixel-prediction quality metrics (PSNR, FVD,
+  LPIPS) are largely orthogonal to action recoverability in world models — high FVD score does not
+  predict whether the representation encodes the scene dynamics that matter for planning. Reporting
+  pixel metrics for MAPA would be not just inapplicable but actively misleading.
+</p>
+
+<h3>The right framework: continual learning metrics, adapted to prediction</h3>
+<p>
+  MAPA is a continual learning system for world model predictors. The appropriate metric framework
+  comes from continual learning literature, specifically the BWT/FWT decomposition which separates
+  forgetting from transfer. These metrics were designed exactly for the stability-plasticity tradeoff
+  MAPA is navigating.
+</p>
+
+<h4>Backward Transfer (BWT) — the forgetting metric</h4>
+<p>
+  In standard continual learning, BWT measures how much performance on old tasks degrades after
+  learning new ones. Adapted for MAPA's prediction setting, where lower error is better:
+</p>
+<div class="math-block">
+  \[\text{BWT}_{\text{MAPA}} = \frac{1}{S-1}\sum_{i=1}^{S-1}\bigl(\varepsilon_{S,i} - \varepsilon_{i,i}\bigr)\]
+  <p>where \(\varepsilon_{j,i}\) is the prediction error on scene \(i\) after visiting scene \(j\). \(\varepsilon_{i,i}\) is performance immediately after first consolidating scene \(i\). \(\varepsilon_{S,i}\) is performance on scene \(i\) at the very end of training, after visiting all \(S\) scenes.</p>
+  <p><strong>BWT &gt; 0</strong>: forgetting — error on old scenes increased after seeing new ones. Bad.<br>
+  <strong>BWT ≤ 0</strong>: no forgetting or positive backward transfer — old scenes actually improved. Good.<br>
+  <strong>Target for MAPA:</strong> BWT significantly below the stateless baseline (which has BWT ≈ 0 trivially, since it never updates). MAPA's LoRA updates should not increase error on old scenes.</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> BWT is the standard measure of catastrophic forgetting and directly validates MAPA's core claim that LoRA updates do not overwrite prior knowledge. If BWT is positive, the adapter is interfering with previously consolidated scene representations. This would require revisiting the gate's novelty criterion or the contrastive sampling design.
+</p>
+
+<h4>Forward Transfer (FWT) — the generalisation metric</h4>
+<p>
+  FWT measures whether exposure to previous scenes helps on future ones:
+</p>
+<div class="math-block">
+  \[\text{FWT}_{\text{MAPA}} = \frac{1}{S-1}\sum_{i=2}^{S}\bigl(\varepsilon_{\text{stateless},i} - \varepsilon_{i-1,i}\bigr)\]
+  <p>\(\varepsilon_{\text{stateless},i}\) is the stateless LeWM's prediction error on scene \(i\) with no prior context. \(\varepsilon_{i-1,i}\) is MAPA's prediction error on scene \(i\) having already visited scenes \(1\) through \(i-1\).</p>
+  <p><strong>FWT &gt; 0</strong>: positive transfer — prior scenes helped on the new one. Good.<br>
+  <strong>FWT ≤ 0</strong>: no transfer — exposure to prior scenes gave no benefit on a new one.</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> FWT tests whether MAPA's landmarks generalise beyond exact scene matches. If the agent visited ten different office environments, MAPA should perform better on an eleventh office environment than a stateless baseline would — because the adapter and landmarks encode office-type dynamics that transfer. If FWT is near zero, the memory is too specific (overfitting to individual scenes) rather than learning structure that transfers.
+</p>
+
+<h4>Latent Prediction MSE at rollout depth — the compounding metric</h4>
+<div class="math-block">
+  \[\varepsilon_k = \operatorname{MSE}\!\bigl(\hat{z}_{t+k},\, z_{t+k}\bigr) \quad \text{at } k \in \{1, 5, 20, 50, 100\}\]
+  <p>Measured on held-out scenes not in the training set. Plot \(\varepsilon_k\) vs \(k\) as a rollout curve. Target: sub-linear growth. Failure: exponential growth past \(k = 20\), indicating autoregressive compounding without landmark anchoring.</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> This is the direct measure of MAPA's solution to bottleneck 1 (autoregressive compounding). The landmark retrieval anchors predictions; this metric shows how far the rollout can go before error diverges. Compare MAPA's rollout curve against stateless LeWM's — the gap is the benefit of landmark anchoring.
+</p>
+
+<h4>Return-Visit Performance Ratio (RVPR) — the memory utility metric</h4>
+<div class="math-block">
+  \[\text{RVPR}_N = \frac{\varepsilon_{\text{visit }N}}{\varepsilon_{\text{visit }1}}\]
+  <p>Prediction error on the \(N\)-th visit to a scene, relative to the first visit. Target: RVPR \(&lt; 1.0\) by visit 3 and declining. This is the practical face of BWT — a system with good BWT will show improving RVPR. A system with zero BWT and zero FWT (stateless) has RVPR \(\approx 1.0\) forever.</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> RVPR is what a practitioner cares about. BWT is the mathematical decomposition; RVPR is the intuitive reading of it. "Does the robot get better at predicting room X each time it visits?" If yes, memory is working. This should be the headline figure in the paper.
+</p>
+
+<h4>Stability-Plasticity score (SP-score)</h4>
+<p>
+  The stability-plasticity dilemma is the fundamental tension in continual learning: a system that
+  updates aggressively adapts fast (high plasticity) but forgets quickly (low stability). A system
+  that barely updates forgets nothing (high stability) but can't adapt (low plasticity). MAPA's gate
+  is designed to navigate this. A single number that captures the trade-off:
+</p>
+<div class="math-block">
+  \[\text{SP-score} = \frac{\text{Plasticity} \times \text{Stability}}{(\text{Plasticity} + \text{Stability})/2}\]
+  <p>where Plasticity = \((1 - \text{normalized FWT loss})\) and Stability = \((1 - \text{normalized BWT loss})\), each normalised to [0, 1] across all baselines. SP-score is the harmonic mean — it penalises extreme sacrifice of either property. A system that does well on one while failing the other gets a low SP-score even if the average is high.</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> The stateless baseline has perfect stability (BWT ≈ 0, it never forgets because it never updates) but zero plasticity. Full fine-tuning has high plasticity but terrible stability. MAPA's SP-score should be higher than both — moderate-to-high plasticity and maintained stability. If MAPA's SP-score is not above the stateless baseline, its memory mechanism is not helping.
+</p>
+
+<h4>Gate Selectivity Score (GSS) — validating the gate's core claim</h4>
+<div class="math-block">
+  \[\text{GSS} = \text{Precision}_{\text{gate}} \times \text{Recall}_{\text{gate}}\]
+  <p>Measured specifically on the matched-noise experiment: environments where noise events produce identical \(\varepsilon_t\) to genuine scene changes. Precision: fraction of gate fires that correspond to genuine changes. Recall: fraction of genuine changes that trigger a gate fire. Target: Precision \(&gt; 0.9\), Recall \(&gt; 0.8\), GSS \(&gt; 0.72\).</p>
+</div>
+<p>
+  <strong>Why this metric:</strong> GSS validates the tightness criterion — the thing that makes MAPA different from an adaptive learning rate. If GSS is near random on the matched-noise experiment, the geometric gate is not working and the entire MAPA architecture needs revision. This is the single metric that most directly tests the central claim.
+</p>
+
+<h3>Metrics NOT to use and why</h3>
 <div class="table-wrap">
   <table>
-    <thead><tr><th>Metric</th><th>Formula</th><th>Target</th><th>What failure looks like</th></tr></thead>
+    <thead><tr><th>Metric</th><th>Why it seems relevant</th><th>Why it's wrong for MAPA</th></tr></thead>
     <tbody>
-      <tr><td><strong>Long-Horizon Prediction Error</strong></td><td>\(\operatorname{MSE}(\hat{z}_{t+k}, z_{t+k})\) at \(k = 20, 50, 100\)</td><td>Sub-linear growth in \(k\); no divergence</td><td>Exponential error growth past \(k=20\)</td></tr>
-      <tr><td><strong>Return-Visit Performance Ratio (RVPR)</strong></td><td>\(\varepsilon_{\text{visit }N} / \varepsilon_{\text{visit }1}\)</td><td>RVPR \(&lt; 1.0\) (improves with visits)</td><td>RVPR \(&gt; 1.0\): model degrades on return</td></tr>
-      <tr><td><strong>Forgetting Rate (FR)</strong></td><td>\(d\varepsilon_A / dN_B\) (error in A per steps in B)</td><td>FR \(\ll\) stateless baseline</td><td>FR matches stateless: memory not working</td></tr>
-      <tr><td><strong>Scene Identification Accuracy (SIA)</strong></td><td>Nearest landmark similarity \(&gt; \delta\) when in known scene</td><td>\(&gt;90\%\) recognition accuracy</td><td>Landmarks do not generalize across visits</td></tr>
-      <tr><td><strong>Gate Selectivity Score (GSS)</strong></td><td>Precision \(\times\) recall on matched-noise experiment</td><td>\(&gt;0.72\) (90% precision \(\times\) 80% recall)</td><td>GSS near random: tightness criterion failing</td></tr>
+      <tr><td><strong>FVD (Fréchet Video Distance)</strong></td><td>Standard video model benchmark</td><td>Pixel-space metric. MAPA produces no pixels. Inapplicable.</td></tr>
+      <tr><td><strong>SSIM / PSNR</strong></td><td>Video quality measures</td><td>Pixel-space. Orthogonal to action recoverability. Misleading for JEPA.</td></tr>
+      <tr><td><strong>Classification accuracy</strong></td><td>Standard continual learning metric</td><td>MAPA is not a classifier. Prediction error is the right analogue.</td></tr>
+      <tr><td><strong>Perplexity / BLEU</strong></td><td>LLM memory benchmark metrics</td><td>Language-domain. Not applicable to latent video prediction.</td></tr>
+      <tr><td><strong>Reward curves (RL)</strong></td><td>Agent performance over time</td><td>MAPA is a world model, not a policy. It predicts, does not act.</td></tr>
     </tbody>
   </table>
 </div>
 
-<h3>Memory efficiency metrics</h3>
+<h3>Memory system health metrics — operational monitoring</h3>
 <div class="table-wrap">
   <table>
-    <thead><tr><th>Metric</th><th>Definition</th><th>Why it matters</th></tr></thead>
+    <thead><tr><th>Metric</th><th>Formula / measurement</th><th>What it tells you</th><th>Target</th></tr></thead>
     <tbody>
-      <tr><td><strong>Memory footprint</strong></td><td>Total MB: buffer + landmarks + LoRA</td><td>Must stay \(&lt;20\) MB; validates the "no replay buffer" claim</td></tr>
-      <tr><td><strong>Landmark growth rate</strong></td><td>\(\Delta N_{\text{landmarks}}\) per episode</td><td>Should decrease over time in a fixed environment</td></tr>
-      <tr><td><strong>LoRA adapter drift</strong></td><td>\(\|\Delta\theta_t - \Delta\theta_0\|_F\) over time</td><td>Bounded drift confirms no catastrophic forgetting in adapter</td></tr>
-      <tr><td><strong>Inference overhead</strong></td><td>Latency increase per step vs stateless</td><td>Must be \(&lt;5\%\) to be deployable</td></tr>
-      <tr><td><strong>Gate fire rate</strong></td><td>Gate fires per 1000 steps</td><td>Should decrease as environment is explored; healthy system goes quiet</td></tr>
+      <tr><td><strong>Gate fire rate</strong></td><td>Fires per 1000 steps</td><td>Should decline over time as environment is explored. High sustained rate = gate is too sensitive or environment is highly non-stationary.</td><td>Declining curve; near zero in familiar environments</td></tr>
+      <tr><td><strong>Landmark growth rate</strong></td><td>\(\Delta N_{\text{landmarks}}\) per episode</td><td>Should decelerate as novelty is exhausted. Sustained linear growth means the novelty criterion is too loose.</td><td>Sub-linear growth, asymptoting</td></tr>
+      <tr><td><strong>LoRA adapter Frobenius drift</strong></td><td>\(\|\Delta\theta_t - \Delta\theta_0\|_F\)</td><td>Should grow then plateau. Unbounded growth means adapter is not converging; the gate is firing on unstable clusters.</td><td>Bounded plateau</td></tr>
+      <tr><td><strong>Memory footprint</strong></td><td>Buffer + landmarks + LoRA in MB</td><td>Validates the "no replay buffer" claim. Must be tractable on device.</td><td>\(&lt; 20\) MB at all times</td></tr>
+      <tr><td><strong>Inference latency overhead</strong></td><td>Step latency vs stateless LeWM</td><td>Landmark retrieval adds \(\mathcal{O}(N \times 192)\) per step. Must remain deployable.</td><td>\(&lt; 5\%\) overhead</td></tr>
     </tbody>
   </table>
 </div>
 
 <div class="verdict">
   <strong>Takeaway</strong>
-  No published benchmark directly tests MAPA's cross-episode memory claim — MAPA must partially create its own evaluation protocol. The Return-Visit Performance Ratio and Forgetting Rate are the two metrics most directly tied to the core claim.
+  The five primary metrics are: BWT (forgetting), FWT (generalisation), latent MSE rollout curve (compounding), RVPR (practical memory utility), and GSS (gate validity). These are grounded in the continual learning literature and directly tied to MAPA's five failure modes. Pixel-space metrics (FVD, SSIM, PSNR) are inapplicable. The SP-score summarises the stability-plasticity tradeoff in a single comparable number. Gate health metrics monitor whether the memory system is operating correctly without being the headline result.
 </div>
 </div>
 
