@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAPA — Interview Walkthrough</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #fff;
+  color: #222;
+  font-size: 17px;
+  line-height: 1.78;
+  -webkit-font-smoothing: antialiased;
+}
+.page { max-width: 700px; margin: 0 auto; padding: 72px 28px 120px; }
+
+.title-block { text-align: center; margin-bottom: 56px; }
+.title-block h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(26px, 5vw, 42px);
+  font-weight: 400;
+  color: #2a2a2a;
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  margin-bottom: 16px;
+}
+.title-block .subtitle { font-size: 15px; color: #888; margin-bottom: 10px; }
+.title-block .date { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; }
+
+p { margin-bottom: 20px; color: #333; }
+p:last-child { margin-bottom: 0; }
+strong { font-weight: 700; color: #1a1a1a; }
+em { font-style: italic; }
+a { color: #1a1a1a; text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: #555; }
+
+blockquote {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #555;
+  margin: 28px 0;
+  padding-left: 20px;
+  border-left: 2px solid #ddd;
+  font-size: 16.5px;
+  line-height: 1.75;
+}
+
+h2 {
+  font-size: clamp(20px, 2.8vw, 26px);
+  font-weight: 700; color: #111; line-height: 1.3;
+  margin-top: 72px; margin-bottom: 18px; letter-spacing: -0.01em;
+}
+h3 { font-size: 18px; font-weight: 700; color: #111; margin-top: 44px; margin-bottom: 12px; }
+h4 { font-size: 14px; font-weight: 700; color: #777; margin-top: 32px; margin-bottom: 10px; letter-spacing: 0.09em; text-transform: uppercase; }
+
+ul, ol { padding-left: 22px; margin-bottom: 20px; }
+li { margin-bottom: 8px; color: #333; }
+li strong { color: #111; }
+
+hr { border: none; border-top: 1px solid #ebebeb; margin: 60px 0; }
+
+/* The opening claim */
+.claim-block {
+  background: #111;
+  color: #f0f0f0;
+  border-radius: 10px;
+  padding: 30px 32px;
+  margin: 40px 0 48px;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  line-height: 1.72;
+}
+.claim-block .cl-label {
+  font-family: system-ui, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #777;
+  margin-bottom: 14px;
+}
+.claim-block em { font-style: italic; color: #ccc; }
+
+/* Script box */
+.script {
+  background: #f5f7ff;
+  border: 1px solid #d8e0f5;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 22px 0;
+  font-size: 15.5px;
+  line-height: 1.82;
+  color: #1a1a1a;
+}
+.script .sc-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #7b8fcb;
+  margin-bottom: 11px;
+}
+
+/* Failure mode card */
+.failure {
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  margin: 28px 0;
+  overflow: hidden;
+}
+.failure-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 18px 22px 14px;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+}
+.failure-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bbb;
+  min-width: 44px;
+}
+.failure-header h3 {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+.failure-body { padding: 20px 22px; }
+.failure-body p { margin-bottom: 14px; font-size: 15.5px; }
+.failure-body p:last-child { margin-bottom: 0; }
+
+/* Mechanism step */
+.mech-step {
+  border-left: 3px solid #d4d4d4;
+  padding: 4px 0 4px 20px;
+  margin: 28px 0;
+}
+.mech-step h4 { margin-top: 0; color: #555; }
+.mech-step p { font-size: 15.5px; margin-bottom: 12px; }
+
+/* Pre-empt */
+.preempt {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 18px 0;
+}
+.preempt .pe-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #bbb; margin-bottom: 10px;
+}
+.preempt ul { margin-bottom: 0; padding-left: 18px; }
+.preempt li { font-size: 14px; color: #555; margin-bottom: 7px; }
+.preempt li strong { color: #333; }
+
+/* Fumble warning */
+.fumble {
+  background: #fff8f0; border: 1px solid #fcd9a8;
+  border-radius: 8px; padding: 16px 20px; margin: 20px 0;
+}
+.fumble .fm-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #c47f2a; margin-bottom: 8px;
+}
+.fumble p { font-size: 14px; color: #7a4a10; margin-bottom: 0; }
+
+/* Anchor — things to lock in */
+.anchor {
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 8px; padding: 16px 20px; margin: 18px 0;
+}
+.anchor .ak-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #16a34a; margin-bottom: 10px;
+}
+.anchor p { font-size: 14px; color: #14532d; margin-bottom: 6px; }
+.anchor ul { margin-bottom: 0; padding-left: 18px; }
+.anchor li { font-size: 14px; color: #14532d; margin-bottom: 5px; }
+
+/* Math */
+.math-block {
+  margin: 22px 0; padding: 18px 22px;
+  background: #fafafa; border-left: 2px solid #d0d0d0;
+  border-radius: 0 6px 6px 0; overflow-x: auto;
+}
+.math-block .mb-note { font-size: 13px; color: #777; margin-bottom: 6px; }
+
+/* Flash cards */
+.flash-grid { display: grid; gap: 14px; margin: 28px 0; }
+.flash-card { border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+.flash-q { background: #f7f7f7; padding: 13px 18px; font-size: 14.5px; font-weight: 600; color: #222; border-bottom: 1px solid #e8e8e8; }
+.flash-a { padding: 13px 18px; font-size: 14px; color: #333; line-height: 1.67; }
+
+/* Table */
+.table-wrap { overflow-x: auto; margin: 28px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { border-bottom: 1.5px solid #ddd; padding: 10px 12px; text-align: left; font-weight: 700; color: #111; }
+tbody td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: #444; vertical-align: top; }
+tbody tr:last-child td { border-bottom: none; }
+
+code {
+  font-family: 'Menlo', 'Monaco', monospace; font-size: 0.83em;
+  background: #f3f3f3; padding: 2px 5px; border-radius: 3px; color: #1e1e1e;
+}
+
+.site-nav { position: fixed; top: 20px; left: 28px; display: flex; gap: 20px; z-index: 200; }
+.site-nav a { font-size: 12.5px; color: #bbb; text-decoration: none; cursor: pointer; letter-spacing: 0.03em; }
+.site-nav a:hover { color: #555; }
+.site-nav a.active { color: #222; }
+
+footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; text-align: center; font-size: 13px; color: #bbb; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/mapa/">Explainer</a>
+  <a class="active">Interview</a>
+</nav>
+
+<div class="page">
+
+<div class="title-block">
+  <h1>How to Walk Someone Through the Proposal</h1>
+  <p class="subtitle">A complete narrative guide for explaining MAPA in an interview or panel</p>
+  <p class="date">July 2026 &nbsp;·&nbsp; Priyam Ghosh</p>
+</div>
+
+<p>
+  This page is a single thing: the story you tell when someone says "walk me through your proposal."
+  It is not a summary. It is a map of the conversation you need to lead — from a kitchen in the dark,
+  through what rats taught us about memory, to five structural absences in the best world model family
+  that exists, to the minimal architecture that closes the gap. Every section has the words to say,
+  the questions it generates, and where people typically lose the room.
+</p>
+<p>
+  Read it once end to end. Then read it again speaking out loud.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════
+     THE CLAIM
+══════════════════════════════ -->
+
+<h2>Start here: the claim</h2>
+
+<p>
+  This is the first thing you say. Not the architecture. Not the acronym. The claim.
+  Everything that follows is the argument for why this claim is true.
+</p>
+
+<div class="claim-block">
+  <div class="cl-label">Open with this. Exactly this.</div>
+  "The core claim is that long-horizon failure in JEPA world models is not a representation problem.
+  It is the predictor being <em>architecturally stateless</em> across episode boundaries. And a
+  two-timescale memory layer is the minimal sufficient fix."
+</div>
+
+<p>
+  Three sentences. After you say them, stop. Let the silence do work. They will either nod and
+  wait for you to continue, or they'll pull on one of the three claims. Either way you're in control.
+  Now you earn the claim with the story.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════
+     PART 1 — KITCHEN / NEUROSCIENCE
+══════════════════════════════ -->
+
+<h2>Part 1 — The kitchen in the dark</h2>
+
+<p>
+  Before JEPA. Before LoRA. Before any architecture. You need to make the problem felt with something
+  concrete and familiar. This is the only part of the talk where you are not speaking about AI at all.
+</p>
+
+<div class="script">
+  <div class="sc-label">What to say</div>
+  <p>
+    "Walk into your kitchen at 2 AM with the lights off. Your hand finds the light switch before
+    your eyes find anything. You already know where the counter ends, that the floor is level,
+    that the fridge is humming three feet to your right. None of that is sensation — your eyes
+    haven't adjusted yet. All of that is <strong>prediction</strong>. Your brain has a model of
+    that kitchen, built from every previous visit, and it is rendering that model ahead of what
+    your senses are actually delivering."
+  </p>
+  <p>
+    "That is predictive processing. The brain's job is not to receive the world — it is to predict
+    the world and then correct only the parts the prediction got wrong. The gap between what you
+    expected and what actually arrived is the only signal your brain truly learns from."
+  </p>
+  <p>
+    "Here is the part that matters for us. That prediction only works because of memory. Strip
+    away memory and every moment arrives completely fresh — no sense of what this kitchen usually
+    looks like, no expectation that the chair is still in the same place. The prediction becomes
+    useless. A system without memory isn't perceiving the world. It's transcribing it, frame by frame,
+    with no understanding of what came before."
+  </p>
+</div>
+
+<p>
+  At this point you have the concept of prediction requiring memory. Now bring in the biology —
+  because the biological solution to this problem is exactly what MAPA is modelled on.
+</p>
+
+<div class="script">
+  <div class="sc-label">Continue</div>
+  <p>
+    "Brains solve this with not one memory system but two, running at completely different speeds.
+    The <strong>hippocampus</strong> writes fast — a new experience is encoded in seconds, vivid
+    and specific. The <strong>neocortex</strong> writes slow — over hours and nights of sleep it
+    distills which parts of experience repeat, and those become stable, compressed knowledge.
+    What remains in the neocortex after consolidation is not memory of Tuesday's kitchen.
+    It is <em>kitchen-ness itself</em>."
+  </p>
+  <p>
+    "The trick that makes the whole system work is the gate between them. Fast memory fills
+    constantly. Slow memory updates only when the evidence has stacked up into something stable
+    and genuinely new. Without that gate, one strange afternoon overwrites years of knowledge.
+    That gate, the judgment of what earns a permanent place, is the hinge the whole biological
+    system turns on."
+  </p>
+</div>
+
+<!-- Rat experiments -->
+<h3>The rats</h3>
+
+<p>
+  Now bring in the experiment. This is where the biology becomes something concrete and falsifiable —
+  not just an analogy, but a demonstrated mechanism.
+</p>
+
+<div class="script">
+  <div class="sc-label">What to say</div>
+  <p>
+    "John O'Keefe showed this in 1971 with rats navigating a maze. He found that individual
+    neurons in the hippocampus fire only when the rat is in a specific location — they're called
+    place cells. The hippocampus is literally building a <strong>spatial map</strong> of the
+    environment, one neuron per location. Not a recording of what the rat saw. A compressed,
+    geometric representation of where the rat is and where it has been."
+  </p>
+  <p>
+    "The more important finding came later. When rats sleep after navigating a new environment,
+    the same sequences of place cells that fired during navigation replay — in compressed, fast
+    bursts called sharp-wave ripples. The hippocampus is broadcasting its recent experience
+    to the neocortex, which integrates it into long-term spatial knowledge. When the rat returns
+    to the same room the next day, it predicts better. Immediately. Not because it relearned —
+    because it consolidated."
+  </p>
+  <p>
+    "Now ask: what would a rat look like if it had no hippocampus? It would navigate perfectly
+    in a maze it knows well — as long as it stays in a single session. The moment you end the
+    session and start a new one, it has no memory of the maze. Every visit is a first visit.
+    That is exactly what a JEPA world model looks like today."
+  </p>
+</div>
+
+<div class="preempt">
+  <div class="pe-label">Questions this generates — and why you've already set them up</div>
+  <ul>
+    <li><strong>"So you're implementing a hippocampus?"</strong> — Yes, functionally. The episodic buffer is the hippocampus. The landmarks are the neocortical consolidation output. The gate is the gating mechanism between them. The analogy is exact and intentional.</li>
+    <li><strong>"Isn't this just adding memory to the model?"</strong> — It's adding the right kind of memory at the right level. The distinction matters — come back to it when you reach the mechanism.</li>
+  </ul>
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     PART 2 — FIVE FAILURE MODES
+══════════════════════════════ -->
+
+<h2>Part 2 — What is missing in JEPA: five structural absences</h2>
+
+<p>
+  Now you move from neuroscience to the architecture. The transition sentence is critical —
+  it connects the biology to the engineering failure without feeling like a pivot.
+</p>
+
+<div class="script">
+  <div class="sc-label">Transition</div>
+  <p>
+    "JEPA — Joint Embedding Predictive Architecture — is the most promising world model family
+    we have. It predicts in latent space rather than pixel space, which means it doesn't waste
+    capacity trying to reconstruct every pixel of a video frame. It learns what matters: the
+    structure of the world. The encoder is good. The latent representations are meaningful.
+    But the predictor — the component that actually models what comes next — has no version
+    of that hippocampal-neocortical system. It is stateless. And that statelessness produces
+    five distinct failure modes, each with a different structural cause."
+  </p>
+</div>
+
+<!-- FAILURE 1 -->
+<div class="failure">
+  <div class="failure-header">
+    <div class="failure-num">FM — 01</div>
+    <h3>Autoregressive predictive compounding</h3>
+  </div>
+  <div class="failure-body">
+    <p>
+      The predictor takes a latent state \(z_t\) and produces \(\hat{z}_{t+1}\). In the next
+      step it consumes its own output and produces \(\hat{z}_{t+2}\). Each step introduces
+      a small error. The question is how that error grows.
+    </p>
+
+    <div class="anchor">
+      <div class="ak-label">What a Lipschitz constant actually is</div>
+      <p>
+        A Lipschitz constant \(L\) is a single number that bounds how much a function can
+        amplify a perturbation. Formally: \(\|f(x) - f(y)\| \leq L \cdot \|x - y\|\). In words —
+        if you nudge the input by some amount, the output cannot move by more than \(L\) times
+        that amount. It's the function's worst-case sensitivity to input error.
+      </p>
+      <p>
+        <strong>L &lt; 1:</strong> the function shrinks differences (a contraction).<br>
+        <strong>L = 1:</strong> the function preserves differences exactly.<br>
+        <strong>L &gt; 1:</strong> the function amplifies differences.
+      </p>
+      <p>
+        Every trained neural network has some Lipschitz constant — bounded by the product of
+        the spectral norms of its weight matrices across layers. For a realistic trained
+        predictor, this constant is slightly above 1. Write it as \(L = (1+\lambda)\), where
+        \(\lambda\) is small and positive.
+      </p>
+    </div>
+
+    <p>
+      If the predictor has Lipschitz constant \((1+\lambda)\), meaning every unit of input
+      error becomes at most \((1+\lambda)\) units of output error, then after \(N\) autoregressive
+      steps the accumulated error is bounded by \((1+\lambda)^N\). Not linear. Exponential.
+      A Lipschitz constant of 1.01 — a 1% amplification per step — produces a 2.7× error after
+      100 steps. After 1000 steps, it is 21,000× the original error.
+    </p>
+    <p>
+      Memory helps because it provides an anchor. If at each step the predictor is conditioned
+      on a landmark that represents what this scene actually looks like, the effective
+      \(\lambda\) — the local amplification — is smaller. The predictor is constrained toward
+      the correct regime by what it already knows about this place.
+    </p>
+    <div class="anchor">
+      <div class="ak-label">If asked: "why (1+λ)^N?"</div>
+      <p>Each step multiplies error by (1+λ). After N steps: (1+λ) × (1+λ) × ... = (1+λ)^N. It's compound interest on prediction error. The Lipschitz constant is the worst-case per-step amplification factor — it bounds how sensitive the function is to perturbations in its input.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAILURE 2 -->
+<div class="failure">
+  <div class="failure-header">
+    <div class="failure-num">FM — 02</div>
+    <h3>No write mechanism</h3>
+  </div>
+  <div class="failure-body">
+    <p>
+      The predictor observes every scene it passes through. But it has no mechanism to write
+      anything from those observations back into itself. It can read from weights. It cannot
+      update weights from experience at inference time.
+    </p>
+    <p>
+      This is not a training failure. The model trains fine. The problem is that the predictor
+      was designed to be frozen after training — a static function approximator. It can generalize
+      across scenes it was trained on, but it cannot adapt to a specific scene it is currently
+      experiencing and will experience again.
+    </p>
+    <p>
+      A robot that re-enters a warehouse it has visited a hundred times should have a predictor
+      that reflects those hundred visits. Instead, the predictor is identical to what it was
+      during pretraining. Every visit is treated the same as the first.
+    </p>
+    <div class="fumble">
+      <div class="fm-label">Fumble zone</div>
+      <p>"Can't you just fine-tune it?" — Full fine-tuning causes catastrophic forgetting. This is exactly why the LoRA solution is necessary. Have this answer ready: the write mechanism must be bounded and selective, not unrestricted. Full fine-tuning is an unbounded write mechanism and it destroys prior knowledge.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAILURE 3 -->
+<div class="failure">
+  <div class="failure-header">
+    <div class="failure-num">FM — 03</div>
+    <h3>Noise versus genuine change ambiguity</h3>
+  </div>
+  <div class="failure-body">
+    <p>
+      The predictor produces a prediction error \(\varepsilon_t = \|\hat{z}_t - z_t\|^2\)
+      at every step. When this error is large, two completely different things could have caused it:
+      a genuine scene change (a door opened, a light switched on, the robot entered a new room),
+      or noise (sensor jitter, lighting variation, a random artifact in the encoding).
+    </p>
+    <p>
+      From error magnitude alone, these are indistinguishable. They produce the same number.
+      A system that fires an update whenever \(\varepsilon_t\) is large will fire on noise events
+      as often as on genuine changes. That corrupts whatever memory it writes.
+    </p>
+    <p>
+      The correct signal is not the magnitude of the error but the <strong>geometry</strong> of
+      the errors. When a genuine scene is revisited repeatedly, the encoder produces similar
+      latent vectors — the scene is real and consistent. Those vectors cluster tightly.
+      Noise vectors are stochastic — they don't cluster. Same error magnitude, different geometry.
+    </p>
+    <div class="anchor">
+      <div class="ak-label">Lock this in — the core insight the whole gate depends on</div>
+      <ul>
+        <li>Genuine scene change: high ε<sub>t</sub>, <strong>tight cluster</strong> in latent space.</li>
+        <li>Noise event: high ε<sub>t</sub>, <strong>dispersed cluster</strong> in latent space.</li>
+        <li>Error magnitude cannot tell them apart. Cluster geometry can.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- FAILURE 4 -->
+<div class="failure">
+  <div class="failure-header">
+    <div class="failure-num">FM — 04</div>
+    <h3>Dynamic drift blindness</h3>
+  </div>
+  <div class="failure-body">
+    <p>
+      The environment is rarely static. Furniture moves. Lighting shifts over hours. Objects are
+      placed and removed. Each individual change may be small enough to produce a prediction error
+      below any reasonable threshold. The predictor never fires a memory update because no single
+      change was large enough to trigger one.
+    </p>
+    <p>
+      But the cumulative drift over weeks or months is significant. The predictor's model of the
+      environment becomes stale — it reflects what the environment looked like at training time,
+      not what it looks like now. And because no single change triggered an update, the predictor
+      has no record that the environment changed at all.
+    </p>
+    <p>
+      The adaptive threshold partially addresses this: \(\tau(t) = \mu_W + \alpha\sigma_W\) adapts
+      to the current noise baseline of the environment. If the environment has been gradually drifting,
+      the baseline shifts with it, and the threshold shifts accordingly. But the deeper fix is
+      landmark staleness detection — if the landmark for a scene consistently produces
+      worse-than-expected predictions, that landmark needs to be updated or replaced.
+    </p>
+  </div>
+</div>
+
+<!-- FAILURE 5 -->
+<div class="failure">
+  <div class="failure-header">
+    <div class="failure-num">FM — 05</div>
+    <h3>Return visit degradation</h3>
+  </div>
+  <div class="failure-body">
+    <p>
+      This is the failure that most directly proves the problem. A robot visits a room today.
+      It visits the same room tomorrow. The prediction error on the second visit is identical to
+      the prediction error on the first visit.
+    </p>
+    <p>
+      This should not be. The second visit should benefit from everything the predictor observed
+      during the first. The room's layout, its typical lighting, what objects tend to be where —
+      all of this is information the predictor had access to and retained exactly none of. The
+      predictor cannot improve with experience because it has no mechanism to retain experience
+      across episode boundaries.
+    </p>
+    <p>
+      This is the clearest measurable symptom of the statelessness problem, and it is what the
+      Return Visit Prediction Recovery metric directly captures: the delta between how well
+      the predictor performs on a return visit versus a first visit.
+    </p>
+    <div class="preempt">
+      <div class="pe-label">If they ask: "isn't this just a training distribution problem?"</div>
+      <ul>
+        <li>No. The encoder is fine — it produces meaningful latents for this room. The predictor can model the room within a session. The failure is specifically cross-episodic: when the session ends, everything resets. That is an architectural property of the predictor, not a training data gap.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     PART 3 — THE SOLUTION
+══════════════════════════════ -->
+
+<h2>Part 3 — How we fix it: deriving the mechanism</h2>
+
+<p>
+  Don't describe MAPA as a list of components. Derive it. Start from what you need, then show
+  that each component is the necessary answer to a specific constraint. Make the architecture
+  feel inevitable, not designed.
+</p>
+
+<div class="script">
+  <div class="sc-label">Transition</div>
+  <p>
+    "So what would the minimal sufficient mechanism look like? We need something that can
+    write scene knowledge into the predictor, distinguish genuine changes from noise, avoid
+    forgetting what was already there, and make that knowledge available at every inference step.
+    Those four requirements, taken in sequence, determine the architecture."
+  </p>
+</div>
+
+<!-- STEP 1 — BUFFER + THRESHOLD -->
+<div class="mech-step">
+  <h4>Step 1 — Filter by surprise, not by magnitude</h4>
+  <p>
+    First requirement: we need to know when something notable happened. We can't use raw prediction
+    error because noise and genuine change are indistinguishable at the magnitude level. So we
+    use an adaptive threshold:
+  </p>
+  <div class="math-block">
+    <p class="mb-note">Adaptive threshold — normalizes to the environment's own noise baseline</p>
+    \[\tau(t) = \mu_W + \alpha \cdot \sigma_W\]
+    <p class="mb-note">where \(W = 100\) is the rolling window, \(\alpha = 2.0\) is the sigma multiplier. Under Gaussian noise, 97.7% of errors fall below this line — the top 2.3% are candidates for memory.</p>
+  </div>
+  <p>
+    Anything that crosses \(\tau(t)\) is written to the episodic buffer as a 5-tuple:
+    \((z_t, a_t, z_{t+1}, \varepsilon_t, \text{episode\_id})\). The buffer holds up to 2048
+    entries and evicts the oldest when full.
+  </p>
+</div>
+
+<!-- STEP 2 — CLUSTERING -->
+<div class="mech-step">
+  <h4>Step 2 — Distinguish real change from noise via geometry</h4>
+  <p>
+    Crossing the threshold is necessary but not sufficient. The buffer now contains a mixture of
+    genuine scene changes and high-magnitude noise events. We need to separate them.
+  </p>
+  <p>
+    The key insight is tightness. When buffer entries for a scene cluster tightly in latent space,
+    that scene is real and consistent — the encoder produces similar vectors every time. Noise
+    vectors are stochastic; they don't cluster. So we run online clustering over the buffer and
+    compute tightness for each cluster:
+  </p>
+  <div class="math-block">
+    \[\text{tightness}(k) = \frac{1}{n_k}\sum_{i \in k}\|z_i - c_k\|^2\]
+    <p class="mb-note">Mean squared distance of cluster members from the centroid. <strong>Low tightness = tight cluster = real scene. High tightness = dispersed = noise.</strong></p>
+  </div>
+</div>
+
+<!-- STEP 3 — GATE -->
+<div class="mech-step">
+  <h4>Step 3 — Gate the consolidation on three conditions</h4>
+  <p>
+    The consolidation gate fires when a cluster satisfies all three:
+  </p>
+  <ul>
+    <li><strong>Support:</strong> enough observations have been assigned to it — it's not a singleton.</li>
+    <li><strong>Tightness:</strong> the cluster is geometrically tight — it's a real scene, not noise.</li>
+    <li><strong>Novelty:</strong> the cluster is sufficiently far from existing landmarks — it's genuinely new information, not a duplicate of something already consolidated.</li>
+  </ul>
+  <p>
+    All three must hold. Support alone can be satisfied by persistent noise. Tightness alone
+    can be satisfied by a consistent measurement artifact. Novelty alone can be satisfied by
+    any distant cluster. The conjunction is what makes the gate selective.
+  </p>
+  <div class="fumble">
+    <div class="fm-label">Fumble zone — tightness direction</div>
+    <p>Low tightness = tight cluster = gate fires. High tightness = dispersed = gate suppresses. Practice saying this both ways before the interview. It is counterintuitive and you will say it backwards under pressure.</p>
+  </div>
+</div>
+
+<!-- STEP 4 — LORA -->
+<div class="mech-step">
+  <h4>Step 4 — Update the predictor without forgetting — LoRA</h4>
+  <p>
+    When the gate fires, we need to write scene knowledge into the predictor. Full fine-tuning
+    catastrophically forgets — the gradient signal for the new scene overwrites weight configurations
+    for all previous scenes. So we freeze the base weights entirely and adapt only a low-rank delta:
+  </p>
+  <div class="math-block">
+    \[\Delta\theta = BA \quad \text{where } A \in \mathbb{R}^{r \times d_{\text{in}}},\ B \in \mathbb{R}^{d_{\text{out}} \times r},\ r = 8\]
+    <p class="mb-note">Base \(\theta\) never receives a gradient from scene data. Only \(\Delta\theta\) adapts. At rank 8 on a 192-dim model: \(2 \times 192 \times 8 = 3072\) parameters over 15M base weights — under 0.02% overhead.</p>
+  </div>
+</div>
+
+<!-- STEP 5 — LANDMARKS -->
+<div class="mech-step">
+  <h4>Step 5 — Write a permanent landmark for retrieval at inference</h4>
+  <p>
+    The gate also writes a landmark: a permanent, EMA-averaged centroid vector in latent space.
+  </p>
+  <div class="math-block">
+    \[c_k \leftarrow \beta \cdot c_k + (1-\beta) \cdot z_t \quad \beta = 0.95\]
+    <p class="mb-note">Each new assignment contributes 5% weight. Effective memory window: ~20 timesteps. This produces a stable, noise-smoothed geometric summary of what the scene looks like.</p>
+  </div>
+  <p>
+    At every inference step, we retrieve the nearest landmark by cosine similarity to the current
+    \(z_t\). That landmark is concatenated with \(z_t\) and fed into the predictor:
+  </p>
+  <div class="math-block">
+    \[\hat{z}_{t+1} = f_{\theta + \Delta\theta}(z_t,\ \hat{L}_k)\]
+    <p class="mb-note">The landmark is not a replacement for the current state. It is context that biases the prediction toward the right regime for this scene. The predictor knows where it is.</p>
+  </div>
+  <div class="anchor">
+    <div class="ak-label">The complete inference loop — seven steps in order</div>
+    <ul>
+      <li><strong>1.</strong> Encode: \(z_t = \varphi(s_t)\)</li>
+      <li><strong>2.</strong> Retrieve: \(\hat{L}_k = \arg\min_k (1 - \cos(z_t, c_k))\)</li>
+      <li><strong>3.</strong> Predict: \(\hat{z}_{t+1} = f_{\theta + \Delta\theta}(z_t, \hat{L}_k)\)</li>
+      <li><strong>4.</strong> Compute error: \(\varepsilon_t = \|\hat{z}_t - z_t\|^2\)</li>
+      <li><strong>5.</strong> Threshold check: if \(\varepsilon_t > \tau(t)\), write to buffer</li>
+      <li><strong>6.</strong> Cluster: assign to nearest cluster, update EMA centroid</li>
+      <li><strong>7.</strong> Gate: if support ≥ N<sub>min</sub> ∧ tightness ≤ σ²<sub>max</sub> ∧ novelty ≥ δ → LoRA update + landmark write</li>
+    </ul>
+  </div>
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     PART 4 — THE PROOF
+══════════════════════════════ -->
+
+<h2>Part 4 — The experiment that makes the claim undeniable</h2>
+
+<p>
+  The strongest objection to MAPA is: this is just LoRA fine-tuning with a clever buffer, and
+  any adaptive learning rate schedule does the same thing. You need to foreclose this before
+  it is raised. The matched-noise experiment is the tool.
+</p>
+
+<div class="script">
+  <div class="sc-label">What to say</div>
+  <p>
+    "The central alternative explanation a skeptic will reach for is that this is sophisticated
+    error-based fine-tuning with a hand-tuned threshold. The claim would be: the gate thresholds
+    were adjusted until the system worked, not derived from first principles, and an adaptive
+    learning rate baseline would perform identically if you tuned it as carefully."
+  </p>
+  <p>
+    "The matched-noise experiment is specifically designed to make that explanation impossible.
+    We engineer noise events that produce <em>identical prediction error magnitude</em> to genuine
+    scene transitions — calibrated, not approximately equal. Then we run both MAPA and an adaptive
+    learning rate baseline on environments containing both genuine changes and these calibrated
+    noise events."
+  </p>
+  <p>
+    "The adaptive-LR baseline cannot distinguish them. It fires on both. MAPA's consolidation
+    gate operates on cluster geometry. Genuine changes produce tight clusters. Engineered noise
+    produces dispersed clusters, because it's stochastic even when its magnitude is matched.
+    The gate correctly suppresses the noise while firing on genuine changes."
+  </p>
+  <p>
+    "If the gate can do this — at identical error magnitudes — the geometric mechanism is doing
+    something structurally different from error-based fine-tuning. That is a pass/fail test on
+    the core claim. If the gate cannot separate signal from noise at identical error scales,
+    the structural necessity of the gate is disproven. We don't get to adjust and rerun."
+  </p>
+</div>
+
+<div class="preempt">
+  <div class="pe-label">Questions this pre-empts</div>
+  <ul>
+    <li><strong>"What's your success criterion?"</strong> — Binary. Gate fires on tight clusters, suppresses dispersed ones, at identical ε<sub>t</sub>. The matched-noise experiment passes or fails. No threshold to debate.</li>
+    <li><strong>"Are your α and N<sub>min</sub> hand-tuned?"</strong> — α=2.0 is the 2-sigma rule, derived from Gaussian statistics. Under Gaussian noise, 97.7% of errors fall within μ ± 2σ. N<sub>min</sub> and σ²<sub>max</sub> are ablated in the component ablation study — if they're redundant, we say so.</li>
+    <li><strong>"What about real-world sensor noise with partial observability?"</strong> — MAPA is validated under controlled non-stationarity. Real-world generalization is an explicit open question and a stated future direction, not a current claim. The matched-noise experiment is the extent of the robustness claim.</li>
+  </ul>
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     METRICS
+══════════════════════════════ -->
+
+<h2>Part 5 — How we measure it</h2>
+
+<div class="fumble">
+  <div class="fm-label">You made both of these mistakes in the interview simulation — read before anything else</div>
+  <p>
+    <strong>Mistake 1 — You called it BMT, not BWT.</strong> There is no M. It is Backward Transfer.
+    BWT. Two letters. You said BMT twice under pressure. In a panel this signals you memorized the
+    concept but not the name. Lock in: <strong>BWT = Backward Transfer. FWT = Forward Transfer.</strong>
+  </p>
+  <p style="margin-top:10px;">
+    <strong>Mistake 2 — You said FWT should be greater than one, not greater than zero.</strong>
+    FWT is a raw error difference — stateless error minus MAPA error. Both are squared distances,
+    both positive. If MAPA's error is lower, the difference is positive, meaning greater than zero.
+    It is not a ratio. It does not need to cross one to mean anything.
+    Lock in: <strong>FWT &gt; 0 means positive transfer. The threshold is zero, not one.</strong>
+  </p>
+</div>
+
+<p>
+  Five metrics. Each one exists because one of the five failure modes needs its own measuring stick.
+  Two are definitionally grounded — the zero crossing is the definition, not a choice you make.
+  Three are experimentally determined — you don't pre-promise a number, you report what the
+  experiment produces and compare it against baselines.
+</p>
+
+<!-- BWT -->
+<h3>BWT — Backward Transfer: did we forget?</h3>
+
+<div class="anchor">
+  <div class="ak-label">One-sentence definition — say this the moment they ask</div>
+  <p><strong>BWT measures whether learning new things makes you worse at old things.</strong> If you visit five rooms in sequence and then go back to Room 1, are you predicting it worse than when you first learned it? That degradation is positive BWT — forgetting. No degradation is zero BWT. Actually getting better at Room 1 just by having visited rooms 2 through 5 is negative BWT — the best possible outcome.</p>
+</div>
+
+<p>
+  Here is the scenario. You have five scenes — five rooms the robot visits in sequence.
+  You visit Room 1, the predictor consolidates knowledge of it, it predicts well.
+  Then you visit Room 2, then 3, then 4, then 5. Now you go back and test the predictor on Room 1.
+</p>
+<p>
+  The question BWT asks is: <strong>are you still as good at Room 1 as you were right after
+  you first learned it?</strong> Or did learning Rooms 2 through 5 overwrite what you knew
+  about Room 1?
+</p>
+
+<div class="script">
+  <div class="sc-label">How to explain it out loud</div>
+  <p>
+    "BWT compares your prediction error on a scene right after you consolidated it, versus your
+    prediction error on that same scene at the very end, after you've visited everything else.
+    If the error went up — you got worse on the old scene — that's forgetting. BWT is positive.
+    If the error stayed the same or went down, BWT is zero or negative. That's the target.
+    Zero is the definitional boundary from the continual learning literature — it's not a bar
+    we chose, it's the line between forgetting and not forgetting."
+  </p>
+</div>
+
+<div class="math-block">
+  <p class="mb-note">BWT formula — the forgetting score</p>
+  \[\text{BWT} = \frac{1}{S-1}\sum_{i=1}^{S-1}\bigl(\varepsilon_{S,i} - \varepsilon_{i,i}\bigr)\]
+  <p class="mb-note">\(\varepsilon_{i,i}\) = error on scene \(i\) right after first learning it. \(\varepsilon_{S,i}\) = error on scene \(i\) after seeing all \(S\) scenes. The difference is how much you forgot. Averaged across all scenes except the last.</p>
+  <p class="mb-note"><strong>BWT ≤ 0:</strong> no forgetting. The LoRA adapter is working. <strong>BWT &gt; 0:</strong> the adapter overwrote old knowledge. The gate's novelty criterion needs tightening.</p>
+</div>
+
+<p>
+  Note that the stateless baseline has BWT ≈ 0 trivially — it never updates, so it never
+  forgets. That sounds good until you realize it also never learns anything. BWT alone doesn't
+  tell the full story. That's why you need FWT alongside it.
+</p>
+
+<!-- FWT -->
+<h3>FWT — Forward Transfer: does memory help?</h3>
+
+<div class="anchor">
+  <div class="ak-label">One-sentence definition — say this the moment they ask</div>
+  <p><strong>FWT measures whether remembering older things makes you better at new things.</strong> You've visited four rooms. Now you walk into Room 5 for the first time. Does having consolidated knowledge from those four rooms make you predict better in Room 5 than a system that has never seen any room? If yes — FWT is positive. Prior memory transferred forward and helped. If no — the memory is too scene-specific, it didn't generalize.</p>
+</div>
+
+<p>
+  Same five-room scenario. You've visited Rooms 1 through 4. Now you're about to walk into
+  Room 5 for the first time.
+</p>
+<p>
+  FWT asks: <strong>does having already visited four rooms make you better at Room 5
+  than a system that has never seen any room before?</strong> A stateless predictor walks into
+  Room 5 with zero prior knowledge. MAPA walks in having consolidated knowledge from four rooms.
+  If MAPA predicts better on that first visit to Room 5, the memory is generalizing. FWT is positive.
+  If MAPA is no better than the stateless baseline on a scene it has never visited, FWT is zero
+  or negative — the memory is too scene-specific to transfer.
+</p>
+
+<div class="script">
+  <div class="sc-label">How to explain it out loud</div>
+  <p>
+    "FWT compares MAPA's error on a new scene against what a stateless baseline would have gotten
+    on that same scene. The baseline has never seen any prior scenes — it's starting fresh.
+    MAPA has already consolidated knowledge from the scenes it visited before. If MAPA does better,
+    the prior knowledge transferred. That's the actual test of whether the memory is learning
+    generalizable structure or just memorizing specific scenes. If you visited ten offices and
+    the eleventh office immediately benefits from that — FWT is positive. If each office feels
+    like a first visit despite all the prior offices — FWT is near zero, and the memory is too
+    specific to be useful."
+  </p>
+</div>
+
+<div class="math-block">
+  <p class="mb-note">FWT formula — the transfer score</p>
+  \[\text{FWT} = \frac{1}{S-1}\sum_{i=2}^{S}\bigl(\varepsilon_{\text{stateless},i} - \varepsilon_{i-1,i}\bigr)\]
+  <p class="mb-note">\(\varepsilon_{\text{stateless},i}\) = error a fresh stateless LeWM would have on scene \(i\). \(\varepsilon_{i-1,i}\) = MAPA's error on scene \(i\) after visiting scenes 1 through \(i-1\). Positive difference means MAPA was better. Averaged across all scenes except the first.</p>
+  <p class="mb-note"><strong>FWT &gt; 0:</strong> memory transfers. Landmarks are encoding generalizable structure. <strong>FWT ≤ 0:</strong> memory is not transferring — too scene-specific, or not consolidating anything useful.</p>
+</div>
+
+<div class="anchor">
+  <div class="ak-label">BWT and FWT together tell the complete story</div>
+  <ul>
+    <li>Stateless baseline: BWT ≈ 0 (never forgets), FWT ≈ 0 (never learns). Good stability, zero plasticity.</li>
+    <li>Full fine-tuning: FWT potentially high (learns fast), BWT positive (forgets old scenes badly). High plasticity, terrible stability.</li>
+    <li>MAPA target: BWT ≤ 0 (gate prevents forgetting), FWT &gt; 0 (landmarks transfer). Both.</li>
+  </ul>
+</div>
+
+<!-- RVPR -->
+<h3>RVPR — Return Visit Prediction Recovery: the practical headline</h3>
+
+<p>
+  BWT and FWT are rigorous but abstract. RVPR is what a practitioner actually cares about.
+  The question is simply: <strong>does the robot predict better in Room X the second time it
+  visits than the first? And the third time than the second?</strong>
+</p>
+
+<div class="script">
+  <div class="sc-label">How to explain it out loud</div>
+  <p>
+    "RVPR is the ratio of prediction error on the N-th visit to a scene, divided by prediction
+    error on the first visit. If RVPR drops below 1.0 by the third visit, the predictor is
+    genuinely improving with experience. If RVPR stays at 1.0 forever, the robot treats every
+    visit to the same room as if it's a first visit — memory is doing nothing. BWT is the
+    mathematical decomposition of forgetting. RVPR is the intuitive face of the same thing.
+    It's the headline figure in the paper because it's the one you can explain to anyone."
+  </p>
+</div>
+
+<div class="math-block">
+  \[\text{RVPR}_N = \frac{\varepsilon_{\text{visit }N}}{\varepsilon_{\text{visit }1}}\]
+  <p class="mb-note">Prediction error on the N-th visit, normalized to the first visit. Target: below 1.0 by visit 3, declining. Stateless predictor: stays at ~1.0 forever, because nothing carries over.</p>
+</div>
+
+<!-- GSS -->
+<h3>GSS — Gate Selectivity Score: does the gate actually work?</h3>
+
+<p>
+  This is the gate's report card, specifically on the matched-noise experiment. You've engineered
+  noise events that produce identical prediction error to genuine scene changes. The gate has to
+  tell them apart using only cluster geometry. GSS measures how well it does.
+</p>
+
+<div class="script">
+  <div class="sc-label">How to explain it out loud</div>
+  <p>
+    "GSS is precision times recall on the gate, measured specifically in the matched-noise experiment.
+    Precision: of all the times the gate fired, what fraction were genuine scene changes and not
+    engineered noise? Recall: of all the genuine scene changes that happened, what fraction did the
+    gate actually catch? You want both high. A gate that fires on everything has perfect recall
+    but terrible precision — it's useless. A gate that almost never fires has perfect precision
+    but terrible recall — it misses most real events. GSS is the product, which penalizes both
+    failure modes. If GSS is near random on the matched-noise experiment, the geometric mechanism
+    is not working. That's the single metric that most directly tests the central claim of the
+    whole architecture."
+  </p>
+</div>
+
+<div class="math-block">
+  \[\text{GSS} = \text{Precision}_{\text{gate}} \times \text{Recall}_{\text{gate}}\]
+  <p class="mb-note">Measured on matched-noise environments where ε<sub>t</sub> is identical for genuine changes and engineered noise. The gate must separate them on cluster geometry alone. This is pass/fail on the core claim — not a number to optimize, a binary on whether the mechanism works.</p>
+</div>
+
+<!-- SP-score -->
+<h3>SP-score — Stability-Plasticity: the summary number</h3>
+
+<p>
+  The fundamental tension in any memory system: a system that never updates is perfectly stable
+  (it never forgets) but completely rigid (it never learns anything new). A system that always
+  updates is maximally plastic (it learns everything immediately) but unstable (it forgets
+  everything it previously knew). This is the stability-plasticity dilemma.
+</p>
+<p>
+  SP-score captures both in a single number using the harmonic mean — which specifically
+  punishes systems that are great at one property while sacrificing the other.
+</p>
+
+<div class="script">
+  <div class="sc-label">How to explain it out loud</div>
+  <p>
+    "The stateless baseline has a perfect stability score — it never forgets because it never
+    updates. But its plasticity score is zero because it never learns anything new either.
+    Full fine-tuning has high plasticity but terrible stability — it learns the new scene and
+    forgets every scene before it. MAPA should score higher than both because it has both:
+    the gate prevents forgetting while the LoRA update enables learning. SP-score is the harmonic
+    mean of stability and plasticity — it's the same formula as F1 score in classification, which
+    means a system that sacrifices either property completely gets a low overall score even if
+    the arithmetic average looks okay."
+  </p>
+</div>
+
+<div class="math-block">
+  \[\text{SP-score} = \frac{2 \times \text{Stability} \times \text{Plasticity}}{\text{Stability} + \text{Plasticity}}\]
+  <p class="mb-note">Stability = (1 − normalized BWT loss). Plasticity = (1 − normalized FWT loss). Each normalized to [0,1] across all baselines. Harmonic mean: being terrible at one property tanks the whole score even if the other is great. MAPA's target: higher SP-score than both the stateless baseline and full fine-tuning.</p>
+</div>
+
+<h3>The metrics you do not use — and why</h3>
+
+<p>
+  If they ask why you're not using FVD, SSIM, or PSNR, the answer is two sentences:
+  MAPA operates entirely in latent space and produces no pixels, so pixel-space metrics
+  are inapplicable. And research in 2025 found that pixel-prediction quality metrics are
+  largely orthogonal to whether the representations encode the dynamics that matter for planning —
+  high FVD score does not predict whether the world model is actually useful.
+</p>
+
+<div class="fumble">
+  <div class="fm-label">Never say a specific percentage target without a derivation</div>
+  <p>If asked "what's your target for gate selectivity?", say: "GSS is measured on the matched-noise experiment. We don't pre-specify a number — we report what the experiment produces and whether the gate separates signal from noise at identical error magnitudes. That's pass/fail on the mechanism, not a number to optimize." Claiming 85% before running the experiment is claiming a result.</p>
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     COLD QUESTIONS
+══════════════════════════════ -->
+
+<h2>Cold questions — 30-second answers, no thinking</h2>
+
+<p>
+  These arrive without warning. You need each one locked in well enough to answer mid-sentence
+  without reconstructing anything from scratch.
+</p>
+
+<div class="flash-grid">
+
+  <div class="flash-card">
+    <div class="flash-q">What is ε<sub>t</sub> exactly — be precise about what ẑ<sub>t</sub> is</div>
+    <div class="flash-a">
+      ε<sub>t</sub> = ‖ẑ<sub>t</sub> − z<sub>t</sub>‖². ẑ<sub>t</sub> is the prediction <em>made at timestep t−1</em> for what the latent at t would be. z<sub>t</sub> is the actual encoding φ(s<sub>t</sub>) at timestep t. So ε<sub>t</sub> is the error of yesterday's prediction, evaluated against today's observation. It is never the distance between two encodings of the same frame.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Tightness — which direction means real change and which means noise?</div>
+    <div class="flash-a">
+      <strong>Low tightness = tight cluster = real scene change = gate fires.</strong> High tightness = dispersed cluster = noise = gate suppresses. Tightness measures the spread of cluster members — low spread means the observations are consistently similar to each other, which is what a real scene produces. Noise scatters.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Why LoRA instead of full fine-tuning?</div>
+    <div class="flash-a">
+      Full fine-tuning catastrophically forgets. The gradient signal for the new scene propagates through all weights, overwriting configurations that encode prior scenes. LoRA keeps base θ completely frozen — it never receives a gradient from scene data. Only Δθ = BA adapts, at rank 8. Everything in θ is untouched. That is the forgetting guarantee.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Where does sub-1% overhead come from? Derive it.</div>
+    <div class="flash-a">
+      LoRA at rank 8 on a 192-dim model adds A ∈ ℝ<sup>8×192</sup> and B ∈ ℝ<sup>192×8</sup> per adapted layer. That is 2 × 192 × 8 = 3,072 parameters per layer. LeWM has 15M parameters. Even adapting all attention projection layers, the ratio stays well under 0.1%. Sub-1% is conservative by roughly an order of magnitude.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">What does a landmark do at inference — precisely?</div>
+    <div class="flash-a">
+      We retrieve the nearest landmark L̂<sub>k</sub> by cosine similarity to z<sub>t</sub>. It is concatenated with z<sub>t</sub> and fed into the predictor: ẑ<sub>t+1</sub> = f<sub>θ+Δθ</sub>(z<sub>t</sub>, L̂<sub>k</sub>). The landmark does not replace the current state — it is a context vector that biases the prediction toward the correct regime for this known scene. It reduces the effective Lipschitz amplification locally by constraining where the predictor's output can go.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">BWT ≥ 0: why is that the threshold? Where does it come from?</div>
+    <div class="flash-a">
+      Zero is the definitional boundary, not a chosen target. BWT = 0 means the predictor on scene i after all subsequent training is exactly as good as right after it learned scene i — no forgetting, no improvement. BWT < 0 means the predictor got worse on old scenes. The definition and the zero-crossing come from Lopez-Paz and Ranzato's 2017 GEM paper. We measure where we land.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Why does MAPA need SIGReg on the encoder?</div>
+    <div class="flash-a">
+      The consolidation gate retrieves landmarks by cosine similarity. Cosine similarity is only a reliable semantic proxy when the latent space is isotropic — equal variance in all directions. Without isotropy, some dimensions dominate cosine computation regardless of semantic content. SIGReg regularizes the encoder toward an isotropic Gaussian, making cosine similarity meaningful. Without it, landmark retrieval is unreliable and the clustering geometry is corrupted.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">What does the stop-gradient do in LeWM's training objective?</div>
+    <div class="flash-a">
+      The loss is ‖f<sub>θ</sub>(z<sub>t</sub>) − sg[φ(s<sub>t+1</sub>)]‖². The stop-gradient detaches φ(s<sub>t+1</sub>) from the computation graph — the encoder receives no gradient through the target side. The only path for gradients to reach the encoder is through z<sub>t</sub>. This asymmetry prevents representational collapse: without it, the trivial solution — map everything to the same constant — minimizes the loss while learning nothing.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">How is MAPA different from PAM?</div>
+    <div class="flash-a">
+      PAM is a retrieval destination — memory is read at inference to construct the prediction. MAPA is a signal source — the buffer feeds the gate, the gate decides whether to update the predictor and write a landmark. The buffer is never read directly at inference. What is read is the landmark, which is the output of the gate after consolidation. PAM: read from memory. MAPA: update the predictor based on what memory tells you has changed.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Why not just extend context or add recurrence to LeWM?</div>
+    <div class="flash-a">
+      Context extension keeps more history within a session but still resets at every episode boundary — it doesn't cross episodes. Adding recurrence changes LeWM's training objective: it's no longer the same model, and you lose the pretraining. MAPA wraps the existing predictor without modifying the base architecture or retraining. It operates on top of what LeWM already learned, adding cross-episode memory without touching the model it applies to.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">Why LeWM at 15M parameters and not V-JEPA 2 at 1.2B?</div>
+    <div class="flash-a">
+      <p>Two reasons, and the second one is more important than the first.</p>
+      <p>The obvious reason: LeWM runs on a single consumer GPU, which makes the research accessible to groups like Lossfunk and academic robotics labs without frontier-lab compute. That matters for adoption.</p>
+      <p>The more important reason: <strong>it's about whether you can isolate what MAPA is actually contributing.</strong> If you test MAPA on V-JEPA 2's 1.2B parameters, any improvement in long-horizon prediction could be explained by the model's inherent scale — a 1.2B parameter predictor has far more capacity to handle non-stationarity just by being bigger. You cannot cleanly attribute the improvement to the memory mechanism versus to the model's raw capability.</p>
+      <p>With LeWM at 15M parameters, the baseline failure is clear and unambiguous — the model provably cannot handle long-horizon prediction without memory. So when MAPA improves it, that improvement is attributable to the memory mechanism, not to scale. The 15M constraint is what makes the causal claim clean.</p>
+      <p>V-JEPA 2 is the right destination for the model-agnostic demonstration once the mechanism is validated on LeWM. But you validate the mechanism where the signal is unconfounded, then show it generalizes to the larger model.</p>
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">What breaks first if SIGReg's metric preservation is imperfect?</div>
+    <div class="flash-a">
+      Retrieval quality degrades first. If the latent space is anisotropic, cosine similarity no longer reliably identifies the semantically nearest landmark — you retrieve a geometrically close vector that doesn't correspond to the correct scene. The gate itself is more robust because it uses Euclidean tightness in the buffer, not cosine similarity. So the architecture degrades gracefully: imperfect SIGReg means weaker landmark conditioning, not actively wrong updates. Forgetting protection remains intact because LoRA still constrains what the write mechanism can touch.
+    </div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-q">What would you cut if you had to deliver a minimal version in one month?</div>
+    <div class="flash-a">
+      Cut LoRA, keep landmarks. Landmark retrieval conditions the predictor on known-scene context without any weight update — zero forgetting risk, zero training overhead. The gate still fires, landmarks still get written, inference still retrieves and conditions. What you lose is the update to the predictor's weights that makes it genuinely better on return visits. You get scene-conditioned prediction without cross-episode learning. It's weaker but it's honest and shippable.
+    </div>
+  </div>
+
+</div>
+
+<hr />
+
+<!-- ══════════════════════════════
+     OFF-SCRIPT HANDLING
+══════════════════════════════ -->
+
+<h2>When it goes off-script</h2>
+
+<h3>If they say: "write the architecture on the whiteboard"</h3>
+<p>
+  Write the 7-step inference loop in a column. Then draw a bracket around steps 1–4 and label it
+  <em>fast timescale</em>. Draw a bracket around steps 5–7 and label it <em>slow timescale</em>.
+  Label the slow timescale's inputs: buffer, cluster geometry, gate conditions. Label its outputs:
+  LoRA update, landmark write. That is the entire architecture readable in 90 seconds.
+</p>
+
+<h3>If they ask about the biological grounding</h3>
+<p>
+  "The architecture operationalizes Complementary Learning Systems theory directly. The episodic buffer
+  is the hippocampus — fast, temporary binding of individual events. The landmark centroids in permanent
+  memory are the neocortex — slow, stable, generalized representations. The gate is the consolidation
+  mechanism that decides what transfers from episodic to semantic memory. The difference from the
+  biological system is that in MAPA, every stage of this process is a measurable, observable parameter.
+  We can track exactly when the gate fires, what gets consolidated, and whether it produces better
+  predictions. The biology is not a metaphor here — it is the design specification."
+</p>
+
+<h3>If they ask whether this generalizes beyond LeWM</h3>
+<p>
+  "MAPA has one constraint on the backbone it wraps: the latent space must be approximately
+  metric-preserving so that cosine similarity is a reliable semantic proxy. Any JEPA predictor
+  that satisfies this — through SIGReg or equivalent regularization — is a valid backbone.
+  LeWM is the demonstration platform because it is accessible, single-GPU, and well-understood.
+  The architecture is not LeWM-specific."
+</p>
+
+<h3>If they ask about something you genuinely don't know</h3>
+<p>
+  Say exactly this: <em>"I haven't worked through that — my best guess from the architecture is X,
+  but I'd want to verify before claiming it."</em> That answer is more credible than a confident
+  wrong answer in every interview, every time. The interviewer is not trying to catch you out.
+  They are checking whether you own what you built or memorized it.
+</p>
+
+<hr />
+
+<!-- ══════════════════════════════
+     CLAIMS TABLE
+══════════════════════════════ -->
+
+<h2>Every claim and its source</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Claim</th>
+      <th>Source / Derivation</th>
+      <th>What to say if challenged</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BWT ≥ 0</td>
+      <td>Lopez-Paz &amp; Ranzato, 2017</td>
+      <td>"Zero is the definitional forgetting boundary. Not our target — the definition."</td>
+    </tr>
+    <tr>
+      <td>FWT &gt; 0</td>
+      <td>Same paper</td>
+      <td>"Definitional boundary for positive transfer."</td>
+    </tr>
+    <tr>
+      <td>α = 2.0 → ~2.3% fire rate</td>
+      <td>2-sigma Gaussian rule</td>
+      <td>"97.7% of Gaussian noise falls within μ ± 2σ. Standard sigma convention."</td>
+    </tr>
+    <tr>
+      <td>Sub-1% overhead</td>
+      <td>2 × 192 × 8 = 3072 / 15M</td>
+      <td>"Do the math. Two LoRA matrices at rank 8 on a 192-dim model."</td>
+    </tr>
+    <tr>
+      <td>Gate fires on tight clusters</td>
+      <td>Validated by matched-noise experiment</td>
+      <td>"This is exactly what the matched-noise experiment tests. Pass/fail."</td>
+    </tr>
+    <tr>
+      <td>β = 0.95 → ~20 step window</td>
+      <td>Geometric series: 1/(1−β) = 20</td>
+      <td>"Standard EMA effective window calculation."</td>
+    </tr>
+    <tr>
+      <td>RVPR and GSS targets</td>
+      <td>No pre-specified target</td>
+      <td>"Experimentally determined. We compare against baseline, not against a pre-promised number."</td>
+    </tr>
+    <tr>
+      <td>Isotropy needed for cosine</td>
+      <td>Property of cosine similarity</td>
+      <td>"Cosine measures angular distance. Anisotropic spaces corrupt the angular geometry — dimensional dominance, not semantic similarity."</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<footer>MAPA Interview Reference &nbsp;·&nbsp; Priyam Ghosh &nbsp;·&nbsp; July 2026</footer>
+
+</div>
+</body>
+</html>

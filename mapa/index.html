@@ -98,19 +98,33 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 .verdict strong { color: #14532d; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; }
 .warn-box { background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-size: 14.5px; color: #854d0e; }
 .warn-box strong { color: #713f12; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.bd-index { border: 1px solid #e8e8e8; border-radius: 10px; padding: 8px 0; margin: 28px 0 40px; }
+.bd-index a {
+  display: block; padding: 12px 20px; text-decoration: none; color: #333;
+  font-size: 14.5px; border-bottom: 1px solid #f0f0f0; line-height: 1.5;
+  transition: background 0.12s;
+}
+.bd-index a:last-child { border-bottom: none; }
+.bd-index a:hover { background: #fafafa; color: #111; }
+.bd-index .idx-num { color: #aaa; font-weight: 700; margin-right: 10px; font-size: 13px; min-width: 22px; display: inline-block; }
 </style>
 <script>
+function isBreakdownsView(view) {
+  return view === 'breakdowns' || view === 'glossary' || /^bd-\d+$/.test(view);
+}
+
 function render(view) {
-  var onBreakdowns = view === 'breakdowns' || view === 'glossary';
+  var onBreakdowns = isBreakdownsView(view);
   document.getElementById('main-page').style.display = onBreakdowns ? 'none' : '';
   document.getElementById('breakdowns-page').style.display = onBreakdowns ? '' : 'none';
   document.getElementById('nav-main').className = view === 'main' ? 'active' : '';
-  document.getElementById('nav-breakdowns').className = view === 'breakdowns' ? 'active' : '';
+  document.getElementById('nav-breakdowns').className = onBreakdowns ? 'active' : '';
   document.getElementById('nav-glossary').className = view === 'glossary' ? 'active' : '';
   if (window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});
-  if (view === 'glossary') {
+  if (view === 'glossary' || /^bd-\d+$/.test(view)) {
     setTimeout(function() {
-      var el = document.getElementById('glossary');
+      var el = document.getElementById(view);
       if (el) el.scrollIntoView({behavior:'smooth'});
     }, 30);
   } else {
@@ -130,10 +144,17 @@ window.addEventListener('popstate', function() {
   render(location.hash.replace('#', '') || 'main');
 });
 
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
   var h = location.hash.replace('#', '');
   if (h) render(h);
-}());
+
+  document.querySelectorAll('.bd-index a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var target = a.getAttribute('href').replace('#', '');
+      history.pushState({view: target}, '', '#' + target);
+    });
+  });
+});
 </script>
 </head>
 <body>
@@ -141,6 +162,7 @@ window.addEventListener('popstate', function() {
   <a id="nav-main" class="active" onclick="showPage('main')">Main</a>
   <a id="nav-breakdowns" onclick="showPage('breakdowns')">Breakdowns</a>
   <a id="nav-glossary" onclick="showGlossary()">Glossary</a>
+  <a href="/mapa/interview/">Interview</a>
 </nav>
 
 <div class="page">
@@ -1430,11 +1452,29 @@ window.addEventListener('popstate', function() {
 </div>
 
 <p>
-  Eleven questions that go below the surface of the MAPA architecture. Each answer traces the
+  Fourteen questions that go below the surface of the MAPA architecture. Each answer traces the
   reasoning from first principles, compares alternatives, states the mathematical grounding, and
   names where the claim could fail. These are not summaries of the main piece — they are the
   working that justifies it.
 </p>
+
+<div class="bd-index">
+  <a href="#bd-1"><span class="idx-num">01</span>How is \(z_t\) produced, and where does \(\hat{z}_t\) come from?</a>
+  <a href="#bd-2"><span class="idx-num">02</span>What is the landmark set actually doing — and how is it different from HWM subgoals?</a>
+  <a href="#bd-3"><span class="idx-num">03</span>How are \(z_t\) and \(\hat{z}_t\) compared — the math, the justification, and what SIGReg actually does</a>
+  <a href="#bd-4"><span class="idx-num">04</span>The adaptive threshold — mechanism, cold start, adaptivity, and validation</a>
+  <a href="#bd-5"><span class="idx-num">05</span>The episodic buffer — write mechanism, storage format, and cross-episode communication</a>
+  <a href="#bd-6"><span class="idx-num">06</span>Online streaming K-means — why K-means, why not better alternatives, the geometry, and the math</a>
+  <a href="#bd-7"><span class="idx-num">07</span>The consolidation gate — where the three criteria come from, their real-world validity</a>
+  <a href="#bd-8"><span class="idx-num">08</span>LoRA adapters — why LoRA and not EWC, GEM, replay, or other continual learning methods</a>
+  <a href="#bd-9"><span class="idx-num">09</span>The permanent landmark set — storage format, real implementation, and cross-episode persistence</a>
+  <a href="#bd-10"><span class="idx-num">10</span>Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</a>
+  <a href="#bd-11"><span class="idx-num">11</span>The 6-month plan — reality-based, month by month</a>
+  <a href="#bd-12"><span class="idx-num">12</span>Why does LeWM use a plain ViT encoder and not a SIGReg-based one like LeJEPA?</a>
+  <a href="#bd-13"><span class="idx-num">13</span>Future optimizations — what changes after the 6-month baseline</a>
+  <a href="#bd-14"><span class="idx-num">14</span>Claims, sources, and mathematical grounding — what is proven, what is precedent, and what is hypothesis</a>
+  <a href="#glossary"><span class="idx-num">—</span>Glossary</a>
+</div>
 
 <hr />
 
@@ -3293,6 +3333,167 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 <div class="verdict">
   <strong>Takeaway</strong>
   The two most important fixes — running support counter and cluster-aware eviction — should go into the Month 2 implementation, not be deferred. They address correctness issues in cross-episode evidence accumulation, not just performance improvements. Everything else is a Month 4+ optimization once the baseline is proven to work.
+</div>
+</div>
+
+<hr />
+
+<!-- ── Q14 ─────────────────────────────────────────────── -->
+<div class="bd-section" id="bd-14">
+<h2>14. Claims, sources, and mathematical grounding — what is proven, what is precedent, and what is hypothesis</h2>
+
+<p>
+  Every non-trivial claim in this document falls into exactly one of three categories: a mathematical
+  fact that follows from definitions, an empirical principle already established in adjacent literature
+  and applied here to a new domain, or a hypothesis specific to MAPA that has not yet been tested.
+  Conflating these categories is the single easiest way to lose credibility in front of a panel. This
+  section separates them explicitly, maps each claim to its formal statement, and cites the literature
+  that grounds it — with links to read the primary sources directly.
+</p>
+
+<h3>Claim 1 — Autoregressive error compounds as \((1+\lambda)^N\)</h3>
+<p><strong>Category: mathematical fact, follows directly from the definition of a Lipschitz constant.</strong></p>
+<div class="math-block">
+  <p>Definition: \(f\) is \(L\)-Lipschitz if \(\|f(x) - f(y)\| \leq L\|x-y\|\) for all \(x, y\).</p>
+  \[\varepsilon_0 = \|\hat{z}_0 - z_0\| \quad\Longrightarrow\quad \varepsilon_k \leq L^k \cdot \varepsilon_0 = (1+\lambda)^k \varepsilon_0\]
+  <p>Proof by induction: \(\varepsilon_{k+1} = \|f(\hat{z}_k) - f(z_k)\| \leq L\|\hat{z}_k - z_k\| = L\varepsilon_k\). Apply \(k\) times.</p>
+</div>
+<p>
+  This requires no citation beyond the definition of Lipschitz continuity itself — a standard object
+  in real analysis, formalized by Rudolf Lipschitz in the 1860s. What is <em>not</em> a mathematical
+  fact is the specific value of \(\lambda\) for a trained predictor — that is an empirical property,
+  measured from the rollout curve, not derived.
+</p>
+<div class="verdict">
+  <strong>Status</strong>
+  Proven, unconditionally, given that \(f_\theta\) has some finite Lipschitz constant — which any
+  network with bounded weights and Lipschitz activations (ReLU, GELU) always has. The only open
+  question is the numerical value of \(\lambda\), not whether the exponential form holds.
+</div>
+
+<h3>Claim 2 — Metric-preserving encoders make cosine similarity a valid semantic proxy</h3>
+<p><strong>Category: mathematical fact, conditional on an empirical premise (approximate isometry).</strong></p>
+<div class="math-block">
+  <p>If \(\varphi\) is \(c\)-isometric — \(c^{-1}\|x-y\|_{\text{obs}} \leq \|\varphi(x)-\varphi(y)\|_{\text{lat}} \leq c\|x-y\|_{\text{obs}}\) — then latent distance is sandwiched by observation distance up to a bounded factor \(c\).</p>
+  \[\cos(\varphi(x), \varphi(y)) \to 1 \iff \|x - y\|_{\text{obs}} \to 0 \quad \text{(as } c \to 1\text{)}\]
+</div>
+<p>
+  The implication itself is a straightforward consequence of the sandwich bound. What SIGReg
+  provides is the empirical premise: a training-time regularizer that pushes \(\varphi\) toward
+  approximate isometry by penalizing mismatch between latent and observation distances. This is
+  the mechanism introduced in the LeJEPA / SIGReg line of work.
+</p>
+<div class="verdict">
+  <strong>Status</strong>
+  The logical implication is proven. The premise (SIGReg achieves approximate isometry in practice)
+  is empirically supported by the original SIGReg training curves, but the degree of isometry achieved
+  for any specific trained encoder is a measured quantity, not a guarantee.
+</div>
+
+<h3>Claim 3 — Tight clusters indicate structural repetition; dispersed clusters indicate unstructured noise</h3>
+<p><strong>Category: established empirical principle from a different field, applied here to a new domain.</strong></p>
+<p>
+  This is the core discriminator behind the consolidation gate's tightness criterion, and it did not
+  originate with MAPA. It is the foundational assumption of an entire subfield of unsupervised anomaly
+  detection, formalized two decades before this proposal:
+</p>
+<div class="math-block">
+  \[\text{tightness}(k) = \frac{1}{n_k}\sum_{i \in k} \|z_i - c_k\|^2\]
+  <p>He, Xu &amp; Deng's Cluster-Based Local Outlier Factor (CBLOF, 2002) formalizes the same discriminator: normal data belongs to large, dense clusters; outliers belong to small, sparse clusters, or to none at all. MAPA's tightness criterion is this principle applied to JEPA latent space with EMA-updated online centroids in place of CBLOF's batch clustering.</p>
+</div>
+<p>
+  Independent confirmation of the same pattern in a different generative model: <a href="https://arxiv.org/pdf/2309.09676" target="_blank">Conditioning Latent-Space Clusters for Real-World Anomaly Classification</a>
+  (arXiv 2309.09676) demonstrates that conditioning a VAE's latent space produces exactly this separation —
+  normal samples cluster tightly, anomalous samples disperse — and that k-means-style clustering on
+  the resulting space performs the anomaly detection directly. This is the same mechanism, in a VAE
+  rather than a JEPA predictor.
+</p>
+<div class="verdict">
+  <strong>Status</strong>
+  The general principle is established, empirically validated, and roughly 20 years old in the anomaly
+  detection literature. What is <em>not</em> established is whether this specific discriminator holds
+  for JEPA world model prediction errors at matched error magnitude — that is MAPA's actual novel
+  claim, and it remains untested until the matched-noise experiment runs.
+</div>
+
+<h3>Claim 4 — Surprise (prediction error) is a valid signal for selective memory formation</h3>
+<p><strong>Category: established empirical principle, with a directly adjacent recent implementation.</strong></p>
+<p>
+  <a href="https://arxiv.org/pdf/2606.03787" target="_blank">Worth Remembering: Surprise-Gated Robot Episodic Memory</a>
+  (arXiv 2606.03787, Gorlo, Wise, Speranzon &amp; Carlone, MIT + Lockheed Martin) computes Bayesian
+  surprise directly in V-JEPA-2's latent space to gate what enters a robot's episodic memory, and
+  shows a 12%+ improvement over prior robot memory methods on temporal, spatial, and binary QA
+  benchmarks.
+</p>
+<div class="math-block">
+  <p>Their gate: Bayesian surprise \(S(z_t) = D_{\text{KL}}(P(\cdot \mid z_{1:t}) \,\|\, P(\cdot \mid z_{1:t-1}))\) — a magnitude-based, probabilistic surprise signal.</p>
+  <p>MAPA's gate: \(\varepsilon_t = \|\hat{z}_t - z_t\|^2\) crossing an adaptive threshold \(\tau(t)\) — also magnitude-based at the filtering stage, but the consolidation decision downstream uses cluster geometry, not magnitude, as the second-stage discriminator.</p>
+</div>
+<p>
+  The overlap: both use a JEPA-family latent space, both use a surprise-style signal to decide what's
+  worth remembering. The distinction that must be explicit: their contribution is the surprise signal
+  itself deciding memory formation. MAPA's contribution is a second-stage geometric filter that
+  operates <em>after</em> a similar magnitude-based trigger, specifically to solve the noise/signal
+  ambiguity their approach does not address (their surprise score, like error magnitude, cannot by
+  itself distinguish a structured change from noise of equal surprise).
+</p>
+<div class="verdict">
+  <strong>Status</strong>
+  Surprise-gated memory in JEPA latent space is established and published, six months before this
+  proposal. MAPA must be positioned explicitly as an extension — geometric consolidation on top of
+  surprise-gated filtering — not as introducing the base idea of surprise gating itself.
+</div>
+
+<h3>Claim 5 — Gradual drift is invisible to instantaneous thresholding (Failure Mode 4)</h3>
+<p><strong>Category: established, formalized, and named in directly adjacent literature.</strong></p>
+<p>
+  <a href="https://arxiv.org/pdf/2603.08455" target="_blank">The Boiling Frog Threshold: Criticality and Blindness in World Model-Based Anomaly Detection Under Gradual Drift</a>
+  (arXiv 2603.08455) formalizes exactly this failure mode for world model anomaly detection: systems
+  using instantaneous thresholds become blind to slowly accumulating drift that individually never
+  crosses the threshold, but which crosses a critical boundary in aggregate.
+</p>
+<div class="math-block">
+  \[\sum_{i=1}^{N} \delta_i < \tau \;\;\forall i, \quad\text{but}\quad \sum_{i=1}^{N}\delta_i \gg \tau\]
+  <p>Each individual drift increment \(\delta_i\) stays under threshold, so no single step ever triggers detection — yet the cumulative drift eventually represents a completely different environment than the one originally consolidated.</p>
+</div>
+<div class="verdict">
+  <strong>Status</strong>
+  This failure mode is independently named and formalized in prior work, published before this
+  proposal. Cite it directly rather than presenting FM-04 as an original observation — doing so
+  strengthens the proposal by showing awareness of the field rather than reinventing a known problem.
+</div>
+
+<h3>Summary table — every claim, its category, and its citation</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Claim</th><th>Category</th><th>Grounding</th><th>What remains open</th></tr></thead>
+    <tbody>
+      <tr><td>Error compounds as \((1+\lambda)^N\)</td><td>Mathematical fact</td><td>Definition of Lipschitz continuity</td><td>Measured value of \(\lambda\) for the trained predictor</td></tr>
+      <tr><td>Metric preservation → valid cosine similarity</td><td>Mathematical fact (conditional)</td><td>Isometry sandwich bound; SIGReg / LeJEPA</td><td>Degree of isometry achieved empirically</td></tr>
+      <tr><td>Tight clusters = structure, dispersed = noise</td><td>Established principle, new domain</td><td>CBLOF (He, Xu &amp; Deng 2002); VAE latent conditioning (2309.09676)</td><td>Whether it holds for JEPA prediction error at matched magnitude</td></tr>
+      <tr><td>Surprise gates memory formation</td><td>Established, directly adjacent</td><td>Worth Remembering (2606.03787)</td><td>MAPA's geometric second stage is the delta, must be argued explicitly</td></tr>
+      <tr><td>Gradual drift evades instantaneous thresholds</td><td>Established, named prior art</td><td>Boiling Frog Threshold (2603.08455)</td><td>MAPA's specific mitigation (drift velocity estimation) is untested</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Further reading</h3>
+<ul>
+  <li><a href="https://www.researchgate.net/publication/224346278_Clustering-Based_Outlier_Detection_Method" target="_blank">Clustering-Based Outlier Detection Method</a> — the CBLOF lineage, foundational anomaly detection assumption.</li>
+  <li><a href="https://arxiv.org/pdf/2606.03787" target="_blank">Worth Remembering: Surprise-Gated Robot Episodic Memory</a> — closest prior art, read in full before citing.</li>
+  <li><a href="https://arxiv.org/pdf/2603.08455" target="_blank">The Boiling Frog Threshold</a> — formalizes Failure Mode 4 independently.</li>
+  <li><a href="https://arxiv.org/pdf/2309.09676" target="_blank">Conditioning Latent-Space Clusters for Real-World Anomaly Classification</a> — same clustering mechanism, VAE domain.</li>
+  <li><a href="https://arxiv.org/html/2508.06096" target="_blank">Bounding Distributional Shifts in World Modeling through Novelty Detection</a> — general background on novelty detection for world models.</li>
+  <li><a href="https://arxiv.org/html/2310.08731v4" target="_blank">Novelty Detection in Reinforcement Learning with World Models</a> — magnitude-based novelty baseline to contrast against.</li>
+</ul>
+
+<div class="warn-box">
+  <strong>How to use this section in a panel</strong>
+  When a claim is challenged, identify its category before answering. Mathematical facts can be
+  derived on the spot. Established principles should be cited by name and source. Hypotheses must
+  be named as hypotheses, with the specific experiment that will test them. Never answer a hypothesis
+  question as if it were a proven fact — that is the single fastest way to lose credibility once a
+  panelist finds the gap.
 </div>
 </div>
 
