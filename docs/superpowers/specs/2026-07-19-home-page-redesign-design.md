@@ -22,7 +22,7 @@ Net effect: three separate "same links, different format" blocks on one page. Th
 ### Header
 Unchanged structurally (icon + name + subtitle), except:
 - `PRIYAM` → `Priyam` (drop `text-transform: uppercase` / all-caps styling on `.header-name`)
-- `AI SYSTEMS · BACKEND · RESEARCH` → `AI Systems · Backend · Research` (drop uppercase on `.header-subtitle`)
+- `AI SYSTEMS · BACKEND · RESEARCH` → `Systems · Research · Inference` (drop uppercase on `.header-subtitle`)
 - Nav bar keeps its current uppercase treatment — unaffected, not part of the complaint.
 
 ### Intro (replaces both `.mission` blocks and the `#about` row table)
@@ -64,7 +64,7 @@ Unchanged: `#000` background, `#fff` primary text, `#9a9a9a` secondary, `#666`/`
 
 ```
 Priyam                      [icon]
-AI Systems · Backend · Research
+Systems · Research · Inference
 
 I build reasoning-centric AI systems and scalable
 backend infrastructure — self-learning LLMs, long-
