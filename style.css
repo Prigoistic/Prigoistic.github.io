@@ -15,7 +15,7 @@ html {
 body {
   background: #000000;
   color: #ffffff;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 14px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
@@ -629,7 +629,7 @@ hr {
 }
 
 .article-figure figcaption {
-  font-family: 'Inter', 'JetBrains Mono', sans-serif;
+  font-family: 'Inter', 'Geist Mono', sans-serif;
   font-size: 12px;
   color: #666666;
   margin-top: 12px;
@@ -639,7 +639,7 @@ hr {
 
 /* ── Equation Block ── */
 .article-equation {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 18px;
   color: #ffffff;
   text-align: center;
@@ -707,7 +707,7 @@ hr {
 }
 
 .article-code-block code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 13.5px;
   color: #c8c8c8;
   line-height: 1.75;
@@ -726,7 +726,7 @@ hr {
 .article-code-block .num { color: #b5cea8; }  /* numbers */
 
 .article-body code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 13.5px;
   color: #e0e0e0;
   background: #141414;
@@ -737,7 +737,7 @@ hr {
 
 /* ── Highlight Block ── */
 .article-highlight {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: 16px;
   font-weight: 700;
   color: #ffffff;
