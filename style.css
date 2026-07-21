@@ -493,6 +493,35 @@ hr {
   color: #9a9a9a;
 }
 
+.writing-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.writing-item-title {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  transition: color 0.2s;
+}
+
+.writing-item-title:hover {
+  color: #9a9a9a;
+}
+
+.writing-item-date {
+  color: #555555;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* ═══════════════════════════════════════════
    BLOG ARTICLE — MEDIUM-STYLE
    ═══════════════════════════════════════════ */
@@ -1176,6 +1205,15 @@ hr {
   .article-figure img {
     max-width: 100%;
     padding: 6px;
+  }
+
+  .writing-item {
+    flex-wrap: wrap;
+  }
+
+  .writing-item-date {
+    width: 100%;
+    margin-top: 2px;
   }
 
   /* ── LIST ITEMS ── */
