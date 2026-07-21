@@ -160,6 +160,13 @@ hr {
   color: #ffffff;
 }
 
+.home-section-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
 /* ── DOTTED LEADER ROWS ── */
 .row {
   display: flex;
