@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Priyam — AI Systems · Backend · Research</title>
@@ -11,6 +14,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
 
 <div class="container">
 
@@ -33,31 +37,34 @@
   </div>
 
   <div class="mission">
-    Co-Founder at <a href="https://www.getmetacognition.com" target="_blank" rel="noopener">MetaCognition</a>. Pre-final year CS undergrad at BITS Pilani.
+    Co-Founder at <a href="https://www.getmetacognition.com" target="_blank" rel="noopener">MetaCognition</a>. 
+    <br>
+    connecting regarding MetaCognition, -> email me at <a href="mailto:priyam@getmetacognition.com">priyam@getmetacognition.com</a>
   </div>
 
   <!-- ═══════════ ME ═══════════ -->
   <div class="home-section-heading">a bit about me</div>
 
   <div class="mission">
-    currently a research fellow at <a href="https://berkeley.edu" target="_blank" rel="noopener">UC Berkeley</a> under prof. kathy yelick on spatial intelligence and quantum
-    <br />
+currently a research fellow at <a href="https://berkeley.edu" target="_blank" rel="noopener">UC Berkeley</a> working on spatial intelligence with quantum entanglement-inspired relational reasoning.    <br />
     <br />
     ex - ml and system architect at <a href="https://www.nasa.gov/mission/artemis-i/" target="_blank" rel="noopener">NASA JPL</a>, worked on <a href="https://www.nasa.gov/artemis" target="_blank" rel="noopener">Artemis 1</a>
     <br />
     <br />
-    <span class="tag">4+ years</span> of experience in building high performance ml systems, data infrastructure and performance optimisation for autonomous spacecraft navigation, deep space communication pipelines and high-reliability scientific workflows
+    <span class="tag">4+ years</span> of experience in building high performance ml systems, data infrastructure and performance optimisation for autonomous spacecraft navigation, deep space communication pipelines and high-reliability scientific workflows.
+
+    
   </div>
 
   <div class="mission">
-    i love deep diving into neuroscience and understanding how intelligence emerges biologically, and then applying those principles to build next-gen AI systems.
+    i love deep diving into <span class="tag">neuroscience</span> and understanding how intelligence emerges biologically, and then trynna interpret into building aritifial intelligence which mimics biological processes -> towards <span class="tag">general intelligence</span>. <br />
   </div>
 
   <!-- ═══════════ WRITING ═══════════ -->
   <div class="home-section-heading">writing</div>
 
   <div class="mission">
-    Notes on systems, AI, and learning.
+    blogs and literature 
   </div>
 
   <div class="writing-item">
@@ -83,5 +90,25 @@
 
 </div>
 
+<script>
+  function setToggleLabel() {
+    var btn = document.getElementById('theme-toggle-btn');
+    if (!btn) return;
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? '☀' : '☾';
+  }
+  function toggleTheme() {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+    setToggleLabel();
+  }
+  setToggleLabel();
+</script>
 </body>
 </html>
