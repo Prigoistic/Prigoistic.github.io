@@ -62,8 +62,8 @@ nav a {
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
   transition: color 0.2s;
 }
 
@@ -971,7 +971,7 @@ hr {
 
   nav a {
     font-size: 11px;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.02em;
   }
 
   nav .sep {
@@ -1055,7 +1055,7 @@ hr {
 
   nav a {
     font-size: 10px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.01em;
   }
 
   nav .sep {
@@ -1360,7 +1360,7 @@ hr {
 
   nav a {
     font-size: 10px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.01em;
   }
 
   nav .sep {
