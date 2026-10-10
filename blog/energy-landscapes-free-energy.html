@@ -1,58 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Energy Landscapes &amp; Free Energy Models — Priyam</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="../images/icon.png" />
-  <link rel="stylesheet" href="../style.css" />
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"
-    onload="document.querySelectorAll('.article-equation').forEach(function(el){katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false});});"></script>
-</head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
-
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="../index.html">ABOUT</a><span class="sep">·</span><a href="../projects.html">PROJECTS</a><span class="sep">·</span><a href="../experience.html">EXPERIENCE</a><span class="sep">·</span><a href="../research.html">RESEARCH</a><span class="sep">·</span><a href="../blog.html" class="active">BLOG</a><span class="sep">·</span><a href="../contact.html">CONTACT</a><span class="sep">·</span><a href="../resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ BACK LINK ═══════════ -->
-  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
-
-  <!-- ═══════════ ARTICLE ═══════════ -->
-  <article class="blog-article">
-
-    <div class="article-meta">
-      <span class="article-date">February 18, 2026</span>
-      <span class="article-reading-time">15 min read</span>
-    </div>
-
-    <h1 class="article-title">A Quick Deep Dive into Energy Landscapes and Free Energy Models</h1>
-
-    <div class="article-tags">
-      <span>energy models</span>
-      <span>free energy</span>
-      <span>dynamical systems</span>
-      <span>AGI</span>
-      <span>memory</span>
-    </div>
-
-    <div class="article-divider"></div>
-
-    <!-- ── CONTENT ── -->
-    <div class="article-body">
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>A Quick Deep Dive into Energy Landscapes and Free Energy Models — Priyam Ghosh</title><meta name="description" content="Energy-based models score configurations and seek low-energy states, offering a different perspective from sequential token prediction. This essay explores attractors, denoising, memory, and the author’s view of reasoning as convergence."><link rel="canonical" href="https://prigoistic.me/blog/energy-landscapes-free-energy.html">
+<meta property="og:type" content="article"><meta property="og:title" content="A Quick Deep Dive into Energy Landscapes and Free Energy Models"><meta property="og:description" content="Energy-based models score configurations and seek low-energy states, offering a different perspective from sequential token prediction. This essay explores attractors, denoising, memory, and the author’s view of reasoning as convergence."><meta property="og:url" content="https://prigoistic.me/blog/energy-landscapes-free-energy.html"><meta property="og:image" content="https://prigoistic.me/assets/covers/energy.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/blog/energy-landscapes-free-energy.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "A Quick Deep Dive into Energy Landscapes and Free Energy Models", "name": "A Quick Deep Dive into Energy Landscapes and Free Energy Models", "description": "Energy-based models score configurations and seek low-energy states, offering a different perspective from sequential token prediction. This essay explores attractors, denoising, memory, and the author’s view of reasoning as convergence.", "url": "https://prigoistic.me/blog/energy-landscapes-free-energy.html", "mainEntityOfPage": "https://prigoistic.me/blog/energy-landscapes-free-energy.html", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/energy.jpg", "datePublished": "2026-02-18"}</script><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#token-models-local-probability-machines">Token Models: Local Probability Machines</a><a href="#energy-based-models-global-configuration-evaluators">Energy Based Models: Global Configuration Evaluators</a><a href="#the-energy-landscape-intuition">The Energy Landscape Intuition</a><a href="#what-energy-based-models-are-good-at">What Energy Based Models Are Good At</a><a href="#the-core-mathematics">The Core Mathematics</a><a href="#sleb-engine-at-ananta-research">SLEB Engine at Ananta Research</a><a href="#limitations">Limitations</a><a href="#where-i-think-this-goes">Where I Think This Goes</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>A Quick Deep Dive into Energy Landscapes and Free Energy Models</h1><p class="article-deck">Exploring energy-based models, attractors, and memory through the geometry of systems that settle into stable states.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-02-18">February 18, 2026</time></dd></div><div><dt>Reading time</dt><dd>8 min read</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/blog/energy-landscapes-free-energy.md">Markdown ↗</a></div><p class="key-topics">energy-based models · free energy · dynamical systems · memory</p></header><article class="article-content"><div class="article-body">
 
       <p>I am a domain expert in this topic. Not bragging. This is just somewhere I have spent months sitting with equations, breaking them, rebuilding them, trying to formalize what we are actually building. And before going further, I want to keep this very honest.</p>
 
@@ -70,7 +22,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Token Models: Local Probability Machines</h2>
+      <h2 id="token-models-local-probability-machines">Token Models: Local Probability Machines</h2>
 
       <p>Let us be clear about how token models operate. They optimize cross-entropy loss:</p>
 
@@ -91,7 +43,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Energy Based Models: Global Configuration Evaluators</h2>
+      <h2 id="energy-based-models-global-configuration-evaluators">Energy Based Models: Global Configuration Evaluators</h2>
 
       <p>Energy based models flip the perspective entirely. Instead of modeling probability over next tokens, they define an energy function over entire configurations:</p>
 
@@ -112,7 +64,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Energy Landscape Intuition</h2>
+      <h2 id="the-energy-landscape-intuition">The Energy Landscape Intuition</h2>
 
       <p>The best way to think about this is geometrically. Imagine every possible state of the system as a point in a high dimensional space. Now define an energy over that space. You get a landscape. Valleys are stable patterns. Hills are unstable configurations. Deep basins are strong attractors. Flat regions are ambiguity.</p>
 
@@ -130,7 +82,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>What Energy Based Models Are Good At</h2>
+      <h2 id="what-energy-based-models-are-good-at">What Energy Based Models Are Good At</h2>
 
       <p>When do energy models shine? They are naturally suited for denoising, pattern completion, constraint satisfaction, structured reasoning, and multi-variable consistency. Token models are excellent at continuation. Energy models are excellent at stabilization.</p>
 
@@ -140,7 +92,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Core Mathematics</h2>
+      <h2 id="the-core-mathematics">The Core Mathematics</h2>
 
       <p>At the center of all this energy based thinking there is something almost embarrassingly simple. You define a scalar function over states. That is it. Call it energy, E(s). Low energy means the configuration is internally consistent. High energy means something does not add up. There is tension in the system, contradictions, instability, unresolved structure.</p>
 
@@ -196,7 +148,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>SLEB Engine at Ananta Research</h2>
+      <h2 id="sleb-engine-at-ananta-research">SLEB Engine at Ananta Research</h2>
 
       <p>Now let me explain this the way I actually feel it. SLEB stands for Self Learning Energy Based architecture — we introduced it formally in <a href="https://www.researchgate.net/publication/397885858_An_Energy-Based_Self-Learning_Engine_for_Neuro-Symbolic_Scientific_Reasoning" target="_blank" rel="noopener"><em>An Energy-Based Self-Learning Engine for Neuro-Symbolic Scientific Reasoning</em></a>. But honestly, that name does not capture what it is. <strong>It feels less like a model and more like a living field.</strong></p>
 
@@ -215,7 +167,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Limitations</h2>
+      <h2 id="limitations">Limitations</h2>
 
       <p>Let us not romanticize this. Energy models struggle with high dimensional scaling, sampling inefficiency, expensive inference steps, partition function estimation, curvature control, and spurious minima.</p>
 
@@ -223,7 +175,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Where I Think This Goes</h2>
+      <h2 id="where-i-think-this-goes">Where I Think This Goes</h2>
 
       <p>Energy models are not replacements for token models. <strong>They are complementary.</strong> Token models are storytellers. Energy models are stabilizers. One generates surface fluency. The other enforces deep structure.</p>
 
@@ -249,39 +201,4 @@
       Written by Priyam · 18 February 2026
     </div>
 
-  </article>
-
-  <hr />
-
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer">
-    <div>&copy; 2026 Priyam</div>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </article><section class="agent-panel" data-markdown="/blog/energy-landscapes-free-energy.md?v=c927caed504b" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>

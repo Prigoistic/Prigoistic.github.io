@@ -1,0 +1,44 @@
+<svg width="100%" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+
+  <rect x="8" y="8" width="188" height="90" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="102" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">Hippocampus</text>
+  <line x1="8" y1="35" x2="196" y2="35" stroke="#a78bfa" stroke-width="1"></line>
+  <text x="102" y="52" text-anchor="middle" font-size="11" fill="#4c1d95">Fast write · High fidelity</text>
+  <text x="102" y="67" text-anchor="middle" font-size="11" fill="#4c1d95">Episode-specific · Short-lived</text>
+  <text x="102" y="82" text-anchor="middle" font-size="11" fill="#4c1d95">Rapid encoding of surprise</text>
+
+
+  <line x1="196" y1="53" x2="234" y2="53" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <text x="215" y="47" text-anchor="middle" font-size="9" fill="#9ca3af">evidence</text>
+
+
+  <rect x="238" y="8" width="196" height="90" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"></rect>
+  <text x="336" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#92400e">Consolidation Gate</text>
+  <line x1="238" y1="35" x2="434" y2="35" stroke="#fcd34d" stroke-width="1"></line>
+  <text x="336" y="52" text-anchor="middle" font-size="11" fill="#78350f">Fires when evidence is stable,</text>
+  <text x="336" y="67" text-anchor="middle" font-size="11" fill="#78350f">novel, and geometrically coherent</text>
+  <text x="336" y="82" text-anchor="middle" font-size="11" fill="#78350f">Suppresses noise-driven updates</text>
+
+
+  <line x1="434" y1="53" x2="472" y2="53" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <text x="453" y="47" text-anchor="middle" font-size="9" fill="#9ca3af">writes to</text>
+
+
+  <rect x="476" y="8" width="196" height="90" rx="6" fill="#ecfdf5" stroke="#4ade80" stroke-width="1.5"></rect>
+  <text x="574" y="28" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">Neocortex</text>
+  <line x1="476" y1="35" x2="672" y2="35" stroke="#4ade80" stroke-width="1"></line>
+  <text x="574" y="52" text-anchor="middle" font-size="11" fill="#14532d">Slow consolidation</text>
+  <text x="574" y="67" text-anchor="middle" font-size="11" fill="#14532d">Compressed · Permanent</text>
+  <text x="574" y="82" text-anchor="middle" font-size="11" fill="#14532d">Cross-episode abstract patterns</text>
+
+  <text x="340" y="118" text-anchor="middle" font-size="10" fill="#9ca3af" font-style="italic">New experiences encode fast. The gate decides when accumulated evidence justifies a slow, permanent update.</text>
+</svg>

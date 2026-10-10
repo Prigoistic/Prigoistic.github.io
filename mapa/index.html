@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Why World Models Need Memory</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
-<style>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>Why World Models Need Memory — Priyam Ghosh</title><meta name="description" content="MAPA proposes a memory hierarchy for world-model prediction: an episodic buffer, consolidated landmarks, and gated adaptation. This essay develops the biological motivation, architectural proposal, failure modes, and experiments needed to test it."><link rel="canonical" href="https://prigoistic.me/mapa/">
+<meta property="og:type" content="article"><meta property="og:title" content="Why World Models Need Memory"><meta property="og:description" content="MAPA proposes a memory hierarchy for world-model prediction: an episodic buffer, consolidated landmarks, and gated adaptation. This essay develops the biological motivation, architectural proposal, failure modes, and experiments needed to test it."><meta property="og:url" content="https://prigoistic.me/mapa/"><meta property="og:image" content="https://prigoistic.me/assets/covers/mapa.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/mapa/index.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -108,24 +104,23 @@ footer { margin-top: 60px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 .bd-index a:last-child { border-bottom: none; }
 .bd-index a:hover { background: #fafafa; color: #111; }
 .bd-index .idx-num { color: #aaa; font-weight: 700; margin-right: 10px; font-size: 13px; min-width: 22px; display: inline-block; }
-</style>
-<script>
+</style><script>
 function isBreakdownsView(view) {
   return view === 'breakdowns' || view === 'glossary' || /^bd-\d+$/.test(view);
 }
 
 function render(view) {
-  var onBreakdowns = isBreakdownsView(view);
+  var target = document.getElementById(view); var onBreakdowns = isBreakdownsView(view) || !!(target && target.closest('#breakdowns-page'));
   document.getElementById('main-page').style.display = onBreakdowns ? 'none' : '';
   document.getElementById('breakdowns-page').style.display = onBreakdowns ? '' : 'none';
   document.getElementById('nav-main').className = view === 'main' ? 'active' : '';
-  document.getElementById('nav-breakdowns').className = onBreakdowns ? 'active' : '';
+  document.getElementById('nav-breakdowns').className = onBreakdowns && view !== 'glossary' ? 'active' : '';
   document.getElementById('nav-glossary').className = view === 'glossary' ? 'active' : '';
-  if (window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});
-  if (view === 'glossary' || /^bd-\d+$/.test(view)) {
+  if (window.renderMathInElement) renderMathInElement(document.querySelector('.article-content'), {delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});
+  if (document.getElementById(view) && view !== 'main' && view !== 'breakdowns') {
     setTimeout(function() {
       var el = document.getElementById(view);
-      if (el) el.scrollIntoView({behavior:'smooth'});
+      if (el) el.scrollIntoView({behavior:'auto'});
     }, 30);
   } else {
     window.scrollTo(0, 0);
@@ -155,13 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-</script>
-</head>
-<body>
+</script><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why World Models Need Memory", "name": "Why World Models Need Memory", "description": "MAPA proposes a memory hierarchy for world-model prediction: an episodic buffer, consolidated landmarks, and gated adaptation. This essay develops the biological motivation, architectural proposal, failure modes, and experiments needed to test it.", "url": "https://prigoistic.me/mapa/", "mainEntityOfPage": "https://prigoistic.me/mapa/", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/mapa.jpg"}</script><noscript><style>#breakdowns-page{display:block!important}</style></noscript><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#1-the-neuroscience-case-why-prediction-requires-memory">1. The neuroscience case: why prediction requires memory</a><a href="#2-language-models-hit-this-wall-first">2. Language models hit this wall first</a><a href="#3-jepa-and-the-long-horizon-memory-gap">3. JEPA and the long-horizon memory gap</a><a href="#4-five-bottlenecks-five-different-root-causes">4. Five bottlenecks, five different root causes</a><a href="#5-the-partial-solutions-and-where-each-one-stalls">5. The partial solutions, and where each one stalls</a><a href="#6-what-if-the-predictor-could-remember">6. What if the predictor could remember?</a><a href="#7-mapa-end-to-end">7. MAPA, end to end</a><a href="#8-inside-the-memory-what-gets-kept-and-how-it-knows">8. Inside the memory: what gets kept, and how it knows</a><a href="#9-architectural-choices-and-pre-training-design">9. Architectural choices and pre-training design</a><a href="#10-mapa-is-model-agnostic">10. MAPA is model-agnostic</a><a href="#11-how-to-actually-test-this">11. How to actually test this</a><a href="#12-knowing-whether-it-actually-worked">12. Knowing whether it actually worked</a><a href="#closing">Closing</a><a href="#breakdowns-overview">Architecture Breakdowns</a><a href="#1-how-is-z-t-produced-and-where-does-hat-z-t-come-from">1. How is \(z_t\) produced, and where does \(\hat{z}_t\) come from?</a><a href="#2-what-is-the-landmark-set-actually-doing-and-how-is-it-different-from-hwm-subgoals">2. What is the landmark set actually doing — and how is it different from HWM subgoals?</a><a href="#3-how-are-z-t-and-hat-z-t-compared-the-math-the-justification-and-what-sigreg-actually-doe">3. How are \(z_t\) and \(\hat{z}_t\) compared — the math, the justification, and what SIGReg actually does</a><a href="#4-the-adaptive-threshold-mechanism-cold-start-adaptivity-and-validation">4. The adaptive threshold — mechanism, cold start, adaptivity, and validation</a><a href="#5-the-episodic-buffer-write-mechanism-storage-format-and-cross-episode-communication">5. The episodic buffer — write mechanism, storage format, and cross-episode communication</a><a href="#6-online-streaming-k-means-why-k-means-why-not-better-alternatives-the-geometry-and-the-ma">6. Online streaming K-means — why K-means, why not better alternatives, the geometry, and the math</a><a href="#7-the-consolidation-gate-where-the-three-criteria-come-from-their-real-world-validity">7. The consolidation gate — where the three criteria come from, their real-world validity</a><a href="#8-lora-adapters-why-lora-and-not-ewc-gem-replay-or-other-continual-learning-methods">8. LoRA adapters — why LoRA and not EWC, GEM, replay, or other continual learning methods</a><a href="#9-the-permanent-landmark-set-storage-format-real-implementation-and-cross-episode-persiste">9. The permanent landmark set — storage format, real implementation, and cross-episode persistence</a><a href="#10-metrics-and-evaluation-jepa-benchmarks-mapa-specific-metrics-and-why-each-one">10. Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</a><a href="#11-the-6-month-plan-reality-based-month-by-month">11. The 6-month plan — reality-based, month by month</a><a href="#12-why-does-lewm-use-a-plain-vit-encoder-and-not-a-sigreg-based-one-like-lejepa">12. Why does LeWM use a plain ViT encoder and not a SIGReg-based one like LeJEPA?</a><a href="#glossary-2">Glossary</a><a href="#13-future-optimizations-what-changes-after-the-6-month-baseline">13. Future optimizations — what changes after the 6-month baseline</a><a href="#14-claims-sources-and-mathematical-grounding-what-is-proven-what-is-precedent-and-what-is-">14. Claims, sources, and mathematical grounding — what is proven, what is precedent, and what is hypothesis</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>Why World Models Need Memory</h1><p class="article-deck">A proposal for giving world models persistent memory, from the neuroscience of prediction to episodic buffers, consolidated landmarks, and gated adaptation.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-06">June 2026</time></dd></div><div><dt>Contents</dt><dd>Essay &amp; technical breakdowns</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/mapa/index.md">Markdown ↗</a></div><p class="key-topics">world models · episodic memory · JEPA · continual adaptation</p></header><article class="article-content">
 <nav class="site-nav">
-  <a id="nav-main" class="active" onclick="showPage('main')">Main</a>
-  <a id="nav-breakdowns" onclick="showPage('breakdowns')">Breakdowns</a>
-  <a id="nav-glossary" onclick="showGlossary()">Glossary</a>
+  <a href="#main" id="nav-main" class="active">Main</a>
+  <a href="#breakdowns" id="nav-breakdowns">Breakdowns</a>
+  <a href="#glossary" id="nav-glossary">Glossary</a>
   <a href="/mapa/interview/">Interview</a>
 </nav>
 
@@ -180,10 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </defs>
 </svg>
 
-<div class="title-block">
-  <h1>Why World Models Need Memory</h1>
-  <p class="date">June 2026 &nbsp;·&nbsp; Priyam Ghosh</p>
-</div>
+
 <blockquote>
   "The failure of current world models at long horizons is not the absence of capacity.
   It is the absence of a persistent memory hierarchy in the predictor."
@@ -203,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
      1 · NEUROSCIENCE: WHY MEMORY AT ALL
 ══════════════════════════════════════════ -->
 
-<h2>1. The neuroscience case: why prediction requires memory</h2>
+<h2 id="1-the-neuroscience-case-why-prediction-requires-memory">1. The neuroscience case: why prediction requires memory</h2>
 
 <p>
   Walk into your kitchen in the dark and your hand finds the light switch before your eyes find anything
@@ -338,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
      2 · MEMORY IN LLMs
 ══════════════════════════════════════════ -->
 
-<h2>2. Language models hit this wall first</h2>
+<h2 id="2-language-models-hit-this-wall-first">2. Language models hit this wall first</h2>
 
 <p>
   A language model has no memory in the ordinary sense. Every time it answers, it reads the whole
@@ -386,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
      3 · JEPA AND THE LONG-HORIZON PROBLEM
 ══════════════════════════════════════════ -->
 
-<h2>3. JEPA and the long-horizon memory gap</h2>
+<h2 id="3-jepa-and-the-long-horizon-memory-gap">3. JEPA and the long-horizon memory gap</h2>
 
 <p>
   JEPA, the Joint-Embedding Predictive Architecture, makes one decisive bet: do not predict what the
@@ -463,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
      4 · THE FIVE BOTTLENECKS
 ══════════════════════════════════════════ -->
 
-<h2>4. Five bottlenecks, five different root causes</h2>
+<h2 id="4-five-bottlenecks-five-different-root-causes">4. Five bottlenecks, five different root causes</h2>
 
 <p>
   Each of these is a distinct failure with a distinct signature. Keeping them separate matters, because
@@ -554,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
      5 · EXISTING SOLUTIONS: HWM, FF-JEPA, PAM
 ══════════════════════════════════════════ -->
 
-<h2>5. The partial solutions, and where each one stalls</h2>
+<h2 id="5-the-partial-solutions-and-where-each-one-stalls">5. The partial solutions, and where each one stalls</h2>
 
 <p>
   Three systems take real runs at the long-horizon problem, each from a different angle. None of them
@@ -715,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function() {
      6 · THE GAP AND THE IDEA
 ══════════════════════════════════════════ -->
 
-<h2>6. What if the predictor could remember?</h2>
+<h2 id="6-what-if-the-predictor-could-remember">6. What if the predictor could remember?</h2>
 
 <p>
   Step back and take stock. HWM and FF-JEPA make prediction within an episode markedly steadier. PAM goes
@@ -773,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
      7 · MAPA: WHAT IT IS
 ══════════════════════════════════════════ -->
 
-<h2>7. MAPA, end to end</h2>
+<h2 id="7-mapa-end-to-end">7. MAPA, end to end</h2>
 
 <p>
   We call it <strong>MAPA</strong>, the Memory-Augmented Predictive Architecture. It is not a new world
@@ -941,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
      8 · MAPA INTERNALS IN DETAIL
 ══════════════════════════════════════════ -->
 
-<h2>8. Inside the memory: what gets kept, and how it knows</h2>
+<h2 id="8-inside-the-memory-what-gets-kept-and-how-it-knows">8. Inside the memory: what gets kept, and how it knows</h2>
 
 <h3>Only the surprises get written down</h3>
 <p>
@@ -1034,7 +1024,7 @@ document.addEventListener('DOMContentLoaded', function() {
      9 · ARCHITECTURAL CHOICES AND PRE-TRAINING
 ══════════════════════════════════════════ -->
 
-<h2>9. Architectural choices and pre-training design</h2>
+<h2 id="9-architectural-choices-and-pre-training-design">9. Architectural choices and pre-training design</h2>
 
 <p>
   Two pre-training choices make everything in Section 8 actually work. They are easy to skip past as
@@ -1123,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', function() {
      10 · MODEL-AGNOSTIC CLAIM
 ══════════════════════════════════════════ -->
 
-<h2>10. MAPA is model-agnostic</h2>
+<h2 id="10-mapa-is-model-agnostic">10. MAPA is model-agnostic</h2>
 
 <p>
   Nothing about MAPA is wedded to LeWM. It asks only two things of whatever predictor it wraps: a
@@ -1163,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', function() {
      11 · EXPERIMENTS
 ══════════════════════════════════════════ -->
 
-<h2>11. How to actually test this</h2>
+<h2 id="11-how-to-actually-test-this">11. How to actually test this</h2>
 
 <p>
   A clean idea is worth little until it survives a fair fight, so the plan is six months built to give
@@ -1273,7 +1263,7 @@ document.addEventListener('DOMContentLoaded', function() {
      12 · METRICS AND EVALUATION
 ══════════════════════════════════════════ -->
 
-<h2>12. Knowing whether it actually worked</h2>
+<h2 id="12-knowing-whether-it-actually-worked">12. Knowing whether it actually worked</h2>
 
 <p>
   A single aggregate score would hide more than it reveals. MAPA could lift average prediction while
@@ -1409,7 +1399,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <hr />
 
-<h2>Closing</h2>
+<h2 id="closing">Closing</h2>
 
 <p>
   The whole argument collapses to a short chain. Intelligence over long horizons is prediction.
@@ -1437,7 +1427,6 @@ document.addEventListener('DOMContentLoaded', function() {
   Either way, the field learns where the real bottleneck is.
 </p>
 
-<footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
 
 </div><!-- /main-page -->
 
@@ -1447,7 +1436,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="breakdowns-page" style="display:none">
 
 <div class="title-block" style="margin-top:48px">
-  <h1 style="font-size:clamp(24px,4vw,36px);font-weight:400">Architecture Breakdowns</h1>
+  <h2 id="breakdowns-overview">Architecture Breakdowns</h2>
   <p class="date">Every design decision, justified from first principles</p>
 </div>
 
@@ -1480,7 +1469,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q1 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-1">
-<h2>1. How is \(z_t\) produced, and where does \(\hat{z}_t\) come from?</h2>
+<h2 id="1-how-is-z-t-produced-and-where-does-hat-z-t-come-from">1. How is \(z_t\) produced, and where does \(\hat{z}_t\) come from?</h2>
 
 <p>
   The encoder \(\varphi\) and the predictor \(f_\theta\) are two separate networks running sequentially
@@ -1524,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q2 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-2">
-<h2>2. What is the landmark set actually doing — and how is it different from HWM subgoals?</h2>
+<h2 id="2-what-is-the-landmark-set-actually-doing-and-how-is-it-different-from-hwm-subgoals">2. What is the landmark set actually doing — and how is it different from HWM subgoals?</h2>
 
 <h3>The fundamental difference</h3>
 <p>
@@ -1575,7 +1564,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q3 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-3">
-<h2>3. How are \(z_t\) and \(\hat{z}_t\) compared — the math, the justification, and what SIGReg actually does</h2>
+<h2 id="3-how-are-z-t-and-hat-z-t-compared-the-math-the-justification-and-what-sigreg-actually-doe">3. How are \(z_t\) and \(\hat{z}_t\) compared — the math, the justification, and what SIGReg actually does</h2>
 
 <h3>The comparison metric</h3>
 <p>
@@ -1630,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q4 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-4">
-<h2>4. The adaptive threshold — mechanism, cold start, adaptivity, and validation</h2>
+<h2 id="4-the-adaptive-threshold-mechanism-cold-start-adaptivity-and-validation">4. The adaptive threshold — mechanism, cold start, adaptivity, and validation</h2>
 
 <h3>What actually enters the threshold</h3>
 <p>
@@ -1707,7 +1696,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q5 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-5">
-<h2>5. The episodic buffer — write mechanism, storage format, and cross-episode communication</h2>
+<h2 id="5-the-episodic-buffer-write-mechanism-storage-format-and-cross-episode-communication">5. The episodic buffer — write mechanism, storage format, and cross-episode communication</h2>
 
 <h3>It is not a key-value store</h3>
 <p>
@@ -1767,7 +1756,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q6 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-6">
-<h2>6. Online streaming K-means — why K-means, why not better alternatives, the geometry, and the math</h2>
+<h2 id="6-online-streaming-k-means-why-k-means-why-not-better-alternatives-the-geometry-and-the-ma">6. Online streaming K-means — why K-means, why not better alternatives, the geometry, and the math</h2>
 
 <h3>Why K-means specifically</h3>
 <p>
@@ -1839,7 +1828,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q7 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-7">
-<h2>7. The consolidation gate — where the three criteria come from, their real-world validity</h2>
+<h2 id="7-the-consolidation-gate-where-the-three-criteria-come-from-their-real-world-validity">7. The consolidation gate — where the three criteria come from, their real-world validity</h2>
 
 <h3>Why three criteria and not one</h3>
 <p>
@@ -1908,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q8 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-8">
-<h2>8. LoRA adapters — why LoRA and not EWC, GEM, replay, or other continual learning methods</h2>
+<h2 id="8-lora-adapters-why-lora-and-not-ewc-gem-replay-or-other-continual-learning-methods">8. LoRA adapters — why LoRA and not EWC, GEM, replay, or other continual learning methods</h2>
 
 <h3>What MAPA needs from a weight update mechanism</h3>
 <p>Three hard requirements:</p>
@@ -1962,7 +1951,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q9 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-9">
-<h2>9. The permanent landmark set — storage format, real implementation, and cross-episode persistence</h2>
+<h2 id="9-the-permanent-landmark-set-storage-format-real-implementation-and-cross-episode-persiste">9. The permanent landmark set — storage format, real implementation, and cross-episode persistence</h2>
 
 <h3>What it actually is in memory</h3>
 <p>
@@ -2024,7 +2013,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q10 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-10">
-<h2>10. Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</h2>
+<h2 id="10-metrics-and-evaluation-jepa-benchmarks-mapa-specific-metrics-and-why-each-one">10. Metrics and evaluation — JEPA benchmarks, MAPA-specific metrics, and why each one</h2>
 
 <h3>What actually exists — corrected picture</h3>
 <p>
@@ -2223,7 +2212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ── Q11 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-11">
-<h2>11. The 6-month plan — reality-based, month by month</h2>
+<h2 id="11-the-6-month-plan-reality-based-month-by-month">11. The 6-month plan — reality-based, month by month</h2>
 
 <p>
   The honest time budget for this project: roughly 60–80 hours of irreplaceable focused research work
@@ -2495,7 +2484,7 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 
 <!-- ── Q12 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-12">
-<h2>12. Why does LeWM use a plain ViT encoder and not a SIGReg-based one like LeJEPA?</h2>
+<h2 id="12-why-does-lewm-use-a-plain-vit-encoder-and-not-a-sigreg-based-one-like-lejepa">12. Why does LeWM use a plain ViT encoder and not a SIGReg-based one like LeJEPA?</h2>
 
 <p>
   This question exposes a gap the main MAPA document glosses over. The short answer: LeWM does not use
@@ -2623,7 +2612,7 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 ══════════════════════════════════════════ -->
 <div class="bd-section" id="glossary">
 
-<h2>Glossary</h2>
+<h2 id="glossary-2">Glossary</h2>
 
 <p>
   Every mechanism in this document rests on a set of ideas that are rarely explained where they appear.
@@ -3178,7 +3167,7 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 
 <!-- ── Q13 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-13">
-<h2>13. Future optimizations — what changes after the 6-month baseline</h2>
+<h2 id="13-future-optimizations-what-changes-after-the-6-month-baseline">13. Future optimizations — what changes after the 6-month baseline</h2>
 
 <p>
   The 6-month plan delivers a working, principled baseline. It is not the final architecture.
@@ -3340,7 +3329,7 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 
 <!-- ── Q14 ─────────────────────────────────────────────── -->
 <div class="bd-section" id="bd-14">
-<h2>14. Claims, sources, and mathematical grounding — what is proven, what is precedent, and what is hypothesis</h2>
+<h2 id="14-claims-sources-and-mathematical-grounding-what-is-proven-what-is-precedent-and-what-is-">14. Claims, sources, and mathematical grounding — what is proven, what is precedent, and what is hypothesis</h2>
 
 <p>
   Every non-trivial claim in this document falls into exactly one of three categories: a mathematical
@@ -3497,11 +3486,8 @@ is the adapter's contribution. With the gate firing every \(T\) steps:</p>
 </div>
 </div>
 
-<hr />
-<footer>Lossfunk Research &nbsp;·&nbsp; MAPA Project &nbsp;·&nbsp; June 2026</footer>
 
 </div><!-- /breakdowns-page -->
 
 </div><!-- /page -->
-</body>
-</html>
+</article><section class="agent-panel" data-markdown="/mapa/index.md?v=97f46dbe23cf" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>

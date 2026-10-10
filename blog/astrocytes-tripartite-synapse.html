@@ -1,92 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Astrocytes, the Supervisors of the Tripartite Synapse — Priyam</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="../images/icon.png" />
-  <link rel="stylesheet" href="../style.css" />
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"
-    onload="document.querySelectorAll('.article-equation').forEach(function(el){katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false});});"></script>
-  <meta name="description" content="How norepinephrine rewires the brain through astrocytes, not neurons — the tripartite synapse, the LC-NE cascade, and what every AI architecture is missing." />
-  <style>
-    .article-highlight {
-      font-family: 'Lora', serif;
-      font-size: 18px;
-      font-weight: 400;
-      font-style: italic;
-      color: #e8e8e8;
-      text-align: left;
-      margin: 48px 0;
-      padding: 20px 0 20px 28px;
-      background: none;
-      border: none;
-      border-left: 3px solid #cc0000;
-      border-radius: 0;
-      letter-spacing: 0;
-      line-height: 1.8;
-    }
-    .article-highlight strong {
-      font-family: 'Inter', sans-serif;
-      font-style: normal;
-      font-weight: 600;
-      font-size: 13px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #cc0000;
-      display: block;
-      margin-bottom: 10px;
-    }
-    sup a.cite-link { color: #555; text-decoration: none; font-size: 0.78em; }
-    sup a.cite-link:hover { color: #ff0000; }
-    p.ref-entry { margin-bottom: 10px; }
-  </style>
-</head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
-
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="../index.html">ABOUT</a><span class="sep">·</span><a href="../projects.html">PROJECTS</a><span class="sep">·</span><a href="../experience.html">EXPERIENCE</a><span class="sep">·</span><a href="../research.html">RESEARCH</a><span class="sep">·</span><a href="../blog.html" class="active">BLOG</a><span class="sep">·</span><a href="../contact.html">CONTACT</a><span class="sep">·</span><a href="../resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ BACK LINK ═══════════ -->
-  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
-
-  <!-- ═══════════ ARTICLE ═══════════ -->
-  <article class="blog-article">
-
-    <div class="article-meta">
-      <span class="article-date">June 3, 2026</span>
-      <span class="article-reading-time">20 min read</span>
-    </div>
-
-    <h1 class="article-title"><span style="color:#ff0000;">Divergent Thinking</span>: Astrocytes, the Supervisors of the Tripartite Synapse</h1>
-
-    <div class="article-tags">
-      <span>astrocytes</span>
-      <span>neuroscience</span>
-      <span>tripartite synapse</span>
-      <span>norepinephrine</span>
-      <span>DAHN</span>
-      <span>diffusion memory</span>
-    </div>
-
-    <div class="article-divider"></div>
-
-    <!-- ── CONTENT ── -->
-    <div class="article-body">
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse — Priyam Ghosh</title><meta name="description" content="This essay examines research on astrocytic neuromodulation and the tripartite synapse, then connects it to associative memory and diffusion models. Its architectural interpretation is an argument developed from that research, rather than an experimentally validated AI system."><link rel="canonical" href="https://prigoistic.me/blog/astrocytes-tripartite-synapse.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse"><meta property="og:description" content="This essay examines research on astrocytic neuromodulation and the tripartite synapse, then connects it to associative memory and diffusion models. Its architectural interpretation is an argument developed from that research, rather than an experimentally validated AI system."><meta property="og:url" content="https://prigoistic.me/blog/astrocytes-tripartite-synapse.html"><meta property="og:image" content="https://prigoistic.me/assets/covers/astrocytes.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/blog/astrocytes-tripartite-synapse.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse", "name": "Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse", "description": "This essay examines research on astrocytic neuromodulation and the tripartite synapse, then connects it to associative memory and diffusion models. Its architectural interpretation is an argument developed from that research, rather than an experimentally validated AI system.", "url": "https://prigoistic.me/blog/astrocytes-tripartite-synapse.html", "mainEntityOfPage": "https://prigoistic.me/blog/astrocytes-tripartite-synapse.html", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/astrocytes.jpg", "datePublished": "2026-06-03"}</script><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#the-neuron-doctrine-and-the-century-of-incomplete-maps">The Neuron Doctrine and the Century of Incomplete Maps</a><a href="#the-third-terminal-nobody-modeled">The Third Terminal Nobody Modeled</a><a href="#the-locus-coeruleus-the-brain-s-arousal-broadcaster">The Locus Coeruleus: The Brain&#x27;s Arousal Broadcaster</a><a href="#the-cascade-from-norepinephrine-to-adenosine">The Cascade: From Norepinephrine to Adenosine</a><a href="#behavioral-consequences-what-happens-when-astrocytes-gate-the-state">Behavioral Consequences: What Happens When Astrocytes Gate the State</a><a href="#two-circuits-one-supervisor-trn-and-amygdala">Two Circuits, One Supervisor: TRN and Amygdala</a><a href="#divergent-thinking-and-t-the-biological-noise-schedule">Divergent Thinking and β(t): The Biological Noise Schedule</a><a href="#what-this-architecture-is-missing-in-ai">What This Architecture Is Missing in AI</a><a href="#where-i-think-this-goes">Where I Think This Goes</a><a href="#references">References</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse</h1><p class="article-deck">How astrocytes regulate the tripartite synapse, and what their role in neuromodulation suggests about associative memory.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-06-03">June 3, 2026</time></dd></div><div><dt>Reading time</dt><dd>17 min read</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/blog/astrocytes-tripartite-synapse.md">Markdown ↗</a></div><p class="key-topics">astrocytes · tripartite synapse · norepinephrine · associative memory</p></header><article class="article-content"><div class="article-body">
 
       <p>I want to start with something uncomfortable. For over a century, every major model of intelligence, from Ramón y Cajal's neuron doctrine in the 1890s to the Transformer architecture powering every LLM you have used, has operated on a single foundational assumption.</p>
 
@@ -104,7 +22,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Neuron Doctrine and the Century of Incomplete Maps</h2>
+      <h2 id="the-neuron-doctrine-and-the-century-of-incomplete-maps">The Neuron Doctrine and the Century of Incomplete Maps</h2>
 
       <p>Cajal formalized the neuron doctrine from his Golgi-stained preparations in the 1890s. His logic was internally consistent and beautiful. Neurons are discrete, individuated cells. They communicate through synaptic junctions. The pattern of connections is the basis of thought. This gave us Hebbian learning, integrate and fire networks, attractor dynamics, predictive coding, and eventually deep neural networks and the Transformer.</p>
 
@@ -128,7 +46,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Third Terminal Nobody Modeled</h2>
+      <h2 id="the-third-terminal-nobody-modeled">The Third Terminal Nobody Modeled</h2>
 
       <p>A classical synapse has two parties. The presynaptic terminal holds vesicles of neurotransmitter. The postsynaptic density holds the receptors. Signal travels in one direction.</p>
 
@@ -138,9 +56,9 @@
 
       <p>This makes it a full input and output device in its own right, sensing the state of the synapse and responding with chemical signals of its own, called gliotransmitters, that feed back to modulate presynaptic release probability.</p>
 
-      <figure style="width: 50vw; position: relative; left: 50%; transform: translateX(-50%); margin-top: 40px; margin-bottom: 8px;">
-        <img src="../images/astro_fig1.png" alt="Diagram of the tripartite synapse — presynaptic terminal, postsynaptic density, and perisynaptic astrocytic process" style="width: 100%; height: auto; display: block;" />
-        <figcaption style="max-width: 720px; margin: 12px auto 40px; padding: 0 24px; font-size: 12px; color: #9a9a9a; font-style: italic; text-align: center;">The tripartite synapse — the presynaptic terminal, the postsynaptic density, and the perisynaptic astrocytic process that wraps around both and controls the gain of the entire connection.</figcaption>
+      <figure>
+        <img src="../images/astro_fig1.png" alt="Diagram of the tripartite synapse — presynaptic terminal, postsynaptic density, and perisynaptic astrocytic process" />
+        <figcaption>The tripartite synapse — the presynaptic terminal, the postsynaptic density, and the perisynaptic astrocytic process that wraps around both and controls the gain of the entire connection.</figcaption>
       </figure>
 
       <p>One astrocyte can envelop anywhere between 20,000 and two million synapses simultaneously. In humans, that upper number is not an exaggeration. Human protoplasmic astrocytes are 15 to 16 times larger by somatic volume than their rodent counterparts, propagate calcium waves five times faster, and have ten times more primary arborization.</p>
@@ -153,13 +71,13 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Locus Coeruleus: The Brain's Arousal Broadcaster</h2>
+      <h2 id="the-locus-coeruleus-the-brain-s-arousal-broadcaster">The Locus Coeruleus: The Brain's Arousal Broadcaster</h2>
 
       <p>The locus coeruleus is a cluster of roughly three thousand neurons sitting in the pons of the brainstem. It is the most densely noradrenergic nucleus in the entire brain. Despite its tiny size, it sends norepinephrine to virtually everywhere: the prefrontal cortex, the hippocampus, the amygdala, the thalamus, the spinal cord, the cerebellum.</p>
 
-      <figure style="width: 50vw; position: relative; left: 50%; transform: translateX(-50%); margin-top: 40px; margin-bottom: 8px;">
-        <img src="../images/astro_fig2.png" alt="Brain anatomy showing the locus coeruleus location and its norepinephrine projection pathways" style="width: 100%; height: auto; display: block;" />
-        <figcaption style="max-width: 720px; margin: 12px auto 40px; padding: 0 24px; font-size: 12px; color: #9a9a9a; font-style: italic; text-align: center;">The locus coeruleus in the pons — a cluster of three thousand neurons whose norepinephrine projections reach virtually every region of the brain simultaneously.</figcaption>
+      <figure>
+        <img src="../images/astro_fig2.png" alt="Brain anatomy showing the locus coeruleus location and its norepinephrine projection pathways" />
+        <figcaption>The locus coeruleus in the pons — a cluster of three thousand neurons whose norepinephrine projections reach virtually every region of the brain simultaneously.</figcaption>
       </figure>
 
       <p>The locus coeruleus does not send targeted messages. It broadcasts.</p>
@@ -182,13 +100,13 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>The Cascade: From Norepinephrine to Adenosine</h2>
+      <h2 id="the-cascade-from-norepinephrine-to-adenosine">The Cascade: From Norepinephrine to Adenosine</h2>
 
       <p>This is the mechanism. Walk through each link carefully because this chain is the most important single finding for understanding how brain state is controlled, and therefore for understanding what AI architectures are not doing.</p>
 
-      <figure style="width: 50vw; position: relative; left: 50%; transform: translateX(-50%); margin-top: 40px; margin-bottom: 8px;">
-        <img src="../images/astro_fig3.png" alt="Step by step diagram of the norepinephrine to adenosine signaling cascade through the astrocyte" style="width: 100%; height: auto; display: block;" />
-        <figcaption style="max-width: 720px; margin: 12px auto 40px; padding: 0 24px; font-size: 12px; color: #9a9a9a; font-style: italic; text-align: center;">The full cascade — norepinephrine activates astrocytic alpha-1A receptors, triggering a calcium wave, ATP release, enzymatic conversion to adenosine, and ultimately presynaptic gain suppression.</figcaption>
+      <figure>
+        <img src="../images/astro_fig3.png" alt="Step by step diagram of the norepinephrine to adenosine signaling cascade through the astrocyte" />
+        <figcaption>The full cascade — norepinephrine activates astrocytic alpha-1A receptors, triggering a calcium wave, ATP release, enzymatic conversion to adenosine, and ultimately presynaptic gain suppression.</figcaption>
       </figure>
 
       <p>The locus coeruleus fires a burst. Norepinephrine floods the extracellular space around the synapse.</p>
@@ -226,7 +144,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Behavioral Consequences: What Happens When Astrocytes Gate the State</h2>
+      <h2 id="behavioral-consequences-what-happens-when-astrocytes-gate-the-state">Behavioral Consequences: What Happens When Astrocytes Gate the State</h2>
 
       <p>The zebrafish data from the Ahrens Laboratory at Janelia Research Campus made the behavioral stakes completely explicit.</p>
 
@@ -250,7 +168,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Two Circuits, One Supervisor: TRN and Amygdala</h2>
+      <h2 id="two-circuits-one-supervisor-trn-and-amygdala">Two Circuits, One Supervisor: TRN and Amygdala</h2>
 
       <p>The same astrocytic gain control mechanism plays out differently in two specific subcortical circuits, revealing the full range of behavioral functions this architecture actually implements.</p>
 
@@ -288,7 +206,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Divergent Thinking and β(t): The Biological Noise Schedule</h2>
+      <h2 id="divergent-thinking-and-t-the-biological-noise-schedule">Divergent Thinking and β(t): The Biological Noise Schedule</h2>
 
       <p>Now I want to make a connection that most people in AI and computational neuroscience have not fully formalized yet. And it is the connection that matters most for understanding what divergent thinking actually is at a mechanistic level.</p>
 
@@ -341,7 +259,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>What This Architecture Is Missing in AI</h2>
+      <h2 id="what-this-architecture-is-missing-in-ai">What This Architecture Is Missing in AI</h2>
 
       <p>LLMs process tokens. This is not a criticism. It is a description. They implement a conditional probability distribution over token sequences and they do it extraordinarily well.</p>
 
@@ -363,7 +281,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>Where I Think This Goes</h2>
+      <h2 id="where-i-think-this-goes">Where I Think This Goes</h2>
 
       <p>The tripartite synapse is the computational unit. Not the bipartite one. Any architecture that is serious about modeling the processes we loosely call thinking needs to implement the third terminal: the slow, calcium mediated, gain controlling, state switching layer that sits above the fast neuronal computation and continuously reparameterizes it.</p>
 
@@ -382,7 +300,7 @@
 
       <div class="article-section-break">· · ·</div>
 
-      <h2>References</h2>
+      <h2 id="references">References</h2>
 
       <p class="ref-entry" id="ref-1">[1] Lefton, K. B., Wu, Y., Dai, Y., Okuda, T., et al. (2025). Norepinephrine signals through astrocytes to modulate synapses. <em>Science</em>, 388(6748), 776–783.</p>
 
@@ -414,39 +332,4 @@
       Written by Priyam · 3 June 2026
     </div>
 
-  </article>
-
-  <hr />
-
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer">
-    <div>&copy; 2026 Priyam</div>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </article><section class="agent-panel" data-markdown="/blog/astrocytes-tripartite-synapse.md?v=ea01dbb4e6f1" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>

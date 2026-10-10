@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "memory-decay",
+    "source": "https://www.researchgate.net/publication/400712116_Differential_Memory_Decay_A_Continuous-Time_Model_of_Forgetting_and_Semantic_Drift",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/memory-decay.png"
+  },
+  {
+    "slug": "precision-controlled",
+    "source": "https://www.researchgate.net/publication/414355577_Precision-Controlled_Dynamical_Systems_for_Associative_Memory",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/precision-controlled.png"
+  },
+  {
+    "slug": "energy-self-learning",
+    "source": "https://www.researchgate.net/publication/397885858_An_Energy-Based_Self-Learning_Engine_for_Neuro-Symbolic_Scientific_Reasoning",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/energy-self-learning.png"
+  },
+  {
+    "slug": "recursive-logic",
+    "source": "https://www.researchgate.net/publication/395473790_A_Critical_Analysis_of_the_Proposed_Recursive_Logic_Subsystem_for_Self-Learning_LLMs_in_Scientific_Discovery",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/recursive-logic.png"
+  },
+  {
+    "slug": "math-text-tokenizer",
+    "source": "https://www.researchgate.net/publication/393773297_Bridging_the_Semantic_Gap_A_Hybrid_Math-Text_Tokenizer_for_Enhanced_Logical_Reasoning_in_Large_Language_Models",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/math-text-tokenizer.png"
+  },
+  {
+    "slug": "ananta",
+    "source": "https://www.researchgate.net/publication/392438202_Ananta_A_Self-Learning_LLM_for_Symbolic_and_Scientific_Reasoning",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/ananta.png"
+  },
+  {
+    "slug": "temporal-attention",
+    "source": "https://www.researchgate.net/publication/391653563_Explicit_Temporal_Attention_in_Video_Diffusion_Models",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/temporal-attention.png"
+  },
+  {
+    "slug": "m2d2",
+    "source": "https://www.researchgate.net/publication/391628259_Developing_an_Autonomous_System_for_Identification_and_Removal_of_Microplastic_from_Water_Bodies_M2D2",
+    "edition": "Public author PDF",
+    "image": "/assets/papers/m2d2.png"
+  },
+  {
+    "slug": "memory-dynamics",
+    "source": "https://ieeexplore.ieee.org/document/11677899",
+    "edition": "IEEE first page supplied by author",
+    "image": "/assets/papers/memory-dynamics.png",
+    "provenance": "User-provided screenshot, 2026-10-11"
+  }
+]

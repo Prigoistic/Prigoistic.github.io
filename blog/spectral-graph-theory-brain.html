@@ -1,58 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spectral Graph Theory & Brain Memory Dynamics — Priyam</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="../images/icon.png" />
-  <link rel="stylesheet" href="../style.css" />
-  <!-- KaTeX -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"
-    onload="document.querySelectorAll('.article-equation').forEach(function(el){katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false});});"></script>
-</head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain — Priyam Ghosh</title><meta name="description" content="Graph Laplacians and diffusion provide a mathematical lens for studying relaxation and smoothing on networks. This essay connects that lens to memory dynamics, inhibition, and consolidation in the brain."><link rel="canonical" href="https://prigoistic.me/blog/spectral-graph-theory-brain.html">
+<meta property="og:type" content="article"><meta property="og:title" content="How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain"><meta property="og:description" content="Graph Laplacians and diffusion provide a mathematical lens for studying relaxation and smoothing on networks. This essay connects that lens to memory dynamics, inhibition, and consolidation in the brain."><meta property="og:url" content="https://prigoistic.me/blog/spectral-graph-theory-brain.html"><meta property="og:image" content="https://prigoistic.me/assets/covers/spectral.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/blog/spectral-graph-theory-brain.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain", "name": "How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain", "description": "Graph Laplacians and diffusion provide a mathematical lens for studying relaxation and smoothing on networks. This essay connects that lens to memory dynamics, inhibition, and consolidation in the brain.", "url": "https://prigoistic.me/blog/spectral-graph-theory-brain.html", "mainEntityOfPage": "https://prigoistic.me/blog/spectral-graph-theory-brain.html", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/spectral.jpg", "datePublished": "2026-02-15"}</script><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#ion-channels-and-neural-relaxation">Ion channels and neural relaxation</a><a href="#inhibition-and-consolidation">Inhibition and consolidation</a><a href="#diffusion-on-a-graph">Diffusion on a graph</a><a href="#local-updates-and-global-relaxation">Local updates and global relaxation</a><a href="#decay-replay-and-stable-memory">Decay, replay, and stable memory</a><a href="#from-local-interactions-to-coherent-structure">From local interactions to coherent structure</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain</h1><p class="article-deck">A mathematical view of neural relaxation, inhibition, and memory consolidation through graph Laplacians and diffusion.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-02-15">February 15, 2026</time></dd></div><div><dt>Reading time</dt><dd>5 min read</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/blog/spectral-graph-theory-brain.md">Markdown ↗</a></div><p class="key-topics">spectral graph theory · graph Laplacian · diffusion · memory dynamics</p></header><article class="article-content"><div class="article-body">
 
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="../index.html">ABOUT</a><span class="sep">·</span><a href="../projects.html">PROJECTS</a><span class="sep">·</span><a href="../experience.html">EXPERIENCE</a><span class="sep">·</span><a href="../research.html">RESEARCH</a><span class="sep">·</span><a href="../blog.html" class="active">BLOG</a><span class="sep">·</span><a href="../contact.html">CONTACT</a><span class="sep">·</span><a href="../resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ BACK LINK ═══════════ -->
-  <a href="../blog.html" class="back-link">← BACK TO BLOG</a>
-
-  <!-- ═══════════ ARTICLE ═══════════ -->
-  <article class="blog-article">
-
-    <div class="article-meta">
-      <span class="article-date">February 15, 2026</span>
-      <span class="article-reading-time">12 min read</span>
-    </div>
-
-    <h1 class="article-title">How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain</h1>
-
-    <div class="article-tags">
-      <span>neuroscience</span>
-      <span>spectral graph theory</span>
-      <span>memory</span>
-      <span>mathematics</span>
-    </div>
-
-    <div class="article-divider"></div>
-
-    <!-- ── CONTENT ── -->
-    <div class="article-body">
-
+      <h2 id="ion-channels-and-neural-relaxation">Ion channels and neural relaxation</h2>
       <p>The human brain has fascinated neuroscientists and researchers for decades. It is one of the most complex biologically grounded systems we know. An organ present in billions of individuals, something so common, yet still one of the hardest systems to truly understand.</p>
 
       <p>There have been countless attempts to model what happens inside the brain and give it artificial meaning. From these efforts emerged Deep Learning, a simplified abstraction of how human brains reason and produce outputs.</p>
@@ -88,6 +42,7 @@
 
       <div class="article-section-break">· · ·</div>
 
+      <h2 id="inhibition-and-consolidation">Inhibition and consolidation</h2>
       <p>Inhibition plays a crucial role in this stability.</p>
 
       <p>Not all neurons excite each other. Many release GABA, the brain's primary inhibitory neurotransmitter. GABA prevents runaway activation. Without inhibition, neural firing would escalate uncontrollably. Patterns would blur into each other. Stability would collapse.</p>
@@ -115,6 +70,7 @@
 
       <div class="article-section-break">· · ·</div>
 
+      <h2 id="diffusion-on-a-graph">Diffusion on a graph</h2>
       <p>But smoothing of what?</p>
 
       <p><strong>Smoothing over connections.</strong></p>
@@ -154,6 +110,7 @@
 
       <div class="article-section-break">· · ·</div>
 
+      <h2 id="local-updates-and-global-relaxation">Local updates and global relaxation</h2>
       <p>If the brain is running a heat equation on meaning, the next question is simple.</p>
 
       <p><strong>How does it actually compute that diffusion?</strong></p>
@@ -187,6 +144,7 @@
 
       <div class="article-section-break">· · ·</div>
 
+      <h2 id="decay-replay-and-stable-memory">Decay, replay, and stable memory</h2>
       <p>The same necessity appears at another scale.</p>
 
       <p>Memory does not change uniformly.</p>
@@ -213,6 +171,7 @@
 
       <div class="article-section-break">· · ·</div>
 
+      <h2 id="from-local-interactions-to-coherent-structure">From local interactions to coherent structure</h2>
       <p>Across all scales, from ion channels to cortical networks, the same pattern appears.</p>
 
       <p>Local interactions drive global stability.<br />
@@ -245,39 +204,4 @@
       Written by Priyam · 15 February 2026
     </div>
 
-  </article>
-
-  <hr />
-
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer">
-    <div>&copy; 2026 Priyam</div>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </article><section class="agent-panel" data-markdown="/blog/spectral-graph-theory-brain.md?v=358cfcf31a0d" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>

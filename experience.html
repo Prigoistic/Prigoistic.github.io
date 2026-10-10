@@ -1,38 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Priyam — Experience</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="images/icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/assets/reading.css?v=4"><link rel="stylesheet" href="/assets/site.css?v=1"><script defer src="/assets/reading.js?v=3"></script>
 </head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
-
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="index.html">ABOUT</a><span class="sep">·</span><a href="projects.html">PROJECTS</a><span class="sep">·</span><a href="experience.html" class="active">EXPERIENCE</a><span class="sep">·</span><a href="research.html">RESEARCH</a><span class="sep">·</span><a href="blog.html">BLOG</a><span class="sep">·</span><a href="contact.html">CONTACT</a><span class="sep">·</span><a href="resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ PAGE HEADER ═══════════ -->
-  <div class="page-title">EXPERIENCE</div>
+<body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html" aria-current="page">Experience</a><a href="/research.html">Research</a><a href="/blog.html">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="site-main"><h1 class="page-title">Experience</h1>
   <div class="page-desc">
     Where I've built, shipped, and learned.
   </div>
 
   <hr />
 
-  <!-- ═══════════ SKILLS OVERVIEW ═══════════ -->
-  <div class="section-title">SKILLS</div>
+
+  <h2 class="section-title">Skills</h2>
 
   <div class="row">
     <span class="row-label">BACKEND</span>
@@ -67,14 +54,14 @@
 
   <hr />
 
-  <!-- ═══════════ EXPERIENCE BLOCKS ═══════════ -->
-  <div class="section-title">TIMELINE</div>
 
-  <!-- ── EXPERIENCE 01 ── -->
+  <h2 class="section-title">Timeline</h2>
+
+
   <div class="exp-block">
     <div class="exp-header">
       <div>
-        <div class="exp-role">Research Fellow</div>
+        <h3 class="exp-role">Research Fellow</h3>
         <div class="exp-org">University of California, Berkeley</div>
         <div class="exp-period">2025-2026</div>
       </div>
@@ -90,21 +77,38 @@
   <div class="exp-block">
     <div class="exp-header">
       <div>
-        <div class="exp-role">Machine Learning &amp; System Architect (Artemis I)</div>
-        <div class="exp-org">National Aeronautics and Space Administration (NASA)</div>
-        <div class="exp-period">2019-2024</div>
+        <h3 class="exp-role">Machine Learning and System Architect — Artemis 1</h3>
+        <div class="exp-org">NASA — National Aeronautics and Space Administration · Apprenticeship</div>
+        <div class="exp-period">Nov 2019 – Jun 2024 · 4 yrs 8 mos</div>
       </div>
       <img src="images/nasa.png" alt="NASA" class="exp-logo" />
     </div>
     <div class="exp-details">
-      <div class="list-item">Contributed to spacecraft trajectory and propulsion simulations supporting Orion’s deep-space navigation planning and GN&amp;C systems.</div>
-      <div class="list-item">Built predictive models for flight stability and anomaly detection, improving simulation reliability by 14%.</div>
-      <div class="list-item">Streamlined research workflows across cross-functional teams, reducing analysis cycle time by 17%.</div>
+      <div class="list-item">Worked on ML-driven big data analysis and predictive modeling for Artemis I’s Orion spacecraft trajectory and propulsion systems, integrating algorithmic insights with real-world hardware and flight control simulations.</div>
+      <div class="list-item">Collaborated with SRAG (Space Radiation Analysis Group, JSC) to correlate onboard FDIR fault events with real-time space weather and SAA transit data, supporting predictive modeling of radiation-induced SEUs in flight avionics and informing ops constraints during high-intensity crossing windows.</div>
+      <div class="project-links"><a href="https://www.nasa.gov/mission/artemis-i/" target="_blank" rel="noopener">Artemis I ↗</a></div>
     </div>
   </div>
 
   <div class="exp-block">
-    <div class="exp-role">Reinforce (AI/ML Club) — President</div>
+    <div class="exp-header">
+      <div>
+        <h3 class="exp-role">Machine Learning Engineer</h3>
+        <div class="exp-org">NASA Jet Propulsion Laboratory</div>
+        <div class="exp-period">Jul 2021 – May 2024 · 2 yrs 11 mos</div>
+      </div>
+      <img src="images/jpl.png" alt="NASA Jet Propulsion Laboratory" class="exp-logo" />
+    </div>
+    <div class="exp-details">
+      <div class="list-item">Architected Project Callisto (internet-independent voice AI on a human-rated spacecraft): retrained Alexa wake-word CNN for 60–70 dB cabin acoustics, driving near-zero false-positive activations through hardware validation at Lockheed Martin (Denver).</div>
+      <div class="list-item">Owned OpNav end-to-end for Artemis I; processed 1,000+ images across 26 passes, achieved 3σ certification in 4 passes, qualifying autonomous return navigation if DSN contact were lost at 384,000 km. · Flight-certified</div>
+      <div class="list-item">GN&amp;C software to NASA NPR 7150.2 Class A within cFS; implemented UDU covariance factorisation across 500+ Monte Carlo trajectories, cleared the pre-launch OIMU-1 anomaly at Flight Readiness Review, and delivered 0 open MISRA C:2012 Required-rule findings.</div>
+      <div class="list-item">Built a DSN latency-tolerant transport layer and Artemis I BET reconstruction; replaced TCP at 2.56 s RTT with CCSDS-native FEC enabling live Mission Control video from 384,000 km, and fused 5 data sources post mission into ground truth for Artemis II algorithm updates.</div>
+    </div>
+  </div>
+
+  <div class="exp-block">
+    <h3 class="exp-role">Reinforce (AI/ML Club) — President</h3>
     <div class="exp-org">Scaler School of Technology</div>
     <div class="exp-period">2025 — Present</div>
     <div class="exp-details">
@@ -112,82 +116,33 @@
       <div class="list-item">Organizing hands-on sessions on deep learning and classical mathematics</div>
     </div>
 
-    <!-- Add images related to this experience:
-    <div class="gallery">
-      <img src="images/workshop-01.jpg" alt="Workshop session" />
-      <img src="images/workshop-02.jpg" alt="Team working" />
-    </div>
-    -->
+
   </div>
 
-  <!-- ── EXPERIENCE 02 (template — fill in your own) ── -->
-  <!--
-  <div class="exp-block">
-    <div class="exp-role">YOUR ROLE TITLE</div>
-    <div class="exp-org">Organization / Company</div>
-    <div class="exp-period">YYYY — YYYY</div>
-    <div class="exp-details">
-      <div class="list-item">What you built or shipped</div>
-      <div class="list-item">Technologies used and scale</div>
-      <div class="list-item">Impact or outcome</div>
-    </div>
-    <div class="gallery">
-      <img src="images/your-image.jpg" alt="description" />
-    </div>
-  </div>
-  -->
+
+
 
   <hr />
 
-  <!-- ═══════════ WORK HIGHLIGHTS ═══════════ -->
-  <div class="section-title">HIGHLIGHTS</div>
+
+  <section aria-labelledby="education-heading">
+    <h2 id="education-heading" class="section-title">Education</h2>
+    <div class="exp-block">
+      <h3 class="exp-role">Bachelor’s in Computer Science</h3>
+      <div class="exp-org">Birla Institute of Technology and Science, Pilani</div>
+      <div class="exp-period">2024–2028</div>
+    </div>
+  </section>
+
+  <hr />
+
+  <h2 class="section-title">Highlights</h2>
 
   <div class="list-item">Analyzed over 10TB of flight and ground-test telemetry to optimize GN&amp;C systems and propulsion control models.</div>
   <div class="list-item">Designed and built energy-based architectures from scratch and scaled them for production use.</div>
   <div class="list-item">Handled complex ML pipelines with deployment on GPU clusters at scale.</div>
   <div class="list-item">Designed workflows for a few high-value startups as an advisor.</div>
 
-  <!-- ═══════════════════════════════════
-       ADD MORE EXPERIENCE BLOCKS ABOVE
-       Copy an exp-block and fill in:
-       - exp-role
-       - exp-org
-       - exp-period
-       - exp-details (list items)
-       - gallery (optional images)
-       ═══════════════════════════════════ -->
 
-  <hr />
 
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer">
-    <div>&copy; 2026 Priyam</div>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><div class="footer-links"><a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><a href="mailto:priyamghosh9753@gmail.com">Email</a></div></footer></body></html>

@@ -1,0 +1,51 @@
+<svg width="100%" viewBox="0 0 680 192" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+  <rect x="295" y="8" width="90" height="44" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"></rect>
+  <text x="340" y="28" text-anchor="middle" font-size="11.5" fill="#475569">input x</text>
+  <text x="340" y="44" text-anchor="middle" font-size="10" fill="#94a3b8">(same image)</text>
+
+  <line x1="314" y1="52" x2="185" y2="80" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+  <line x1="366" y1="52" x2="495" y2="80" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+  <text x="214" y="76" text-anchor="middle" font-size="10" fill="#64748b">aug 1</text>
+  <text x="466" y="76" text-anchor="middle" font-size="10" fill="#64748b">aug 2</text>
+
+  <rect x="100" y="82" width="140" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="170" y="99" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="170" y="115" text-anchor="middle" font-size="10" fill="#7c3aed">shared weights</text>
+
+  <rect x="440" y="82" width="140" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="510" y="99" text-anchor="middle" font-size="11.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="510" y="115" text-anchor="middle" font-size="10" fill="#7c3aed">shared weights</text>
+
+  <circle cx="170" cy="158" r="14" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"></circle>
+  <text x="170" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">z_i</text>
+  <circle cx="510" cy="158" r="14" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"></circle>
+  <text x="510" y="163" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">z_j</text>
+
+  <line x1="170" y1="124" x2="170" y2="144" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+  <line x1="510" y1="124" x2="510" y2="144" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+
+  <path d="M184,153 Q340,124 496,153" stroke="#166534" stroke-width="2" fill="none" marker-end="url(#arr)"></path>
+  <path d="M496,163 Q340,192 184,163" stroke="#166534" stroke-width="2" fill="none" marker-end="url(#arr)"></path>
+  <text x="340" y="141" text-anchor="middle" font-size="11" font-weight="700" fill="#166534">positive pair — pulled together</text>
+
+  <circle cx="58" cy="155" r="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"></circle>
+  <text x="58" y="159" text-anchor="middle" font-size="9" fill="#92400e">z_k</text>
+  <text x="58" y="178" text-anchor="middle" font-size="9" fill="#d97706">negative</text>
+  <circle cx="622" cy="155" r="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"></circle>
+  <text x="622" y="159" text-anchor="middle" font-size="9" fill="#92400e">z_k</text>
+  <text x="622" y="178" text-anchor="middle" font-size="9" fill="#d97706">negative</text>
+
+  <line x1="156" y1="155" x2="72" y2="155" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="3,2" marker-end="url(#arr)"></line>
+  <line x1="524" y1="155" x2="610" y2="155" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="3,2" marker-end="url(#arr)"></line>
+  <text x="110" y="147" text-anchor="middle" font-size="9" fill="#d97706">pushed apart</text>
+  <text x="570" y="147" text-anchor="middle" font-size="9" fill="#d97706">pushed apart</text>
+</svg>

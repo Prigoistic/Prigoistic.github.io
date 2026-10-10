@@ -1,123 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Priyam — AI Systems · Backend · Research</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="images/icon.png" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
-
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="index.html" class="active">ABOUT</a><span class="sep">·</span><a href="projects.html">PROJECTS</a><span class="sep">·</span><a href="experience.html">EXPERIENCE</a><span class="sep">·</span><a href="research.html">RESEARCH</a><span class="sep">·</span><a href="blog.html">BLOG</a><span class="sep">·</span><a href="contact.html">CONTACT</a><span class="sep">·</span><a href="resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ HEADER ═══════════ -->
-  <div class="home-header">
-    <div>
-      <div class="header-name">Priyam</div>
-      <div class="header-subtitle">Systems · Research · Inference</div>
-    </div>
-    <img src="images/icon.png" alt="Priyam" class="home-icon" />
-  </div>
-
-  <div class="mission">
+<html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>Priyam — AI Systems · Backend · Research</title><meta name="description" content="Priyam Ghosh — systems engineer, researcher, and co-founder of MetaCognition."><link rel="canonical" href="https://prigoistic.me/">
+<link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/reading.css?v=4"><link rel="stylesheet" href="/assets/site.css?v=1"><script defer src="/assets/reading.js?v=3"></script></head>
+<body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html" aria-current="page">Priyam Ghosh</a><div class="reading-links"><a href="/index.html" aria-current="page">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="site-main"><header class="home-heading"><div><h1>Priyam</h1><p class="header-subtitle">Systems · Research · Inference</p></div><img class="home-icon" src="/images/icon.png" alt="Priyam's illustrated portrait"></header><div class="home-columns"><div><div class="mission">
     Hey, I'm <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">Priyam</a> — a seasoned ML systems engineer and researcher working on frontier intelligence architectures that mimic <span class="tag">cerebral</span> computation.
   </div>
 
   <div class="mission">
-    Co-Founder at <a href="https://www.getmetacognition.com" target="_blank" rel="noopener">MetaCognition</a>. 
+    Co-Founder at <a href="https://www.getmetacognition.com" target="_blank" rel="noopener">MetaCognition</a>.
     <br>
     email me -> <a href="mailto:priyam@getmetacognition.com">priyam@getmetacognition.com</a> (to know more about metacognition)
   </div>
 
-  <!-- ═══════════ ME ═══════════ -->
-  <div class="home-section-heading">a bit about me</div>
+  <h2 class="section-label">a bit about me</h2>
+
 
   <div class="mission">
-currently a research fellow at <a href="https://berkeley.edu" target="_blank" rel="noopener">UC Berkeley</a> working on spatial intelligence with quantum entanglement-inspired relational reasoning.    <br />
-    <br />
-    ex - ml and system architect at <a href="https://www.nasa.gov/mission/artemis-i/" target="_blank" rel="noopener">NASA JPL</a>, worked on <a href="https://www.nasa.gov/artemis" target="_blank" rel="noopener">Artemis 1</a>
-    <br />
-    <br />
-    <span class="tag">4+ years</span> of experience in building high performance ml systems, data infrastructure and performance optimisation for autonomous spacecraft navigation, deep space communication pipelines and high-reliability scientific workflows.
+currently a research fellow at <a href="https://berkeley.edu" target="_blank" rel="noopener">UC Berkeley</a> working on spatial intelligence with quantum entanglement-inspired relational reasoning.<br><br>ex - ml and system architect at <a href="https://www.nasa.gov/mission/artemis-i/" target="_blank" rel="noopener">NASA JPL</a>, worked on <a href="https://www.nasa.gov/artemis" target="_blank" rel="noopener">Artemis 1</a><br><br><span class="tag">4+ years</span> of experience in building high performance ml systems, data infrastructure and performance optimisation for autonomous spacecraft navigation, deep space communication pipelines and high-reliability scientific workflows.
 
-    
+
   </div>
 
   <div class="mission">
-    i love deep diving into <span class="tag">neuroscience</span> and understanding how intelligence emerges biologically, and then trynna interpret into building aritifial intelligence which mimics biological processes -> towards <span class="tag">general intelligence</span>. <br />
-
-    <br/>
-    
-    im a sucker for <span class="tag">astrophysics</span> & <span class="tag">physics</span> (have been a space enthusiast since childhood) -> spent most of my school days dealing with anomalies.
+    i love deep diving into <span class="tag">neuroscience</span> and understanding how intelligence emerges biologically, and then trynna interpret into building aritifial intelligence which mimics biological processes -> towards <span class="tag">general intelligence</span>.<br><br>im a sucker for <span class="tag">astrophysics</span> & <span class="tag">physics</span> (have been a space enthusiast since childhood) -> spent most of my school days dealing with anomalies.
     <br>
-    love reading pieces about <span class="tag">history</span> and <span class="tag">philosophy</span>, helps me quite alot to understand human behaviorial patterns -> medieval history is my favorite ngl <br>
-    <br>
-    <br>
-    lowkey have passion towards filming and cinematography, im also a seasoned vocalist trained in hindustani classical music for 7 years.
+    love reading pieces about <span class="tag">history</span> and <span class="tag">philosophy</span>, helps me quite alot to understand human behaviorial patterns -> medieval history is my favorite ngl<br><br>lowkey have passion towards filming and cinematography, im also a seasoned vocalist trained in hindustani classical music for 7 years.
   </div>
 
-  <!-- ═══════════ WRITING ═══════════ -->
-  <div class="home-section-heading">writing</div>
-
-  <div class="mission">
-    blogs and literature 
-  </div>
-
-  <div class="writing-item">
-    <a href="https://prigoistic.me/cheeger/" class="writing-item-title" target="_blank" rel="noopener">cheeger: Differentiable Spectral Embedding for Dense Semantic Segmentation</a>
-    <span class="writing-item-date">2026-06-16</span>
-  </div>
-  <div class="writing-item">
-    <a href="https://prigoistic.me/engram" class="writing-item-title" target="_blank" rel="noopener">engram: Building a Redis-Wire Vector Memory Engine in Rust from Scratch</a>
-    <span class="writing-item-date">2026-06-16</span>
-  </div>
-
-  <a href="blog.html" class="back-link">view all →</a>
-
-  <!-- ═══════════ REACH ═══════════ -->
-  <div class="home-section-heading">reach</div>
-
-  <div class="mission">
-    connect on <a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a> · <a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a> — or email at <a href="mailto:priyamghosh9753@gmail.com">priyamghosh9753@gmail.com</a>
-  </div>
-
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer home-footer">&copy; 2026 Priyam</div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </div><aside class="home-aside"><h2 class="section-label">selected writing</h2><article class="post-card"><a href="/blog/cheeger.html"><img src="/assets/covers/cheeger.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><h2>Cheeger: Learning to Segment by Cutting Graphs</h2></a></article><article class="post-card"><a href="/blog/engram.html"><img src="/assets/covers/engram.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><h2>Engram: Building a Vector Memory Engine in Rust</h2></a></article><a class="all-writing" href="/blog.html">All writing →</a></aside></div><div class="reach">Connect on <a href="https://x.com/prigoistic">X</a> · <a href="https://github.com/prigoistic">GitHub</a> · <a href="https://linkedin.com/in/prigoistic">LinkedIn</a> · <a href="mailto:priyamghosh9753@gmail.com">Email</a></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><div class="footer-links"><a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><a href="mailto:priyamghosh9753@gmail.com">Email</a></div></footer></body></html>

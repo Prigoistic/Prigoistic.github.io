@@ -1,0 +1,21 @@
+<svg width="520" height="220" viewBox="0 0 520 220" role="img" aria-label="Fiedler partition" xmlns="http://www.w3.org/2000/svg"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style>
+
+      <g stroke="#cdcabd" stroke-width="1">
+        <line x1="120" y1="70" x2="170" y2="50"></line><line x1="120" y1="70" x2="160" y2="110"></line>
+        <line x1="170" y1="50" x2="160" y2="110"></line><line x1="160" y1="110" x2="110" y2="150"></line>
+        <line x1="120" y1="70" x2="110" y2="150"></line>
+        <line x1="350" y1="70" x2="400" y2="55"></line><line x1="350" y1="70" x2="360" y2="120"></line>
+        <line x1="400" y1="55" x2="360" y2="120"></line><line x1="360" y1="120" x2="410" y2="150"></line>
+        <line x1="400" y1="55" x2="410" y2="150"></line>
+        <line x1="160" y1="110" x2="360" y2="120" stroke-dasharray="4 4"></line>
+      </g>
+      <g>
+        <circle cx="120" cy="70" r="12" fill="#3C3489"></circle><circle cx="170" cy="50" r="12" fill="#3C3489"></circle>
+        <circle cx="160" cy="110" r="12" fill="#3C3489"></circle><circle cx="110" cy="150" r="12" fill="#3C3489"></circle>
+        <circle cx="350" cy="70" r="12" fill="#0a5a49"></circle><circle cx="400" cy="55" r="12" fill="#0a5a49"></circle>
+        <circle cx="360" cy="120" r="12" fill="#0a5a49"></circle><circle cx="410" cy="150" r="12" fill="#0a5a49"></circle>
+      </g>
+      <text class="svg-sub" x="150" y="195" text-anchor="middle" fill="#3C3489">Fiedler &lt; 0</text>
+      <text class="svg-sub" x="385" y="195" text-anchor="middle" fill="#0a5a49">Fiedler &gt; 0</text>
+      <text class="svg-sub" x="260" y="100" text-anchor="middle">weakest seam</text>
+    </svg>

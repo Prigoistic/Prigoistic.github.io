@@ -1,231 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <script>
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-  </script>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Priyam — Projects</title>
+  <title>Projects | Priyam Ghosh</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="images/icon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/assets/reading.css?v=4"><link rel="stylesheet" href="/assets/site.css?v=1"><script defer src="/assets/reading.js?v=3"></script>
 </head>
-<body>
-<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">☾</button>
-
-<div class="container">
-
-  <!-- ═══════════ NAVBAR ═══════════ -->
-  <nav>
-    <a href="index.html">ABOUT</a><span class="sep">·</span><a href="projects.html" class="active">PROJECTS</a><span class="sep">·</span><a href="experience.html">EXPERIENCE</a><span class="sep">·</span><a href="research.html">RESEARCH</a><span class="sep">·</span><a href="blog.html">BLOG</a><span class="sep">·</span><a href="contact.html">CONTACT</a><span class="sep">·</span><a href="resume/">RESUME</a>
-  </nav>
-
-  <!-- ═══════════ PAGE HEADER ═══════════ -->
-  <div class="page-title">PROJECTS</div>
+<body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html" aria-current="page">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="site-main"><h1 class="page-title">Projects</h1>
   <div class="page-desc">
-    Systems, tools, and experiments — shipped or in progress.
+    Software, systems, and research.
   </div>
 
   <hr />
 
-  <!-- ═══════════ PROJECT 01 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">engram — Redis-Wire Associative Vector Memory Engine</div>
+    <h2 class="project-name">engram: Vector memory engine</h2>
     <div class="project-desc">
-      A Redis-wire-compatible (RESP) vector memory engine written from scratch in Rust with zero
-      dependencies beyond libc — works unchanged with redis-cli and existing clients. Hand-rolled
-      HNSW approximate nearest-neighbour index with a single-threaded event-driven I/O core over
-      raw kqueue/epoll and vector search offloaded to a worker pool. Hand-written SIMD distance
-      kernels in NEON (ARM64) and AVX2+FMA (x86_64) with runtime dispatch achieve ~9&times;
-      speedup at 768 dimensions; WAL + compacting mmap snapshot for crash-safe durability.
+      A vector memory engine written in Rust that works with Redis clients through the RESP protocol. Uses HNSW for similarity search, SIMD distance calculations, and a write-ahead log for recovery.
     </div>
-    <div class="project-meta">STACK <span>Rust (no deps beyond libc), NEON/AVX2+FMA SIMD</span></div>
-    <div class="project-meta">ARCH <span>From-scratch HNSW, kqueue/epoll event loop, worker-pool I/O, mmap+WAL persistence</span></div>
-    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-meta">STACK <span>Rust, libc, ARM NEON, x86 AVX2/FMA</span></div>
+    <div class="project-meta">ARCH <span>HNSW index, event loop, search workers, write-ahead log and snapshots</span></div>
+    <div class="project-meta">STATUS <span>Open source</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/engram" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://prigoistic.me/engram" target="_blank" rel="noopener">Blog</a>
+      <a href="/blog/engram.html">Blog</a>
     </div>
   </div>
 
-  <!-- ═══════════ PROJECT 02 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">cheeger — Differentiable Spectral Embedding for Dense Semantic Segmentation</div>
+    <h2 class="project-name">cheeger: Differentiable image segmentation</h2>
     <div class="project-desc">
-      A from-scratch differentiable spectral-segmentation library in PyTorch that treats a
-      network's feature map as a graph and learns to segment by cutting graphs, motivated by the
-      Cheeger inequality bounding graph conductance by the Fiedler value &lambda;<sub>2</sub>.
-      Implements every spectral operator by hand — learned-metric affinity kernels, three
-      graph-Laplacian variants, k-NN sparsification, and a symmetric eigensolver (cyclic Jacobi
-      + Lanczos), each validated against numpy/scipy oracles. Hand-codes a degeneracy-robust
-      differentiable eigensolver replacing PyTorch's unstable <code>eigh</code> backward with
-      Lorentzian-broadened eigenvalue-gap gradients stable where eigenvalues collapse at segment
-      boundaries. Replaces fixed eigenbasis weighting with a learned, label-supervised spectral
-      response whose noise floor is set from the Marchenko–Pastur bulk edge; benchmarked as a
-      U-Net head on Cityscapes with mIoU / Boundary-IoU metrics.
+      A PyTorch library that treats image features as a graph and learns to segment them using spectral methods. Includes custom graph operators and a differentiable eigensolver, with evaluation as a U-Net segmentation head on Cityscapes.
     </div>
-    <div class="project-meta">STACK <span>Python, PyTorch, NumPy, SciPy (test oracles only)</span></div>
-    <div class="project-meta">ARCH <span>Differentiable spectral graph operators, cyclic Jacobi + Lanczos eigensolver, OHEM/Lovász + Rayleigh losses, U-Net segmentation head</span></div>
-    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-meta">STACK <span>Python, PyTorch, NumPy and SciPy for validation</span></div>
+    <div class="project-meta">ARCH <span>Graph Laplacians, differentiable eigensolver, learned spectral response</span></div>
+    <div class="project-meta">STATUS <span>Open source</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/cheeger" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://prigoistic.me/cheeger/" target="_blank" rel="noopener">Write-up</a>
+      <a href="/blog/cheeger.html">Write-up</a>
     </div>
   </div>
 
-  <!-- ═══════════ PROJECT 03 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">Poolgrad — Memory Aware ML Runtime to Explore Neural Network Performance</div>
+    <h2 class="project-name">Poolgrad: Autograd and memory management</h2>
     <div class="project-desc">
-      A minimal autograd engine built from scratch in Rust exploring where
-      neural network performance actually comes from. Implements reverse-mode
-      autograd over a dynamic graph, four matrix multiplication kernels
-      (naive, tiled, packed+SIMD, and an experimental Strassen-form mp variant),
-      a kernel scheduler, and a gradient memory pool with lifetime-based release.
-      CPU-only; SIMD via NEON on arm64 and AVX2+FMA on x86_64.
+      A CPU-based autograd engine in Rust for studying computation and memory use in neural networks. Combines a dynamic computation graph, matrix multiplication kernels, task scheduling, and a reusable pool for gradient memory.
     </div>
-    <div class="project-meta">STACK <span>Rust, Rayon, NEON/AVX2+FMA SIMD</span></div>
-    <div class="project-meta">ARCH <span>Dynamic autograd graph, kernel scheduler, size-based gradient memory pool</span></div>
-    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-meta">STACK <span>Rust, Rayon, ARM NEON, x86 AVX2/FMA</span></div>
+    <div class="project-meta">ARCH <span>Reverse-mode autograd, kernel scheduler, gradient memory pool</span></div>
+    <div class="project-meta">STATUS <span>Open source</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/poolgrad" target="_blank" rel="noopener">GitHub</a>
       <a href="https://shorturl.at/fKmj1" target="_blank" rel="noopener">Paper</a>
     </div>
   </div>
 
-  <!-- ═══════════ PROJECT 02 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">Ananta — Energy-Based Self-Learning Architecture</div>
+    <h2 class="project-name">Ananta: Scientific and symbolic reasoning</h2>
     <div class="project-desc">
-      Research-driven LLM architecture exploring energy-based self-learning
-      for scientific reasoning, symbolic mathematics, and formal logic.
-      Combines contrastive energy functions with autoregressive generation
-      to enable iterative self-correction without external reward models.
+      An LLM research project for scientific reasoning, mathematics, and formal logic. Combines energy-based objectives with autoregressive generation to study iterative self-correction.
     </div>
-    <div class="project-meta">STACK <span>Python, PyTorch, CUDA, LoRA/QLora, RLHF</span></div>
-    <div class="project-meta">ARCH <span>Energy-based models, autoregressive decoding, self-play loops</span></div>
-    <div class="project-meta">STATUS <span>Open-sourced</span></div>
+    <div class="project-meta">STACK <span>Python, PyTorch, CUDA, LoRA/QLoRA, RLHF</span></div>
+    <div class="project-meta">ARCH <span>Energy-based models, autoregressive decoding, self-play</span></div>
+    <div class="project-meta">STATUS <span>Open source</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/ananta-oss" target="_blank" rel="noopener">GitHub</a>
     </div>
   </div>
 
-  <!-- ═══════════ PROJECT 02 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">Whisp</div>
+    <h2 class="project-name">Whisp</h2>
     <div class="project-desc">
-      Real-time chat system built from scratch over raw WebSocket connections.
-      Persistent message storage, presence detection, typing indicators,
-      and room-based multiplexing — no third-party chat SDKs.
+      A real-time chat application with saved messages, online presence, typing indicators, and chat rooms. Uses Socket.IO for communication and MongoDB for message storage.
     </div>
     <div class="project-meta">STACK <span>TypeScript, Node.js, Express, Socket.IO, MongoDB</span></div>
-    <div class="project-meta">ARCH <span>Event-driven, WebSocket bidirectional, room-scoped pub/sub</span></div>
+    <div class="project-meta">ARCH <span>Event-driven messaging, chat rooms, persistent message storage</span></div>
     <div class="project-links">
       <a href="https://github.com/Prigoistic/whisp" target="_blank" rel="noopener">GitHub</a>
-      <!-- <a href="#" target="_blank" rel="noopener">Live</a> -->
+
     </div>
   </div>
 
-  <!-- ═══════════ PROJECT 03 ═══════════ -->
+
   <div class="project">
-    <div class="project-name">Anti-Shuffle</div>
+    <h2 class="project-name">Anti-Shuffle</h2>
     <div class="project-desc">
-      Mobile application that clusters photos using on-device ML
-      for perceptual similarity. Extracts feature embeddings, runs
-      hierarchical clustering, and groups visually related images
-      without uploading data to any external server.
+      An Android app that groups visually similar photos. Extracts image features and clusters them on the device, keeping photos off external servers.
     </div>
     <div class="project-meta">STACK <span>Kotlin, Java, TensorFlow Lite, Android SDK</span></div>
-    <div class="project-meta">ARCH <span>On-device inference, feature extraction, agglomerative clustering</span></div>
-    <div class="project-links">
-      <!-- <a href="#" target="_blank" rel="noopener">GitHub</a> -->
-      <!-- <a href="#" target="_blank" rel="noopener">Play Store</a> -->
-    </div>
-  </div>
+    <div class="project-meta">ARCH <span>On-device image embeddings and hierarchical clustering</span></div>
+</div>
 
-  <!-- ═══════════ PROJECT 04 ═══════════ -->
-  <div class="project">
-    <div class="project-name">Oro</div>
-    <div class="project-desc">
-      Deterministic spatial interaction engine for generating structured
-      synthetic datasets. Simulates grid-based environments with
-      configurable physics, agent policies, and collision semantics —
-      designed to produce training data for autonomous agent learning.
-    </div>
-    <div class="project-meta">STACK <span>Python, NumPy, JSON schema</span></div>
-    <div class="project-meta">ARCH <span>Deterministic simulation, configurable state machines, batch export</span></div>
-    <div class="project-links">
-      <!-- <a href="#" target="_blank" rel="noopener">GitHub</a> -->
-    </div>
-  </div>
 
-  <!-- ═══════════ PROJECT 05 ═══════════ -->
   <div class="project">
-    <div class="project-name">M2D2</div>
+    <h2 class="project-name">Oro</h2>
     <div class="project-desc">
-      AI-driven microplastic detection pipeline combining optical particle
-      counters with Bulk Acoustic Wave (BAW) preprocessing. Classifies
-      particle morphology through signal analysis and implements a
-      toxin-free acoustic capture system for microplastic recovery
-      across varied aquatic environments.
+      A simulator that generates training datasets from grid-based environments. Supports configurable physics, agent policies, and collision rules, with repeatable runs and batch export.
     </div>
-    <div class="project-meta">STACK <span>Python, MATLAB, signal processing, optical sensor data</span></div>
-    <div class="project-meta">DOMAIN <span>Environmental sensing, acoustic filtering, particle classification</span></div>
+    <div class="project-meta">STACK <span>Python, NumPy, JSON Schema</span></div>
+    <div class="project-meta">ARCH <span>Deterministic simulation, state machines, batch export</span></div>
+</div>
+
+
+  <div class="project">
+    <h2 class="project-name">M2D2</h2>
+    <div class="project-desc">
+      A system for detecting and collecting microplastics in water. Combines optical particle measurements, signal analysis, and acoustic filtering to identify and separate particles.
+    </div>
+    <div class="project-meta">STACK <span>Python, MATLAB, optical sensors, signal processing</span></div>
+    <div class="project-meta">DOMAIN <span>Microplastic detection and acoustic separation</span></div>
     <div class="project-meta">STATUS <span>Published</span></div>
     <div class="project-links">
       <a href="https://www.researchgate.net/publication/391628259_Developing_an_Autonomous_System_for_Identification_and_Removal_of_Microplastic_from_Water_Bodies_M2D2" target="_blank" rel="noopener">Paper</a>
     </div>
   </div>
 
-  <div class="list-tail">...and ongoing experimental systems</div>
 
-  <!-- ═══════════════════════════════════
-       ADD MORE PROJECTS BELOW
-       Copy a project block and fill in:
-       - project-name
-       - project-desc
-       - project-meta (stack, status)
-       - project-links (GitHub, Demo, Paper, etc.)
-       You can also add images inside a project:
-       <div class="gallery">
-         <img src="images/your-screenshot.png" alt="description" />
-       </div>
-       ═══════════════════════════════════ -->
 
-  <hr />
 
-  <!-- ═══════════ FOOTER ═══════════ -->
-  <div class="footer">
-    <div>&copy; 2026 Priyam</div>
-    <div class="footer-links">
-      <a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><span class="sep">·</span><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><span class="sep">·</span><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><span class="sep">·</span><a href="mailto:priyamghosh9753@gmail.com">Email</a>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function setToggleLabel() {
-    var btn = document.getElementById('theme-toggle-btn');
-    if (!btn) return;
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀' : '☾';
-  }
-  function toggleTheme() {
-    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    if (isDark) {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setToggleLabel();
-  }
-  setToggleLabel();
-</script>
-</body>
-</html>
+  </main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><div class="footer-links"><a href="https://linkedin.com/in/prigoistic" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/prigoistic" target="_blank" rel="noopener">X</a><a href="https://github.com/prigoistic" target="_blank" rel="noopener">GitHub</a><a href="mailto:priyamghosh9753@gmail.com">Email</a></div></footer></body></html>

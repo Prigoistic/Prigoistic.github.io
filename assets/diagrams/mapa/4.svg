@@ -1,0 +1,34 @@
+<svg width="100%" viewBox="0 0 680 248" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+
+  <rect x="8" y="8" width="664" height="38" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"></rect>
+  <text x="340" y="32" text-anchor="middle" font-size="12" fill="#475569">Multi-episode unlabeled video observation stream</text>
+  <line x1="340" y1="46" x2="340" y2="68" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+
+
+  <rect x="8" y="72" width="664" height="72" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="340" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Stage 1 · SIGReg Encoder Pre-training</text>
+  <line x1="8" y1="100" x2="672" y2="100" stroke="#a78bfa" stroke-width="1"></line>
+  <text x="340" y="116" text-anchor="middle" font-size="11" fill="#4c1d95">L = L_InfoNCE + λ_geo · L_geo  ·  metric-preserving latent space</text>
+  <text x="340" y="132" text-anchor="middle" font-size="11" fill="#4c1d95">No EMA target network · halves trainable params · bounds encoder Lipschitz constant</text>
+
+  <line x1="340" y1="144" x2="340" y2="166" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+
+
+  <rect x="8" y="170" width="664" height="72" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"></rect>
+  <text x="340" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Stage 2 · LeJEPA Predictor Pre-training</text>
+  <line x1="8" y1="198" x2="672" y2="198" stroke="#60a5fa" stroke-width="1"></line>
+  <text x="340" y="214" text-anchor="middle" font-size="11" fill="#1e3a8a">Multi-step targets k ∈ {1,2,4,8,16}  ·  L_JEPA = ||f_θ(z_t,k) − sg[φ(s_{t+k})]||²</text>
+  <text x="340" y="230" text-anchor="middle" font-size="11" fill="#1e3a8a">Representations meaningful at multiple timescales · aligns with MAPA fast/slow memory split</text>
+
+  <line x1="340" y1="242" x2="340" y2="248" stroke="#94a3b8" stroke-width="1.5"></line>
+  <text x="400" y="247" font-size="11" fill="#64748b">Frozen φ + initialized f_θ → MAPA runtime</text>
+</svg>

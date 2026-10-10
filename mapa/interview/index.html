@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MAPA — Interview Walkthrough</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-  onload="renderMathInElement(document.body,{delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})"></script>
-<style>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>How to Walk Someone Through the MAPA Proposal — Priyam Ghosh</title><meta name="description" content="A narrative guide to explaining MAPA in an interview or panel, including the motivation, proposed mechanisms, mathematical questions, and failure modes. It distinguishes established foundations from hypotheses and planned validation."><link rel="canonical" href="https://prigoistic.me/mapa/interview/">
+<meta property="og:type" content="article"><meta property="og:title" content="How to Walk Someone Through the MAPA Proposal"><meta property="og:description" content="A narrative guide to explaining MAPA in an interview or panel, including the motivation, proposed mechanisms, mathematical questions, and failure modes. It distinguishes established foundations from hypotheses and planned validation."><meta property="og:url" content="https://prigoistic.me/mapa/interview/"><meta property="og:image" content="https://prigoistic.me/assets/covers/mapa.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/mapa/interview/index.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -221,9 +217,7 @@ code {
 .site-nav a.active { color: #222; }
 
 footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; text-align: center; font-size: 13px; color: #bbb; }
-</style>
-</head>
-<body>
+</style><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "How to Walk Someone Through the MAPA Proposal", "name": "How to Walk Someone Through the MAPA Proposal", "description": "A narrative guide to explaining MAPA in an interview or panel, including the motivation, proposed mechanisms, mathematical questions, and failure modes. It distinguishes established foundations from hypotheses and planned validation.", "url": "https://prigoistic.me/mapa/interview/", "mainEntityOfPage": "https://prigoistic.me/mapa/interview/", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/mapa.jpg"}</script><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#start-here-the-claim">Start here: the claim</a><a href="#part-1-the-kitchen-in-the-dark">Part 1 — The kitchen in the dark</a><a href="#part-2-what-is-missing-in-jepa-five-structural-absences">Part 2 — What is missing in JEPA: five structural absences</a><a href="#part-3-how-we-fix-it-deriving-the-mechanism">Part 3 — How we fix it: deriving the mechanism</a><a href="#part-4-the-experiment-that-makes-the-claim-undeniable">Part 4 — The experiment that makes the claim undeniable</a><a href="#part-5-how-we-measure-it">Part 5 — How we measure it</a><a href="#cold-questions-30-second-answers-no-thinking">Cold questions — 30-second answers, no thinking</a><a href="#when-it-goes-off-script">When it goes off-script</a><a href="#every-claim-and-its-source">Every claim and its source</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>How to Walk Someone Through the MAPA Proposal</h1><p class="article-deck">A complete narrative guide for explaining MAPA in an interview or panel.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-07">July 2026</time></dd></div><div><dt>Reading time</dt><dd>31 min read</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/mapa/interview/index.md">Markdown ↗</a></div><p class="key-topics">MAPA · world models · memory hierarchy · research proposal</p></header><article class="article-content"><p class="lede">A complete narrative guide for explaining MAPA in an interview or panel</p>
 
 <nav class="site-nav">
   <a href="/mapa/">Explainer</a>
@@ -232,11 +226,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 
 <div class="page">
 
-<div class="title-block">
-  <h1>How to Walk Someone Through the Proposal</h1>
-  <p class="subtitle">A complete narrative guide for explaining MAPA in an interview or panel</p>
-  <p class="date">July 2026 &nbsp;·&nbsp; Priyam Ghosh</p>
-</div>
+
 
 <p>
   This page is a single thing: the story you tell when someone says "walk me through your proposal."
@@ -255,7 +245,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      THE CLAIM
 ══════════════════════════════ -->
 
-<h2>Start here: the claim</h2>
+<h2 id="start-here-the-claim">Start here: the claim</h2>
 
 <p>
   This is the first thing you say. Not the architecture. Not the acronym. The claim.
@@ -281,7 +271,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      PART 1 — KITCHEN / NEUROSCIENCE
 ══════════════════════════════ -->
 
-<h2>Part 1 — The kitchen in the dark</h2>
+<h2 id="part-1-the-kitchen-in-the-dark">Part 1 — The kitchen in the dark</h2>
 
 <p>
   Before JEPA. Before LoRA. Before any architecture. You need to make the problem felt with something
@@ -383,7 +373,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      PART 2 — FIVE FAILURE MODES
 ══════════════════════════════ -->
 
-<h2>Part 2 — What is missing in JEPA: five structural absences</h2>
+<h2 id="part-2-what-is-missing-in-jepa-five-structural-absences">Part 2 — What is missing in JEPA: five structural absences</h2>
 
 <p>
   Now you move from neuroscience to the architecture. The transition sentence is critical —
@@ -590,7 +580,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      PART 3 — THE SOLUTION
 ══════════════════════════════ -->
 
-<h2>Part 3 — How we fix it: deriving the mechanism</h2>
+<h2 id="part-3-how-we-fix-it-deriving-the-mechanism">Part 3 — How we fix it: deriving the mechanism</h2>
 
 <p>
   Don't describe MAPA as a list of components. Derive it. Start from what you need, then show
@@ -721,7 +711,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      PART 4 — THE PROOF
 ══════════════════════════════ -->
 
-<h2>Part 4 — The experiment that makes the claim undeniable</h2>
+<h2 id="part-4-the-experiment-that-makes-the-claim-undeniable">Part 4 — The experiment that makes the claim undeniable</h2>
 
 <p>
   The strongest objection to MAPA is: this is just LoRA fine-tuning with a clever buffer, and
@@ -773,7 +763,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      METRICS
 ══════════════════════════════ -->
 
-<h2>Part 5 — How we measure it</h2>
+<h2 id="part-5-how-we-measure-it">Part 5 — How we measure it</h2>
 
 <div class="fumble">
   <div class="fm-label">You made both of these mistakes in the interview simulation — read before anything else</div>
@@ -1002,7 +992,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      COLD QUESTIONS
 ══════════════════════════════ -->
 
-<h2>Cold questions — 30-second answers, no thinking</h2>
+<h2 id="cold-questions-30-second-answers-no-thinking">Cold questions — 30-second answers, no thinking</h2>
 
 <p>
   These arrive without warning. You need each one locked in well enough to answer mid-sentence
@@ -1114,7 +1104,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      OFF-SCRIPT HANDLING
 ══════════════════════════════ -->
 
-<h2>When it goes off-script</h2>
+<h2 id="when-it-goes-off-script">When it goes off-script</h2>
 
 <h3>If they say: "write the architecture on the whiteboard"</h3>
 <p>
@@ -1158,7 +1148,7 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
      CLAIMS TABLE
 ══════════════════════════════ -->
 
-<h2>Every claim and its source</h2>
+<h2 id="every-claim-and-its-source">Every claim and its source</h2>
 
 <div class="table-wrap">
 <table>
@@ -1217,5 +1207,4 @@ footer { margin-top: 64px; padding-top: 28px; border-top: 1px solid #ebebeb; tex
 <footer>MAPA Interview Reference &nbsp;·&nbsp; Priyam Ghosh &nbsp;·&nbsp; July 2026</footer>
 
 </div>
-</body>
-</html>
+</article><section class="agent-panel" data-markdown="/mapa/interview/index.md?v=77e46a3be581" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>

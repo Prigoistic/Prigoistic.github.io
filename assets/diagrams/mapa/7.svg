@@ -1,0 +1,38 @@
+<svg width="100%" viewBox="0 0 680 196" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+  <rect x="40" y="20" width="220" height="68" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"></rect>
+  <text x="150" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Online Encoder</text>
+  <line x1="40" y1="52" x2="260" y2="52" stroke="#60a5fa" stroke-width="1"></line>
+  <text x="150" y="70" text-anchor="middle" font-size="10.5" fill="#1e3a8a">θ_online · updated every step by ∇</text>
+
+  <rect x="420" y="20" width="220" height="68" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="530" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Target Encoder</text>
+  <line x1="420" y1="52" x2="640" y2="52" stroke="#a78bfa" stroke-width="1"></line>
+  <text x="530" y="70" text-anchor="middle" font-size="10.5" fill="#4c1d95">θ_target · no gradient ever</text>
+
+  <path d="M260,36 C330,8 390,8 420,36" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)" stroke-dasharray="5,3"></path>
+  <text x="340" y="12" text-anchor="middle" font-size="10" fill="#64748b">EMA update each step</text>
+  <text x="340" y="25" text-anchor="middle" font-size="9.5" fill="#94a3b8">θ_t ← m·θ_t + (1–m)·θ_online</text>
+
+  <line x1="150" y1="88" x2="150" y2="128" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"></line>
+  <text x="172" y="114" font-size="10" fill="#3b82f6">∇ gradient</text>
+
+  <line x1="530" y1="88" x2="530" y2="118" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,3"></line>
+  <text x="548" y="107" font-size="10" fill="#dc2626">✕ no gradient</text>
+
+  <rect x="260" y="148" width="160" height="38" rx="5" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5"></rect>
+  <text x="340" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">Loss</text>
+  <text x="340" y="179" text-anchor="middle" font-size="10" fill="#78350f">predictor vs. target encoder</text>
+
+  <line x1="295" y1="148" x2="163" y2="128" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"></line>
+  <text x="530" y="145" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">slow ghost of the online network</text>
+  <text x="530" y="158" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">— stable targets, smooth loss</text>
+</svg>

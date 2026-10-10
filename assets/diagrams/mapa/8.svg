@@ -1,0 +1,41 @@
+<svg width="100%" viewBox="0 0 680 148" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+  <rect x="10" y="28" width="88" height="56" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"></rect>
+  <text x="54" y="54" text-anchor="middle" font-size="12" fill="#475569">Input x</text>
+  <text x="54" y="70" text-anchor="middle" font-size="10" fill="#94a3b8">(image/video)</text>
+
+  <rect x="128" y="20" width="178" height="72" rx="6" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3"></rect>
+  <text x="217" y="48" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">Encoder φ</text>
+  <text x="217" y="65" text-anchor="middle" font-size="11" fill="#7c3aed">🔒 FROZEN</text>
+  <text x="217" y="81" text-anchor="middle" font-size="10" fill="#4c1d95">requires_grad = False</text>
+
+  <rect x="336" y="28" width="68" height="56" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"></rect>
+  <text x="370" y="55" text-anchor="middle" font-size="12" fill="#475569">z</text>
+  <text x="370" y="72" text-anchor="middle" font-size="10" fill="#94a3b8">192-dim</text>
+
+  <rect x="434" y="28" width="130" height="56" rx="5" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.5"></rect>
+  <text x="499" y="54" text-anchor="middle" font-size="12.5" font-weight="700" fill="#166534">Linear  W</text>
+  <text x="499" y="71" text-anchor="middle" font-size="10.5" fill="#14532d">only this layer trains</text>
+
+  <rect x="594" y="34" width="76" height="44" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"></rect>
+  <text x="632" y="60" text-anchor="middle" font-size="11.5" fill="#475569">ŷ</text>
+
+  <line x1="98" y1="56" x2="128" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"></line>
+  <line x1="306" y1="56" x2="336" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"></line>
+  <line x1="404" y1="56" x2="434" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"></line>
+  <line x1="564" y1="56" x2="594" y2="56" stroke="#475569" stroke-width="1.5" marker-end="url(#arr-dk)"></line>
+
+  <line x1="594" y1="110" x2="564" y2="110" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"></line>
+  <line x1="434" y1="110" x2="404" y2="110" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"></line>
+  <text x="499" y="130" text-anchor="middle" font-size="9.5" fill="#16a34a">∇ gradient flows through linear W only</text>
+  <line x1="336" y1="110" x2="312" y2="110" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,3"></line>
+  <text x="196" y="130" text-anchor="middle" font-size="9.5" fill="#dc2626">✕ frozen encoder sees no gradient at all</text>
+</svg>

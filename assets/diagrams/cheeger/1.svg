@@ -1,0 +1,45 @@
+<svg width="760" height="210" viewBox="0 0 760 210" role="img" aria-label="cheeger pipeline" xmlns="http://www.w3.org/2000/svg"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style>
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M2 1 L8 5 L2 9" fill="none" stroke="#b7b3a6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+        </marker>
+      </defs>
+      <g>
+        <rect x="6" y="74" width="92" height="58" rx="9" fill="#fff" stroke="#e0ddd3"></rect>
+        <text class="svg-lbl" x="52" y="98" text-anchor="middle">image</text>
+        <text class="svg-sub" x="52" y="116" text-anchor="middle">H×W×3</text>
+
+        <rect x="120" y="62" width="96" height="82" rx="9" fill="#eef0fb" stroke="#cfd2f0"></rect>
+        <text class="svg-lbl" x="168" y="98" text-anchor="middle">U-Net</text>
+        <text class="svg-sub" x="168" y="116" text-anchor="middle">features</text>
+
+        <rect x="238" y="62" width="104" height="82" rx="9" fill="#e7f3ee" stroke="#bfe0d2"></rect>
+        <text class="svg-lbl" x="290" y="92" text-anchor="middle">graph +</text>
+        <text class="svg-lbl" x="290" y="110" text-anchor="middle">Laplacian</text>
+        <text class="svg-sub" x="290" y="127" text-anchor="middle">L_sym</text>
+
+        <rect x="364" y="62" width="110" height="82" rx="9" fill="#efedfb" stroke="#d4cff0"></rect>
+        <text class="svg-lbl" x="419" y="92" text-anchor="middle">eigensolver</text>
+        <text class="svg-sub" x="419" y="110" text-anchor="middle">bottom-k (U,λ)</text>
+        <text class="svg-sub" x="419" y="126" text-anchor="middle">Lanczos</text>
+
+        <rect x="496" y="62" width="104" height="82" rx="9" fill="#fbf0e9" stroke="#eccdb9"></rect>
+        <text class="svg-lbl" x="548" y="92" text-anchor="middle">response</text>
+        <text class="svg-sub" x="548" y="110" text-anchor="middle">Φ = U·h_θ(λ)</text>
+        <text class="svg-sub" x="548" y="126" text-anchor="middle">learned</text>
+
+        <rect x="662" y="74" width="92" height="58" rx="9" fill="#fff" stroke="#e0ddd3"></rect>
+        <text class="svg-lbl" x="708" y="98" text-anchor="middle">seg mask</text>
+        <text class="svg-sub" x="708" y="116" text-anchor="middle">H×W×K</text>
+
+        <line x1="98" y1="103" x2="118" y2="103" stroke="#cdcabd" marker-end="url(#ar)"></line>
+        <line x1="216" y1="103" x2="236" y2="103" stroke="#cdcabd" marker-end="url(#ar)"></line>
+        <line x1="342" y1="103" x2="362" y2="103" stroke="#cdcabd" marker-end="url(#ar)"></line>
+        <line x1="474" y1="103" x2="494" y2="103" stroke="#cdcabd" marker-end="url(#ar)"></line>
+        <line x1="600" y1="103" x2="660" y2="103" stroke="#cdcabd" marker-end="url(#ar)"></line>
+
+        <text class="svg-sub" x="380" y="178" text-anchor="middle" fill="#9a6b12">the green, purple and orange blocks are learned and differentiable end to end</text>
+        <path d="M238 158 H600" stroke="#e7c98f" stroke-dasharray="4 3" fill="none"></path>
+        <path d="M238 158 V150 M600 158 V150" stroke="#e7c98f" fill="none"></path>
+      </g>
+    </svg>

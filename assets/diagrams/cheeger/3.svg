@@ -1,0 +1,22 @@
+<svg width="560" height="250" viewBox="0 0 560 250" role="img" aria-label="fixed versus learned spectral response" xmlns="http://www.w3.org/2000/svg"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style>
+      <line x1="60" y1="210" x2="520" y2="210" stroke="#cdcabd"></line>
+      <line x1="60" y1="210" x2="60" y2="30" stroke="#cdcabd"></line>
+      <text class="svg-sub" x="290" y="238" text-anchor="middle">eigenvalue  λ  (low frequency → high)</text>
+      <text class="svg-sub" x="30" y="120" text-anchor="middle" transform="rotate(-90 30 120)">weight  h(λ)</text>
+
+
+      <path d="M60 60 H230 V206 H520" fill="none" stroke="#9a6b12" stroke-width="2" stroke-dasharray="5 4"></path>
+      <text class="svg-sub" x="150" y="52" fill="#9a6b12">truncation  (hard cutoff)</text>
+
+
+      <path d="M60 70 Q220 150 520 195" fill="none" stroke="#0a5a49" stroke-width="2" stroke-dasharray="5 4"></path>
+      <text class="svg-sub" x="300" y="135" fill="#0a5a49">tempering  (fixed power)</text>
+
+
+      <path d="M60 50 C150 60 200 120 250 120 C330 120 360 175 520 200" fill="none" stroke="#3C3489" stroke-width="3.2"></path>
+      <text class="svg-h" x="360" y="70" fill="#3C3489">h_θ(λ)  learned</text>
+
+
+      <line x1="430" y1="40" x2="430" y2="210" stroke="#c9b27a" stroke-dasharray="3 3"></line>
+      <text class="svg-sub" x="430" y="34" text-anchor="middle" fill="#9a6b12">MP noise edge</text>
+    </svg>

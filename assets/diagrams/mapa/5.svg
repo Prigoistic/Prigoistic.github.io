@@ -1,0 +1,51 @@
+<svg width="100%" viewBox="0 0 680 205" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+  <rect x="10" y="22" width="100" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="60" y="39" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6">frame A₁</text>
+  <text x="60" y="54" text-anchor="middle" font-size="10" fill="#7c3aed">kitchen · angle 1</text>
+
+  <rect x="10" y="82" width="100" height="42" rx="5" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"></rect>
+  <text x="60" y="99" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b21b6">frame A₂</text>
+  <text x="60" y="114" text-anchor="middle" font-size="10" fill="#7c3aed">kitchen · angle 2</text>
+
+  <rect x="10" y="142" width="100" height="42" rx="5" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"></rect>
+  <text x="60" y="159" text-anchor="middle" font-size="11.5" font-weight="600" fill="#1d4ed8">frame B₁</text>
+  <text x="60" y="174" text-anchor="middle" font-size="10" fill="#1e3a8a">car park · noon</text>
+
+  <line x1="110" y1="43" x2="218" y2="90" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+  <line x1="110" y1="103" x2="218" y2="101" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+  <line x1="110" y1="163" x2="218" y2="113" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arr)"></line>
+
+  <rect x="220" y="72" width="126" height="58" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"></rect>
+  <text x="283" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Encoder φ</text>
+  <text x="283" y="114" text-anchor="middle" font-size="10.5" fill="#64748b">s ↦ z ∈ ℝ¹⁹²</text>
+
+  <line x1="346" y1="101" x2="386" y2="101" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+
+  <rect x="390" y="12" width="280" height="182" rx="6" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"></rect>
+  <text x="530" y="31" text-anchor="middle" font-size="10.5" font-weight="700" fill="#94a3b8" letter-spacing="0.1em">LATENT SPACE  ℝ¹⁹²</text>
+
+  <circle cx="456" cy="82" r="10" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"></circle>
+  <text x="456" y="86" text-anchor="middle" font-size="9" font-weight="700" fill="#5b21b6">A₁</text>
+  <circle cx="484" cy="98" r="10" fill="#c4b5fd" stroke="#7c3aed" stroke-width="1.5"></circle>
+  <text x="484" y="102" text-anchor="middle" font-size="9" font-weight="700" fill="#5b21b6">A₂</text>
+  <ellipse cx="470" cy="90" rx="33" ry="22" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"></ellipse>
+  <text x="470" y="130" text-anchor="middle" font-size="10" fill="#7c3aed">same place, different view</text>
+  <text x="470" y="143" text-anchor="middle" font-size="10" fill="#7c3aed">→ close together</text>
+
+  <circle cx="598" cy="148" r="10" fill="#bfdbfe" stroke="#2563eb" stroke-width="1.5"></circle>
+  <text x="598" y="152" text-anchor="middle" font-size="9" font-weight="700" fill="#1d4ed8">B₁</text>
+  <text x="598" y="172" text-anchor="middle" font-size="10" fill="#1e3a8a">different scene</text>
+  <text x="598" y="185" text-anchor="middle" font-size="10" fill="#1e3a8a">→ far apart</text>
+
+  <line x1="500" y1="97" x2="587" y2="142" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4,3"></line>
+  <text x="550" y="108" text-anchor="middle" font-size="9" fill="#9ca3af" font-style="italic">large distance</text>
+</svg>

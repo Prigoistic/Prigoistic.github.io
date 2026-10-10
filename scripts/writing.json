@@ -1,0 +1,132 @@
+[
+  {
+    "path": "mapa/index.html",
+    "title": "Why World Models Need Memory",
+    "cover": "mapa",
+    "published": null,
+    "date": "June 2026",
+    "topics": [
+      "world models",
+      "episodic memory",
+      "JEPA",
+      "continual adaptation"
+    ],
+    "canonical": "https://prigoistic.me/mapa/",
+    "minutes": 113,
+    "description": "MAPA proposes a memory hierarchy for world-model prediction: an episodic buffer, consolidated landmarks, and gated adaptation. This essay develops the biological motivation, architectural proposal, failure modes, and experiments needed to test it."
+  },
+  {
+    "path": "blog/cheeger.html",
+    "title": "Cheeger: Learning to Segment by Cutting Graphs",
+    "cover": "cheeger",
+    "published": "2026-06-16",
+    "date": "June 16, 2026",
+    "topics": [
+      "spectral graph theory",
+      "semantic segmentation",
+      "differentiable eigensolvers",
+      "PyTorch"
+    ],
+    "canonical": "https://prigoistic.me/blog/cheeger.html",
+    "minutes": 19,
+    "description": "Cheeger builds a differentiable spectral segmentation head that learns graph affinities and the response applied to Laplacian eigenvectors. The article explains the mathematical foundations, implementation, experiments, and current limitations."
+  },
+  {
+    "path": "blog/engram.html",
+    "title": "Engram: Building a Vector Memory Engine in Rust",
+    "cover": "engram",
+    "published": "2026-06-16",
+    "date": "June 16, 2026",
+    "topics": [
+      "Rust",
+      "vector search",
+      "HNSW",
+      "SIMD",
+      "Redis protocol"
+    ],
+    "canonical": "https://prigoistic.me/blog/engram.html",
+    "minutes": 7,
+    "description": "Engram is a Redis-wire-compatible vector-memory engine written in Rust with libc as its only dependency. This article walks through its event loop, SIMD kernels, HNSW index, persistence, worker pool, benchmarks, and remaining limitations."
+  },
+  {
+    "path": "blog/astrocytes-tripartite-synapse.html",
+    "title": "Divergent Thinking: Astrocytes, the Supervisors of the Tripartite Synapse",
+    "cover": "astrocytes",
+    "published": "2026-06-03",
+    "date": "June 3, 2026",
+    "topics": [
+      "astrocytes",
+      "tripartite synapse",
+      "norepinephrine",
+      "associative memory"
+    ],
+    "canonical": "https://prigoistic.me/blog/astrocytes-tripartite-synapse.html",
+    "minutes": 17,
+    "description": "This essay examines research on astrocytic neuromodulation and the tripartite synapse, then connects it to associative memory and diffusion models. Its architectural interpretation is an argument developed from that research, rather than an experimentally validated AI system."
+  },
+  {
+    "path": "blog/oops-through-clash-royale.html",
+    "title": "Understanding Principles of OOP Through Clash Royale",
+    "cover": "oop",
+    "published": "2026-02-19",
+    "date": "February 19, 2026",
+    "topics": [
+      "object-oriented programming",
+      "Java",
+      "inheritance",
+      "polymorphism",
+      "game design"
+    ],
+    "canonical": "https://prigoistic.me/blog/oops-through-clash-royale.html",
+    "minutes": 9,
+    "description": "Clash Royale provides concrete examples for inheritance, polymorphism, encapsulation, abstraction, and composition. Java examples show how these ideas fit together and why the diamond problem matters."
+  },
+  {
+    "path": "blog/energy-landscapes-free-energy.html",
+    "title": "A Quick Deep Dive into Energy Landscapes and Free Energy Models",
+    "cover": "energy",
+    "published": "2026-02-18",
+    "date": "February 18, 2026",
+    "topics": [
+      "energy-based models",
+      "free energy",
+      "dynamical systems",
+      "memory"
+    ],
+    "canonical": "https://prigoistic.me/blog/energy-landscapes-free-energy.html",
+    "minutes": 8,
+    "description": "Energy-based models score configurations and seek low-energy states, offering a different perspective from sequential token prediction. This essay explores attractors, denoising, memory, and the author’s view of reasoning as convergence."
+  },
+  {
+    "path": "blog/spectral-graph-theory-brain.html",
+    "title": "How Spectral Graph Theory Connects to Advanced Memory Dynamics in the Human Brain",
+    "cover": "spectral",
+    "published": "2026-02-15",
+    "date": "February 15, 2026",
+    "topics": [
+      "spectral graph theory",
+      "graph Laplacian",
+      "diffusion",
+      "memory dynamics"
+    ],
+    "canonical": "https://prigoistic.me/blog/spectral-graph-theory-brain.html",
+    "minutes": 5,
+    "description": "Graph Laplacians and diffusion provide a mathematical lens for studying relaxation and smoothing on networks. This essay connects that lens to memory dynamics, inhibition, and consolidation in the brain."
+  },
+  {
+    "path": "mapa/interview/index.html",
+    "title": "How to Walk Someone Through the MAPA Proposal",
+    "cover": "mapa",
+    "published": null,
+    "date": "July 2026",
+    "topics": [
+      "MAPA",
+      "world models",
+      "memory hierarchy",
+      "research proposal"
+    ],
+    "canonical": "https://prigoistic.me/mapa/interview/",
+    "minutes": 31,
+    "description": "A narrative guide to explaining MAPA in an interview or panel, including the motivation, proposed mechanisms, mathematical questions, and failure modes. It distinguishes established foundations from hypotheses and planned validation."
+  }
+]

@@ -1,0 +1,38 @@
+<svg class="fig" viewBox="0 0 640 280" role="img" aria-label="HNSW layered graph" xmlns="http://www.w3.org/2000/svg"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style>
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1f6f5c"></path></marker>
+    <style>
+      .ly{fill:#a39e92;font:500 12px &quot;JetBrains Mono&quot;,ui-monospace,monospace}
+      .nd{fill:#f5f3ec;stroke:#cdc7b8;stroke-width:1.5}
+      .ed{stroke:#e0dccf;stroke-width:1.4}
+      .path{stroke:#1f6f5c;stroke-width:2.4;fill:none;marker-end:url(#ar)}
+      .hot{fill:#1f6f5c;stroke:#fff;stroke-width:2}
+      .tgt{fill:#cf7a2b;stroke:#fff;stroke-width:2}
+      .lbl{fill:#76726a;font:500 11px &quot;JetBrains Mono&quot;,ui-monospace,monospace}
+    </style>
+  </defs>
+  <text x="14" y="44" class="ly">L2</text>
+  <line x1="120" y1="40" x2="470" y2="40" class="ed"></line>
+  <circle cx="120" cy="40" r="10" class="nd hot"></circle>
+  <circle cx="470" cy="40" r="10" class="nd"></circle>
+  <text x="86" y="26" class="lbl">entry</text>
+  <text x="14" y="134" class="ly">L1</text>
+  <line x1="120" y1="130" x2="540" y2="130" class="ed"></line>
+  <circle cx="120" cy="130" r="10" class="nd"></circle>
+  <circle cx="260" cy="130" r="10" class="nd hot"></circle>
+  <circle cx="400" cy="130" r="10" class="nd"></circle>
+  <circle cx="540" cy="130" r="10" class="nd"></circle>
+  <text x="14" y="234" class="ly">L0</text>
+  <line x1="80" y1="230" x2="600" y2="230" class="ed"></line>
+  <line x1="200" y1="230" x2="300" y2="205" class="ed"></line>
+  <line x1="300" y1="205" x2="420" y2="230" class="ed"></line>
+  <circle cx="80" cy="230" r="9" class="nd"></circle>
+  <circle cx="200" cy="230" r="9" class="nd"></circle>
+  <circle cx="300" cy="205" r="9" class="nd tgt"></circle>
+  <circle cx="420" cy="230" r="9" class="nd"></circle>
+  <circle cx="520" cy="230" r="9" class="nd"></circle>
+  <circle cx="600" cy="230" r="9" class="nd"></circle>
+  <text x="262" y="262" class="lbl">k-nn result</text>
+  <path class="path" d="M120,52 L255,120"></path>
+  <path class="path" d="M260,142 L298,193"></path>
+</svg>

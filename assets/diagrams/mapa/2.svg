@@ -1,0 +1,55 @@
+<svg width="100%" viewBox="0 0 680 285" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,-apple-system,sans-serif"><style>:root{--ink:#252521;--muted:#65655d;--indigo:#3c3489;--teal:#0a5a49;--coral:#9c3b1b;--amber:#9a6b12}text{font-family:Arial,sans-serif}.svg-lbl{font-size:13px;fill:#252521}.svg-sub{font-size:11px;fill:#65655d}.svg-h{font-size:14px;font-weight:600}</style><svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#94a3b8"></polygon>
+    </marker>
+    <marker id="arr-dk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#475569"></polygon>
+    </marker>
+  </defs>
+</svg>
+
+  <rect x="8" y="8" width="664" height="68" rx="6" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5"></rect>
+  <text x="340" y="30" text-anchor="middle" font-size="13" font-weight="700" fill="#0369a1">High-Level Planner (slow, abstract)</text>
+  <line x1="8" y1="37" x2="672" y2="37" stroke="#7dd3fc" stroke-width="1"></line>
+  <text x="340" y="54" text-anchor="middle" font-size="11.5" fill="#075985">Subgoal sequence: g₁ → g₂ → g₃  ·  Action Encoder compresses primitive actions into Latent Macro-Actions</text>
+  <text x="340" y="68" text-anchor="middle" font-size="11" fill="#075985">Operates on coarse representations across many timesteps</text>
+
+
+  <line x1="170" y1="76" x2="170" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="340" y1="76" x2="340" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <line x1="510" y1="76" x2="510" y2="112" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"></line>
+  <text x="170" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₁</text>
+  <text x="340" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₂</text>
+  <text x="510" y="104" text-anchor="middle" font-size="11" fill="#64748b">g₃</text>
+
+
+  <rect x="60" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"></rect>
+  <text x="170" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="60" y1="145" x2="280" y2="145" stroke="#cbd5e1" stroke-width="1"></line>
+  <text x="170" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="170" y="175" text-anchor="middle" font-size="11" fill="#475569">z₁ … z_k</text>
+
+  <rect x="230" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"></rect>
+  <text x="340" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="230" y1="145" x2="450" y2="145" stroke="#cbd5e1" stroke-width="1"></line>
+  <text x="340" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="340" y="175" text-anchor="middle" font-size="11" fill="#475569">z_k … z_2k</text>
+
+  <rect x="400" y="118" width="220" height="70" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"></rect>
+  <text x="510" y="138" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">Low-level Predictor</text>
+  <line x1="400" y1="145" x2="620" y2="145" stroke="#cbd5e1" stroke-width="1"></line>
+  <text x="510" y="160" text-anchor="middle" font-size="11" fill="#475569">f_θ · frame-level dynamics</text>
+  <text x="510" y="175" text-anchor="middle" font-size="11" fill="#475569">z_2k … z_3k</text>
+
+
+  <line x1="60" y1="210" x2="280" y2="210" stroke="#e2e8f0" stroke-width="1"></line>
+  <text x="170" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+  <line x1="230" y1="210" x2="450" y2="210" stroke="#e2e8f0" stroke-width="1"></line>
+  <text x="340" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+  <line x1="400" y1="210" x2="620" y2="210" stroke="#e2e8f0" stroke-width="1"></line>
+  <text x="510" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">error bounded per interval</text>
+
+  <text x="340" y="258" text-anchor="middle" font-size="10.5" fill="#94a3b8">Subgoal boundaries act as re-anchor points · high-level plan persists across low-level noise</text>
+  <text x="340" y="273" text-anchor="middle" font-size="10.5" fill="#94a3b8">Error per interval: L_f^(N/K) vs free rollout: L_f^N where L_f = 1+λ is the predictor Lipschitz constant</text>
+</svg>

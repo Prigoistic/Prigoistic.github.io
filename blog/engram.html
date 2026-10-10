@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script>
+<title>Engram: Building a Vector Memory Engine in Rust — Priyam Ghosh</title><meta name="description" content="Engram is a Redis-wire-compatible vector-memory engine written in Rust with libc as its only dependency. This article walks through its event loop, SIMD kernels, HNSW index, persistence, worker pool, benchmarks, and remaining limitations."><link rel="canonical" href="https://prigoistic.me/blog/engram.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Engram: Building a Vector Memory Engine in Rust"><meta property="og:description" content="Engram is a Redis-wire-compatible vector-memory engine written in Rust with libc as its only dependency. This article walks through its event loop, SIMD kernels, HNSW index, persistence, worker pool, benchmarks, and remaining limitations."><meta property="og:url" content="https://prigoistic.me/blog/engram.html"><meta property="og:image" content="https://prigoistic.me/assets/covers/engram.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="alternate" type="text/markdown" href="https://prigoistic.me/blog/engram.md" title="Markdown"><link rel="icon" href="/images/icon.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="/assets/reading.js?v=3"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="document.querySelectorAll('.article-equation').forEach(el=>katex.render(el.textContent.trim(),el,{displayMode:true,throwOnError:false}));renderMathInElement(document.querySelector('.article-content'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script><script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" onload="mermaid.initialize({startOnLoad:true,theme:'neutral',securityLevel:'strict'});"></script><link rel="stylesheet" href="/assets/reading.css?v=4"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Engram: Building a Vector Memory Engine in Rust", "name": "Engram: Building a Vector Memory Engine in Rust", "description": "Engram is a Redis-wire-compatible vector-memory engine written in Rust with libc as its only dependency. This article walks through its event loop, SIMD kernels, HNSW index, persistence, worker pool, benchmarks, and remaining limitations.", "url": "https://prigoistic.me/blog/engram.html", "mainEntityOfPage": "https://prigoistic.me/blog/engram.html", "author": {"@type": "Person", "name": "Priyam Ghosh", "url": "https://prigoistic.me/"}, "image": "https://prigoistic.me/assets/covers/engram.jpg", "datePublished": "2026-06-16"}</script><link rel="stylesheet" href="/assets/site.css?v=1"></head><body class="reading-site"><a class="skip-link" href="#main-content">Skip to content</a><nav class="reading-nav" aria-label="Main navigation"><a class="brand" href="/index.html">Priyam Ghosh</a><div class="reading-links"><a href="/index.html">About</a><a href="/projects.html">Projects</a><a href="/experience.html">Experience</a><a href="/research.html">Research</a><a href="/blog.html" aria-current="page">Blogs</a><a href="/contact.html">Contact</a><a href="/resume/">Resume</a></div><button type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode"><svg class="theme-icon theme-icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg><svg class="theme-icon theme-icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.2A9 9 0 0 1 10.8 3.1a9 9 0 1 0 10.1 10.1Z"/></svg></button></nav><main id="main-content" class="reading-layout"><aside class="reading-toc" aria-label="Article contents"><details open><summary>On this page</summary><div data-toc-links><a href="#00-motivationwhy-build-this">00 / motivationWhy build this?</a><a href="#architecture">01 / architectureOne loop, a handful of descriptors</a><a href="#02-hot-pathsimd-distance-kernels">02 / hot pathSIMD distance kernels</a><a href="#03-the-indexhnsw-by-hand">03 / the indexHNSW, by hand</a><a href="#04-durabilitywrite-ahead-log-snapshot">04 / durabilityWrite-ahead log + snapshot</a><a href="#05-concurrencynon-blocking-search">05 / concurrencyNon-blocking search</a><a href="#06-honestywhat-i-d-do-differently">06 / honestyWhat I’d do differently</a><a href="#07-run-ittry-it-yourself">07 / run itTry it yourself</a></div></details></aside><div class="reading-document"><header class="article-header"><a class="back-to-blogs" href="/blog.html">← Blogs</a><h1>Engram: Building a Vector Memory Engine in Rust</h1><p class="article-deck">An associative vector-memory engine, handwritten in Rust from poll() up — event loop, SIMD kernels, an HNSW index, a crash-safe log, and a worker-pool reactor. Zero dependencies but libc.</p><dl class="article-meta"><div><dt>Author</dt><dd><a href="/index.html">Priyam Ghosh</a></dd></div><div><dt>Published</dt><dd><time datetime="2026-06-16">June 16, 2026</time></dd></div><div><dt>Reading time</dt><dd>7 min read</dd></div></dl><div class="article-tools" aria-label="Reading format"><button data-reading-mode="human" aria-pressed="true">Human</button><button data-reading-mode="agent" aria-pressed="false">[ Agent ]</button><a href="/blog/engram.md">Markdown ↗</a></div><p class="key-topics">Rust · vector search · HNSW · SIMD · Redis protocol</p></header><article class="article-content"><header>
+
+  <p class="lead">redis remembers keys.<br /><span class="hl">engram remembers meaning.</span></p>
+
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/Prigoistic/engram">view source →</a>
+    <a class="btn ghost" href="#architecture">read the design</a>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>~5.3k</b><span>lines of rust</span></div>
+  <div class="stat"><b>1</b><span>dependency · libc</span></div>
+  <div class="stat"><b>123</b><span>tests passing</span></div>
+  <div class="stat"><b>8.8×</b><span>simd over scalar</span></div>
+  <div class="stat"><b>1.00</b><span>recall@10</span></div>
+  <div class="stat"><b>&lt;0.6ms</b><span>p99 ping under load</span></div>
+</div>
+
+<h2 id="00-motivationwhy-build-this"><span class="num">00 / motivation</span>Why build this?</h2>
+<p>Every agent framework eventually bolts on a “memory” — a vector store you write embeddings to and query by similarity. In production you’d reach for <code>usearch</code>, <code>FAISS</code>, or <code>pgvector</code>, and you should. So why hand-roll one?</p>
+<p>Because the interesting research surface is the <em>retrieval primitive itself</em> — associative recall, energy-based memory, decay and consolidation — and off-the-shelf databases won’t let you touch it. <strong>engram</strong> is a substrate I fully control: a real, wire-compatible memory engine where the similarity core is mine to replace. The byproduct is a tour through the systems stack — multiplexing, SIMD, graph indexes, durability, concurrency — each built by hand and measured, not imported.</p>
+<div class="callout">It speaks <strong>RESP2</strong>, the Redis wire protocol, so <code>redis-cli</code>, <code>redis-benchmark</code>, and every Redis client library talk to it unchanged.</div>
+
+<h2 id="architecture"><span class="num">01 / architecture</span>One loop, a handful of descriptors</h2>
+<p>The whole engine is driven by readiness on a few file descriptors through a single <code>poll()</code>. Here is the stack — and the idea that holds it together is that <em>everything</em>, including cross-thread search completions, enters through that same loop.</p>
+
+<div class="stack">
+  <div class="layer l-loop"><span class="lname">event loop · i/o multiplexer</span><div class="ldesc">one <code>poll()</code> over kqueue (macOS) / epoll (Linux) — watches the listener, every client socket, and a self-pipe</div></div>
+  <div class="layer"><span class="lname">server</span><div class="ldesc">accept · per-connection read buffers · in-order reply tracking</div></div>
+  <div class="layer indent"><span class="lname">resp2 codec + command dispatch</span><div class="ldesc">parse <code>argv</code>, arity-check, route to a handler — key-value commands run inline</div></div>
+  <div class="layer indent"><span class="lname">vector engine</span><div class="ldesc">simd kernels (neon/avx2/scalar) · hnsw graph index · registry behind an <code>RwLock</code></div></div>
+  <div class="layer indent"><span class="lname">search worker pool</span><div class="ldesc">VSEARCH runs off the loop; results return through the self-pipe</div></div>
+  <div class="layer indent"><span class="lname">persistence</span><div class="ldesc">crc-framed fsync’d wal · compacting snapshot loaded via <code>mmap</code></div></div>
+</div>
+
+<h3>Everything is a file descriptor</h3>
+<p>The multiplexer exposes two operations — <code>subscribe(fd)</code> and <code>poll()</code> — and over the engine’s lifetime exactly three kinds of fd are ever registered. That set <em>is</em> the architecture.</p>
+<table>
+  <tr><th>subscribed fd</th><th>readiness means</th></tr>
+  <tr><td class="mono">listener socket</td><td>a new client is waiting → <code>accept()</code></td></tr>
+  <tr><td class="mono">client socket</td><td>bytes arrived → parse &amp; dispatch commands</td></tr>
+  <tr><td class="mono">self-pipe</td><td>a worker finished a search → write its reply</td></tr>
+</table>
+
+<h2 id="02-hot-pathsimd-distance-kernels"><span class="num">02 / hot path</span>SIMD distance kernels</h2>
+<p>Similarity search spends nearly all its time in one inner loop: the dot product / squared-L2 between a query and stored vectors. So that loop is hand-written with SIMD intrinsics and chosen at runtime — <strong>NEON</strong> on Apple Silicon, <strong>AVX2 + FMA</strong> on x86-64, scalar elsewhere. The scalar version stays as the oracle the SIMD paths are tested against.</p>
+<pre><code>#[cfg(target_arch = "aarch64")]
+pub fn dot(a: &amp;[f32], b: &amp;[f32]) -> f32 {
+    // SAFETY: NEON is baseline on AArch64, always available.
+    unsafe { dot_neon(a, b) }      // 4 x 128-bit FMA accumulators / iter
+}
+
+#[cfg(target_arch = "x86_64")]
+pub fn dot(a: &amp;[f32], b: &amp;[f32]) -> f32 {
+    if is_x86_feature_detected!("avx2") &amp;&amp; is_x86_feature_detected!("fma") {
+        unsafe { dot_avx2(a, b) }  // guarded by runtime detection
+    } else { dot_scalar(a, b) }
+}</code></pre>
+<div class="bars">
+  <div class="bar-row"><span class="bar-label">scalar</span><div class="bar"><div class="bar-fill slow" style="width:100%">47.9 ms</div></div></div>
+  <div class="bar-row"><span class="bar-label">neon</span><div class="bar"><div class="bar-fill" style="width:11.3%">5.4 ms</div></div></div>
+</div>
+<p class="mut" style="font-size:.86rem">100,000 × 768-dim dot products. <strong style="color:var(--ink)">8.85× faster</strong>, ~28 GFLOP/s — bit-comparable to the scalar reference across every vector length, including the remainder/tail paths.</p>
+
+<h2 id="03-the-indexhnsw-by-hand"><span class="num">03 / the index</span>HNSW, by hand</h2>
+<p>Exact nearest-neighbour search is a linear scan — fine as a correctness oracle, too slow at scale. The approximate index is a from-scratch <strong>Hierarchical Navigable Small World</strong> graph: a stack of layers where upper layers are sparse “express lanes” and the bottom holds everyone. A query greedily descends from the top entry point, then runs a breadth-bounded search at the base.</p>
+
+<figure style="margin:24px 0">
+<svg class="fig" viewBox="0 0 640 280" role="img" aria-label="HNSW layered graph">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1f6f5c"/></marker>
+    <style>
+      .ly{fill:#a39e92;font:500 12px "JetBrains Mono",ui-monospace,monospace}
+      .nd{fill:#f5f3ec;stroke:#cdc7b8;stroke-width:1.5}
+      .ed{stroke:#e0dccf;stroke-width:1.4}
+      .path{stroke:#1f6f5c;stroke-width:2.4;fill:none;marker-end:url(#ar)}
+      .hot{fill:#1f6f5c;stroke:#fff;stroke-width:2}
+      .tgt{fill:#cf7a2b;stroke:#fff;stroke-width:2}
+      .lbl{fill:#76726a;font:500 11px "JetBrains Mono",ui-monospace,monospace}
+    </style>
+  </defs>
+  <text x="14" y="44" class="ly">L2</text>
+  <line x1="120" y1="40" x2="470" y2="40" class="ed"/>
+  <circle cx="120" cy="40" r="10" class="nd hot"/>
+  <circle cx="470" cy="40" r="10" class="nd"/>
+  <text x="86" y="26" class="lbl">entry</text>
+  <text x="14" y="134" class="ly">L1</text>
+  <line x1="120" y1="130" x2="540" y2="130" class="ed"/>
+  <circle cx="120" cy="130" r="10" class="nd"/>
+  <circle cx="260" cy="130" r="10" class="nd hot"/>
+  <circle cx="400" cy="130" r="10" class="nd"/>
+  <circle cx="540" cy="130" r="10" class="nd"/>
+  <text x="14" y="234" class="ly">L0</text>
+  <line x1="80" y1="230" x2="600" y2="230" class="ed"/>
+  <line x1="200" y1="230" x2="300" y2="205" class="ed"/>
+  <line x1="300" y1="205" x2="420" y2="230" class="ed"/>
+  <circle cx="80" cy="230" r="9" class="nd"/>
+  <circle cx="200" cy="230" r="9" class="nd"/>
+  <circle cx="300" cy="205" r="9" class="nd tgt"/>
+  <circle cx="420" cy="230" r="9" class="nd"/>
+  <circle cx="520" cy="230" r="9" class="nd"/>
+  <circle cx="600" cy="230" r="9" class="nd"/>
+  <text x="262" y="262" class="lbl">k-nn result</text>
+  <path class="path" d="M120,52 L255,120"/>
+  <path class="path" d="M260,142 L298,193"/>
+</svg>
+<figcaption>greedy descent through the layers, then a breadth-bounded search at L0</figcaption>
+</figure>
+
+<p>The implementation follows Malkov &amp; Yashunin (2018): the <code>search_layer</code> routine, the neighbour-selection heuristic (keep a candidate only if it’s closer to the base than to any already-chosen neighbour, with kept-pruned backfill), and bidirectional linking with degree pruning. Deletes are tombstones; <code>VSAVE</code> compacts them away.</p>
+<div class="callout">Measured <strong>recall@10 = 1.00</strong> against the exhaustive scan on a held-out query set — the graph returns exactly what brute force would, far faster.</div>
+
+<h2 id="04-durabilitywrite-ahead-log-snapshot"><span class="num">04 / durability</span>Write-ahead log + snapshot</h2>
+<p>Persistence follows the shape of Redis’ AOF + RDB. Every mutation is appended to a <strong>write-ahead log</strong> and flushed; a periodic <strong>snapshot</strong> captures live state so the log can be truncated. The log is the source of truth — a crash loses nothing committed.</p>
+
+<h3>Each record is self-describing</h3>
+<div style="display:flex;gap:5px;font-family:var(--mono);font-size:.76rem;margin:16px 0;flex-wrap:wrap">
+  <div style="flex:1;min-width:84px;background:var(--accent-soft);border:1px solid #c2dcd3;border-radius:7px 0 0 7px;padding:13px;text-align:center;color:#2c2a24">crc-32<br><span class="mut">u32</span></div>
+  <div style="flex:1;min-width:84px;background:#fff;border:1px solid var(--line2);padding:13px;text-align:center">length<br><span class="mut">u32</span></div>
+  <div style="flex:3;min-width:150px;background:#fff;border:1px solid var(--line2);border-radius:0 7px 7px 0;padding:13px;text-align:center">payload · op + length-prefixed fields</div>
+</div>
+<p>On replay, records are read until one is short or fails its checksum — the exact signature of a write torn by a crash. Everything up to that point is durable and is replayed; the torn tail is discarded. The snapshot is written to a temp file and <code>rename</code>d into place (atomic), then loaded back through a read-only <code>mmap</code>.</p>
+
+<pre class="mermaid">
+flowchart LR
+  A([boot]) --> B{snapshot?}
+  B -- yes --> C[mmap-load<br/>rebuild graph]
+  B -- no --> D[empty registry]
+  C --> E[replay WAL on top]
+  D --> E
+  E --> F([ready])
+</pre>
+<div class="callout">Validated the brutal way: write data, <code>kill -9</code> the process mid-flight (no clean shutdown), restart — WAL replay reconstructs the full index, dead keys stay dead, and a post-snapshot crash recovers from snapshot + tail.</div>
+
+<h2 id="05-concurrencynon-blocking-search"><span class="num">05 / concurrency</span>Non-blocking search</h2>
+<p>The loop is single-threaded — perfect for key-value ops that finish in nanoseconds. But an HNSW walk over millions of vectors takes milliseconds, long enough to stall every other client. So <code>VSEARCH</code> is the one command pushed off the loop, onto a pool of worker threads that read the registry under a shared lock.</p>
+<p>The elegant part: there is no second event system. A worker writes one byte to a <strong>self-pipe</strong>, whose read end is subscribed to the <em>same</em> multiplexer. The loop wakes for “search done” exactly the way it wakes for “socket readable.”</p>
+
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Client A
+  participant L as Event loop
+  participant W as Worker pool
+  participant P as Self-pipe
+  C->>L: VSEARCH index q k
+  L->>W: enqueue job, mark conn busy
+  Note over L: loop keeps serving<br/>other clients
+  W->>W: read-lock registry, walk HNSW
+  W->>P: write 1 byte
+  P-->>L: pipe readable, poll() returns
+  L->>C: write reply, clear busy
+</pre>
+<p>A connection with a search in flight is marked <em>busy</em> so its later commands don’t overtake the pending reply — per-connection ordering is preserved while every other connection runs free. A monotonic connection id guards against a worker’s result landing on a different client that reused the same fd.</p>
+
+<div class="bars">
+  <div class="bar-row"><span class="bar-label">1 client</span><div class="bar"><div class="bar-fill" style="width:17.6%">681 q/s</div></div></div>
+  <div class="bar-row"><span class="bar-label">8 clients</span><div class="bar"><div class="bar-fill" style="width:100%">3,859 q/s</div></div></div>
+</div>
+<p class="mut" style="font-size:.86rem"><strong style="color:var(--ink)">5.7× parallel speedup</strong>, and during the storm <code>PING</code> stayed at <strong style="color:var(--ink)">0.06 ms median / 0.57 ms max</strong> — the event loop never head-of-line-blocks behind a search.</p>
+
+<h2 id="06-honestywhat-i-d-do-differently"><span class="num">06 / honesty</span>What I’d do differently</h2>
+<p>Being honest about the gaps is the point — these are the difference between “correct and fast enough to demo” and “saturates a NIC at p99.”</p>
+<ul class="tick cross">
+  <li>One global <code>RwLock</code> over the registry — a single insert stalls all readers. Per-index locks or an epoch / arc-swap read path would fix it.</li>
+  <li>The WAL <code>fsync</code>s on every write. Real systems group-commit, or offer an <code>everysec</code> durability tier.</li>
+  <li><code>search_layer</code> clones the neighbour list each hop and allocates a fresh visited-set per query — a reused, versioned visited array removes both.</li>
+  <li>Vectors are raw <code>f32</code> with no quantization (PQ/SQ would cut memory 4–32×), and the live store is heap-resident — serving reads straight from a persistent <code>mmap</code> is the natural next step.</li>
+  <li>Single-node, single-reactor: no sharding, no write-backpressure handling.</li>
+</ul>
+<div class="callout warn">None are conceptually hard — they’re the next tier. Knowing where your own system breaks is the actual engineering.</div>
+
+<h2 id="07-run-ittry-it-yourself"><span class="num">07 / run it</span>Try it yourself</h2>
+<pre><code>cargo run -- --dir ./data        # start with persistence on :6380
+
+redis-cli -p 6380 VNEW mem 4 METRIC l2     # create a 4-dim index
+redis-cli -p 6380 VSEARCH mem &lt;query&gt; 10   # 10 nearest keys + distances
+redis-cli -p 6380 VSAVE                    # snapshot + truncate the WAL</code></pre>
+<p>Commands: <code>VNEW · VADD · VSEARCH · VDEL · VINFO · VSAVE</code>, alongside the classic <code>GET / SET / DEL / INCR / …</code> key-value set. Vectors travel on the wire as packed little-endian <code>f32</code> bulk strings.</p>
+
+<footer>
+  built in rust · <a href="https://github.com/Prigoistic/engram">github.com/Prigoistic/engram</a> · apache-2.0
+</footer>
+
+</article><section class="agent-panel" data-markdown="/blog/engram.md?v=913b7575d04b" aria-label="Markdown article" hidden><div class="agent-actions"><button data-copy-markdown>Copy Markdown</button><span data-agent-status role="status"></span></div><pre tabindex="0"></pre></section></div></main><footer class="reading-footer"><span>© 2026 Priyam Ghosh</span><a href="/blog.md">Writing in Markdown</a></footer></body></html>
