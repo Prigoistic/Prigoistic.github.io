@@ -1,0 +1,116 @@
+[
+  {
+    "asset": "/assets/covers/intelligence-between-things.jpg",
+    "source_asset": "audubon-swallow-source.jpg",
+    "title": "Bank Swallow and Violet-green Swallow",
+    "creator": "Robert Havell after John James Audubon",
+    "date": 1837,
+    "collection": "National Gallery of Art, Gift of Mrs. Walter B. James, 1945.8.385",
+    "source": "https://www.nga.gov/artworks/32526-bank-swallow-and-violet-green-swallow",
+    "original": "https://api.nga.gov/iiif/0a56f71d-b0dc-4adb-aadd-9edc0f13ff0a/full/1600,/0/default.jpg",
+    "license": "CC0 / public domain",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "One flying bird cropped, pale background removed, rotated and combined with an original Canvas flock, rust sun, and paper texture.",
+    "source_script": "scripts/paint-intelligence.cjs"
+  },
+  {
+    "asset": "external-hypergraph.svg",
+    "title": "Hypergraph",
+    "creator": "Kilom691",
+    "source": "https://commons.wikimedia.org/wiki/File:Hypergraph.svg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Hypergraph.svg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "changes": "Added viewBox scaling metadata; drawing unchanged. This asset remains CC BY-SA 3.0."
+  },
+  {
+    "asset": "attractor-recall-study.png",
+    "displayed_asset": "attractor-recall-basins.png",
+    "creator": "Suchitra Sampath and Vipin Srivastava",
+    "title": "Figure 5: Distribution of basins of attraction before and after orthogonalization",
+    "source": "https://doi.org/10.1371/journal.pone.0238054.g005",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Displayed version is cropped to panel A. Full original retained unchanged."
+  },
+  {
+    "embed": "https://www.youtube-nocookie.com/embed/16W7c0mb-rE",
+    "title": "Emergence: How Stupid Things Become Smart Together",
+    "creator": "Kurzgesagt – In a Nutshell",
+    "source": "https://www.youtube.com/watch?v=16W7c0mb-rE",
+    "reuse": "Official embedded player. Video is not copied or rehosted."
+  },
+  {
+    "asset": "nested-events.mp4",
+    "creator": "Original illustration for Priyam Ghosh’s essay",
+    "source_script": "scripts/animate-nested-events.cjs",
+    "duration_seconds": 12,
+    "description": "Giving event, remembered event, belief about that memory. Silent, captioned MP4."
+  },
+  {
+    "asset": "memory-flow.mp4",
+    "portrait_asset": "memory-flow-mobile.mp4",
+    "creator": "Original illustration for Priyam Ghosh’s essay",
+    "source_script": "scripts/animate-memory-flow.cjs",
+    "duration_seconds": 16,
+    "description": "A schematic of sparse retrieval, active reasoning and checked write-back, with a separate portrait composition."
+  },
+  {
+    "asset": "planarian-experiments-full.png",
+    "displayed_assets": [
+      "planarian-regeneration-normal.png",
+      "planarian-regeneration-altered.png"
+    ],
+    "title": "Figure 2: Diagrams of the main planarian regeneration experiments found in the literature",
+    "creator": "Daniel Lobo, Wendy S. Beane and Michael Levin",
+    "source": "https://doi.org/10.1371/journal.pcbi.1002481.g002",
+    "original": "https://journals.plos.org/ploscompbiol/article/figure/image?size=large&id=10.1371/journal.pcbi.1002481.g002",
+    "license": "Creative Commons Attribution (as stated in the source article)",
+    "license_url": "https://journals.plos.org/ploscompbiol/s/licenses-and-copyright",
+    "changes": "Displayed crops isolate the first example in panel A and panel D. Original image retained unchanged.",
+    "crops_xyxy": {
+      "planarian-regeneration-normal.png": [
+        0,
+        60,
+        615,
+        520
+      ],
+      "planarian-regeneration-altered.png": [
+        0,
+        1170,
+        730,
+        1635
+      ]
+    }
+  },
+  {
+    "asset": "starling-murmuration.jpg",
+    "title": "A murmuration of starlings at Gretna",
+    "creator": "Walter Baxter",
+    "source": "https://www.geograph.org.uk/photo/2687912",
+    "via": "https://commons.wikimedia.org/wiki/File:Starling_murmuration.jpg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Starling_murmuration.jpg",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "changes": "None. Original image retained unchanged."
+  },
+  {
+    "asset": "visual-memory-experiment.png",
+    "title": "Figure 1: Working memory task conditions, trial types, and TMS procedures",
+    "creator": "Mrugank Dake and Clayton E. Curtis",
+    "source": "https://www.nature.com/articles/s41467-025-57882-8/figures/1",
+    "original": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-025-57882-8/MediaObjects/41467_2025_57882_Fig1_HTML.png",
+    "license": "CC BY-NC-ND 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "changes": "None. Full original figure reproduced unchanged for the non-commercial essay."
+  },
+  {
+    "embed": "https://www.youtube-nocookie.com/embed/2hcsmtkSzIw",
+    "title": "Can humans make AI any better?",
+    "creator": "Welch Labs",
+    "source": "https://www.youtube.com/watch?v=2hcsmtkSzIw",
+    "technical_notes": "https://www.welchlabs.com/blog/2026/1/31/the-bitter-lesson-video-technical-notes",
+    "relevant_section": "00:00–04:39: HARPY",
+    "reuse": "Official embedded player, manual playback. Video is not copied or rehosted."
+  }
+]

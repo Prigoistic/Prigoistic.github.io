@@ -1,0 +1,12 @@
+{
+  "name": "prigoistic-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "python3 scripts/check_writing.py && node scripts/check_essay.mjs",
+    "diagrams": "node scripts/render-essay-diagrams.mjs"
+  },
+  "dependencies": {
+    "pele": "^1.12.0"
+  }
+}

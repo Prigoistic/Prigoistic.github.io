@@ -62,6 +62,8 @@ class Markdown:
             return re.sub(r'\s+', ' ', n)
         tag, attrs = n.tag, n.attrs
         classes = attrs.get('class', '').split()
+        if 'data-playground-ui' in attrs:
+            return ''  # The static example and caption describe the playground in Agent mode.
         if tag in {'script', 'style', 'button', 'nav', 'defs'} or 'article-code-header' in classes:
             return ''
         if tag == 'svg':
@@ -95,6 +97,28 @@ class Markdown:
             return f'\n\n{fence}{language}\n{raw}\n{fence}\n\n'
         if tag == 'img':
             return f'![{attrs.get("alt", "Figure")}]({urljoin(self.item["canonical"], attrs["src"])})'
+        if tag in {'video', 'iframe'}:
+            source = attrs.get('src')
+            if not source:
+                media = next(n.find(lambda child: child.tag == 'source' and child.attrs.get('src')), None)
+                source = media.attrs['src'] if media else None
+            label = attrs.get('title') or attrs.get('aria-label') or 'Video'
+            return f'\n\n[{label}]({urljoin(self.item["canonical"], source)})\n\n' if source else self.children(n)
+        if tag == 'dl':
+            entries, term = [], ''
+            for child in n.children:
+                if not isinstance(child, Node):
+                    continue
+                if child.tag == 'dt':
+                    term = self.children(child).strip().rstrip(':')
+                elif child.tag == 'dd':
+                    value = self.children(child).strip()
+                    prefix = f'**{term}:** ' if term else ''
+                    entries.append('- ' + prefix + value)
+            return '\n\n' + '\n'.join(entries) + '\n\n'
+        if tag == 'div' and 'memory-exchange' in classes:
+            lines = [self.render(child).strip() for child in n.children]
+            return '\n\n' + '\n\n'.join(line for line in lines if line) + '\n\n'
         if tag == 'table':
             rows = list(n.find(lambda x: x.tag == 'tr'))
             cells = [[self.render(c).strip().replace('|', '\\|').replace('\n', '<br>') for c in row.children if isinstance(c, Node) and c.tag in {'td','th'}] for row in rows]

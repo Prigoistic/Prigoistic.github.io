@@ -68,7 +68,7 @@ for item in items:
         target = local_path(link, markdown)
         if target is not None:
             check(target.exists(), f'{markdown.name}: missing Markdown asset/link {link}')
-for diagram in (ROOT/'assets/diagrams').rglob('*.svg'):
+for diagram in (ROOT/'assets').rglob('*.svg'):
     try:
         svg = ET.parse(diagram).getroot()
         check('viewBox' in svg.attrib, f'{diagram}: missing SVG viewBox')

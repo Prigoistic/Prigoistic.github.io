@@ -2,6 +2,7 @@
 
 Essays on memory, neuroscience, mathematics, and building software.
 
+- [Intelligence between things](https://prigoistic.me/blog/intelligence-between-things.html) — [Markdown](https://prigoistic.me/blog/intelligence-between-things.md)
 - [Why World Models Need Memory](https://prigoistic.me/mapa/) — [Markdown](https://prigoistic.me/mapa/index.md)
 - [Cheeger: Learning to Segment by Cutting Graphs](https://prigoistic.me/blog/cheeger.html) — [Markdown](https://prigoistic.me/blog/cheeger.md)
 - [Engram: Building a Vector Memory Engine in Rust](https://prigoistic.me/blog/engram.html) — [Markdown](https://prigoistic.me/blog/engram.md)

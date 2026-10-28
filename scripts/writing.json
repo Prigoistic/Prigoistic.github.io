@@ -1,5 +1,22 @@
 [
   {
+    "path": "blog/intelligence-between-things.html",
+    "title": "Intelligence between things",
+    "cover": "intelligence-between-things",
+    "published": "2026-10-28",
+    "date": "October 28, 2026",
+    "topics": [
+      "distributed cognition",
+      "bioelectricity",
+      "associative memory",
+      "hypergraphs",
+      "sparse inference"
+    ],
+    "canonical": "https://prigoistic.me/blog/intelligence-between-things.html",
+    "minutes": 45,
+    "description": "An essay on distributed cognition, bioelectricity and memory, and a testable proposal for learning persistent relations and reasoning through sparse local activation."
+  },
+  {
     "path": "mapa/index.html",
     "title": "Why World Models Need Memory",
     "cover": "mapa",
