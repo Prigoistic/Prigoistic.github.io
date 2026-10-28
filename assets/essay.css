@@ -14,6 +14,12 @@
 .essay-body-grid{display:grid;grid-template-columns:160px minmax(0,720px);gap:50px;justify-content:center;align-items:start}
 .essay-body-grid>.reading-toc{top:26px;font-size:11px;max-height:calc(100dvh - 52px)}
 .essay-body-grid>.article-content{font-size:18px;line-height:1.9;overflow-wrap:break-word}
+/* Prose emphasis stays inline, with stronger weight and warm, legible italics. */
+.essay-document{--essay-italic:#843b26}
+.essay-document[data-theme=dark]{--essay-italic:#efc3a1}
+.reading-site .essay-body-grid>.article-content>section:not(.essay-sources)>p em{font-style:italic;font-weight:500;color:var(--essay-italic)}
+.reading-site .essay-body-grid>.article-content>section:not(.essay-sources)>p strong{font-weight:650;color:var(--ink)}
+.reading-site .essay-body-grid>.article-content>section:not(.essay-sources)>p strong em{font-weight:600}
 .reading-site .essay-body-grid .article-content p{margin:0 0 22px}
 .reading-site .essay-body-grid .article-content h2{font-size:30px;font-weight:500;letter-spacing:-.8px;line-height:1.3;margin:62px 0 24px;text-wrap:balance}
 .reading-site .essay-body-grid .article-content>section:first-child h2{margin-top:0}
